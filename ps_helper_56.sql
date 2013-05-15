@@ -280,6 +280,7 @@ SELECT IF(id IS NULL,
   JOIN performance_schema.threads USING (thread_id)
   LEFT JOIN information_schema.processlist ON processlist_id = id
  WHERE object_name IS NOT NULL
+   AND event_name LIKE 'wait/io/file/%'
  ORDER BY timer_start;
 
 /*
