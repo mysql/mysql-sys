@@ -5,6 +5,8 @@ CREATE DATABASE IF NOT EXISTS ps_helper DEFAULT CHARACTER SET utf8;
 
 USE ps_helper;
 
+CREATE OR REPLACE VIEW version AS SELECT '1.0.1';
+
 /*
  * Function: format_bytes()
  * 
@@ -104,7 +106,7 @@ DROP FUNCTION IF EXISTS format_time;
 
 DELIMITER $$
 
-CREATE FUNCTION format_time(picoseconds BIGINT)
+CREATE FUNCTION format_time(picoseconds BIGINT UNSIGNED)
   RETURNS VARCHAR(16) CHARSET UTF8 DETERMINISTIC
 BEGIN
   IF picoseconds IS NULL THEN RETURN NULL;
