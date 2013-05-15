@@ -996,19 +996,19 @@ SELECT pst.object_schema AS table_schema,
        format_time(SUM(fsbi.sum_timer_write)) AS io_write_latency,
        SUM(fsbi.count_misc) AS io_misc_requests,
        format_time(SUM(fsbi.sum_timer_misc)) AS io_misc_latency,
-       format_bytes(SUM(IF(ibp.compressed_size = 0, 16384, compressed_size))) AS innodb_buffer_allocated,
-       format_bytes(SUM(ibp.data_size)) AS innodb_buffer_data,
-       COUNT(ibp.page_number) AS innodb_buffer_pages,
-       COUNT(IF(ibp.is_hashed = 'YES', 1, 0)) AS innodb_buffer_pages_hashed,
-       COUNT(IF(ibp.is_old = 'YES', 1, 0)) AS innodb_buffer_pages_old,
-       ROUND(SUM(ibp.number_records)/COUNT(DISTINCT ibp.index_name)) AS innodb_buffer_rows_cached
+       ibp.innodb_buffer_allocated,
+       ibp.innodb_buffer_data,
+       ibp.innodb_buffer_pages,
+       ibp.innodb_buffer_pages_hashed,
+       ibp.innodb_buffer_pages_old,
+       ibp.innodb_buffer_rows_cached
   FROM performance_schema.table_io_waits_summary_by_table AS pst
   LEFT JOIN performance_schema.file_summary_by_instance AS fsbi
     ON pst.object_schema = extract_schema_from_file_name(fsbi.file_name)
    AND pst.object_name = extract_table_from_file_name(fsbi.file_name)
-  LEFT JOIN information_schema.innodb_buffer_page AS ibp
-    ON pst.object_schema = REPLACE(SUBSTRING_INDEX(ibp.table_name, '.', 1), '`', '')
-   AND pst.object_name = REPLACE(SUBSTRING_INDEX(ibp.table_name, '.', -1), '`', '')
+  LEFT JOIN ps_helper.innodb_buffer_statistics_by_table AS ibp
+    ON pst.object_schema = ibp.object_schema
+   AND pst.object_name = ibp.object_name
  GROUP BY pst.object_schema, pst.object_name
  ORDER BY pst.sum_timer_wait DESC;
  
