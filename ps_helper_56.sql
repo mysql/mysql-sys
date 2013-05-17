@@ -1329,6 +1329,7 @@ DROP PROCEDURE IF EXISTS only_enable;
 DELIMITER $$
 
 CREATE PROCEDURE only_enable(IN pattern VARCHAR(128))
+    COMMENT 'Parameters: pattern (varchar(128))'
 BEGIN
     UPDATE performance_schema.setup_instruments
        SET enabled = IF(name LIKE pattern, 'YES', 'NO'),
@@ -1507,6 +1508,7 @@ DROP PROCEDURE IF EXISTS currently_enabled;
 DELIMITER $$
 
 CREATE PROCEDURE currently_enabled(IN show_instruments BOOLEAN, IN show_threads BOOLEAN)
+    COMMENT 'Parameters: show_instruments (boolean), show_threads (boolean)'
 BEGIN
     SELECT @@performance_schema AS performance_schema_enabled;
 
@@ -1556,7 +1558,8 @@ DROP PROCEDURE IF EXISTS truncate_all;
 
 DELIMITER $$
 
-CREATE PROCEDURE truncate_all(IN verbose INT)
+CREATE PROCEDURE truncate_all(IN verbose BOOLEAN)
+    COMMENT 'Parameters: verbose (boolean)'
 BEGIN
     DECLARE v_done INT DEFAULT FALSE;
     DECLARE v_ps_table VARCHAR(64);
@@ -1622,6 +1625,7 @@ DROP PROCEDURE IF EXISTS dump_thread_stack;
 DELIMITER $$
 
 CREATE PROCEDURE dump_thread_stack(IN thd_id INT, IN debug BOOLEAN)
+    COMMENT 'Parameters: thd_id (int), debug (boolean)'
 BEGIN
 
     /* Do not track the current thread, it will kill the stack */
@@ -1854,6 +1858,7 @@ DELIMITER $$
 
 CREATE PROCEDURE analyze_statement_digest(IN digest_in VARCHAR(32), IN runtime INT, 
     IN interval_in DECIMAL(2,2), IN start_fresh BOOLEAN, IN auto_enable BOOLEAN)
+    COMMENT "Parameters: digest_in (varchar(32)), runtime (int), interval_in (decimal(2,2)), start_fresh (boolean), auto_enable (boolean)"
 BEGIN
 
     DECLARE v_start_fresh BOOLEAN DEFAULT false;
