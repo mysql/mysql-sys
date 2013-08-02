@@ -1858,7 +1858,7 @@ DELIMITER $$
 
 CREATE PROCEDURE analyze_statement_digest(IN digest_in VARCHAR(32), IN runtime INT, 
     IN interval_in DECIMAL(2,2), IN start_fresh BOOLEAN, IN auto_enable BOOLEAN)
-    COMMENT "Parameters: digest_in (varchar(32)), runtime (int), interval_in (decimal(2,2)), start_fresh (boolean), auto_enable (boolean)"
+    COMMENT 'Parameters: digest_in (varchar(32)), runtime (int), interval_in (decimal(2,2)), start_fresh (boolean), auto_enable (boolean)'
 BEGIN
 
     DECLARE v_start_fresh BOOLEAN DEFAULT false;
