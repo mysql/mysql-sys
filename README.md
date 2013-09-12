@@ -10,7 +10,7 @@ For instance if you download to /tmp/dbahelper/ you should:
 cd /tmp/dbahelper/
 mysql -u user -p < ./ps_helper_<version>.sql
 
-Of if you would like to log in to the client:
+Or if you would like to log in to the client:
 
 cd /tmp/dbahelper/
 mysql -u user -p 
