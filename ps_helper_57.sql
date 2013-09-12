@@ -27,7 +27,7 @@ SOURCE ./views/i_s/innodb_buffer_stats_by_table.sql
 SOURCE ./views/i_s/schema_object_overview.sql
 
 SOURCE ./views/p_s/check_lost_instrumentation.sql
-SOURCE ./views/p_s/processlist.sql
+SOURCE ./views/p_s/processlist_57.sql
 
 SOURCE ./views/p_s/latest_file_io.sql
 SOURCE ./views/p_s/io_by_thread_by_latency.sql
@@ -35,6 +35,10 @@ SOURCE ./views/p_s/io_global_by_file_by_bytes.sql
 SOURCE ./views/p_s/io_global_by_file_by_latency.sql
 SOURCE ./views/p_s/io_global_by_wait_by_bytes.sql
 SOURCE ./views/p_s/io_global_by_wait_by_latency.sql
+
+SOURCE ./views/p_s/memory_by_user.sql
+SOURCE ./views/p_s/memory_global_by_current_allocated.sql
+SOURCE ./views/p_s/memory_global_total.sql
 
 SOURCE ./views/p_s/schema_index_statistics.sql
 SOURCE ./views/p_s/schema_table_statistics.sql
@@ -49,7 +53,7 @@ SOURCE ./views/p_s/statements_with_runtimes_in_95th_percentile.sql
 SOURCE ./views/p_s/statements_with_sorting.sql
 SOURCE ./views/p_s/statements_with_temp_tables.sql
 
-SOURCE ./views/p_s/user_summary.sql
+SOURCE ./views/p_s/user_summary_57.sql
 SOURCE ./views/p_s/user_summary_by_statement_type.sql
 SOURCE ./views/p_s/user_summary_by_stages.sql
 
@@ -59,4 +63,3 @@ SOURCE ./views/p_s/waits_by_user_by_latency.sql
 SOURCE ./views/p_s/waits_global_by_latency.sql
 
 SOURCE ./after_setup.sql
-
