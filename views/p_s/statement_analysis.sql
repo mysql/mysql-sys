@@ -5,22 +5,18 @@
  * mimics the MySQL Enterprise Monitor Query Analysis view,
  * ordered by the total execution time per normalized statement
  * 
- * mysql> select * from statement_analysis where query IS NOT NULL limit 10;
- * +-------------------------------------------------------------------+-----------+------------+-----------+------------+---------------+-------------+-------------+-----------+---------------+--------------+----------------------------------+
- * | query                                                             | full_scan | exec_count | err_count | warn_count | total_latency | max_latency | avg_latency | rows_sent | rows_sent_avg | rows_scanned | digest                           |
- * +-------------------------------------------------------------------+-----------+------------+-----------+------------+---------------+-------------+-------------+-----------+---------------+--------------+----------------------------------+
- * | COMMIT                                                            |           |      14477 |         0 |          0 | 2.68 s        | 319.99 ms   | 185.07 µs   |         0 |             0 |            0 | 08467ba5a1c5748b32cd7518509ef9a9 |
- * | SELECT `maptimeser0_` . `id` A ...  `maptimeser0_` . `hash` = ?   |           |       2190 |         0 |          0 | 399.22 ms     | 12.85 ms    | 182.09 µs   |      2190 |             1 |         2190 | a39256afecc105bb49acb266134f00be |
- * | SELECT `environmen0_` . `hid`  ... 393_0_` , `environmen0_` . ... |           |        996 |         0 |          0 | 347.44 ms     | 8.91 ms     | 348.61 µs   |       996 |             1 |          996 | ecea708cfd3d0909be4dedf676798e56 |
- * | SELECT `mysqlserve0_` . `hid`  ... , `mysqlserve0_` . `os` AS ... | *         |       1080 |         0 |          0 | 337.56 ms     | 6.49 ms     | 312.53 µs   |      1572 |             1 |         1572 | e9eac5233c5cb73ecb2e336283da0f55 |
- * | SELECT `this_` . `instance_att ... his_` . `attribute_id` = ? )   |           |       1070 |         0 |          0 | 201.62 ms     | 2.01 ms     | 188.38 µs   |         2 |             0 |            2 | 971dc9b0e9a864b40b1218ecf00ec66d |
- * | SELECT `identityna0_` . `id` A ... RE `identityna0_` . `id` = ?   |           |       1074 |         0 |          0 | 158.70 ms     | 7.43 ms     | 147.66 µs   |         0 |             0 |            0 | 0c55d5168c602404fdcd414ced10e2ee |
- * | SELECT `mysqlserve2_` . `hid`  ... ` WHERE `agent0_` . `id` = ?   | *         |        518 |         0 |          0 | 143.75 ms     | 2.65 ms     | 277.43 µs   |      1036 |             2 |         2072 | 3a0b0da99b4faaceb4ce7ecea64cd2ed |
- * | SELECT `agent0_` . `hid` AS `h ... ventory` . `Agent` `agent0_`   | *         |        510 |         0 |          0 | 115.21 ms     | 3.50 ms     | 225.79 µs   |       510 |             1 |          510 | 0d705eeb9f631f35f08bb828a995e0b8 |
- * | SELECT `network_in2_` . `hid`  ... WHERE `network0_` . `id` = ?   |           |        522 |         0 |          0 | 98.86 ms      | 422.11 µs   | 189.37 µs   |       108 |             0 |          216 | dc23c65f7d6201455c9da09214ca8bc9 |
- * | SELECT `network0_` . `hid` AS  ... 21_394_0_` , `network0_` . ... |           |        522 |         0 |          0 | 89.75 ms      | 374.44 µs   | 171.82 µs   |       522 |             1 |          522 | 759bfff4b6c0155fe043a5ad38c4a9f0 |
- * +-------------------------------------------------------------------+-----------+------------+-----------+------------+---------------+-------------+-------------+-----------+---------------+--------------+----------------------------------+
- *
+ * mysql> select * from statement_analysis limit 5;
+ * +-------------------------------------------------------------------+-----------+------------+-----------+------------+---------------+-------------+-------------+--------------+-----------+---------------+--------------+------------+-----------------+-------------+-------------------+----------------------------------+
+ * | query                                                             | full_scan | exec_count | err_count | warn_count | total_latency | max_latency | avg_latency | lock_latency | rows_sent | rows_sent_avg | rows_scanned | tmp_tables | tmp_disk_tables | rows_sorted | sort_merge_passes | digest                           |
+ * +-------------------------------------------------------------------+-----------+------------+-----------+------------+---------------+-------------+-------------+--------------+-----------+---------------+--------------+------------+-----------------+-------------+-------------------+----------------------------------+
+ * | INSERT INTO `mem__quan` . `exa ...  `hostTo` ) , `hostTo` ) , ... |           |      48183 |         0 |          0 | 00:34:07.14   | 663.32 ms   | 42.49 ms    | 00:01:49.68  |         0 |             0 |            0 |          0 |               0 |           0 |                 0 | b0542e318db3e65d09574082d3f63cec |
+ * | INSERT INTO `mem__quan` . `nor ... nDuration` = IF ( VALUES ( ... |           |      48241 |         0 |          0 | 00:15:37.60   | 712.57 ms   | 19.44 ms    | 00:02:03.80  |         0 |             0 |            0 |          0 |               0 |           0 |                 0 | 361bbfa1983c4ec4901cb2237f256138 |
+ * | INSERT INTO `mem__quan` . `nor ... `lastSeen` ) ) , `lastSeen` )  |           |      49660 |      1428 |          0 | 00:08:04.46   | 379.57 ms   | 9.76 ms     | 00:01:41.35  |         0 |             0 |            0 |          0 |               0 |           0 |                 0 | 6134e9d6f25eb8e6cddf11f6938f202a |
+ * | COMMIT                                                            |           |     111127 |         0 |          0 | 00:07:40.62   | 1.30 s      | 4.14 ms     | 0 ps         |         0 |             0 |            0 |          0 |               0 |           0 |                 0 | e51be358a1cbf99c1acab35cc1c6b683 |
+ * | SELECT DISTINCTROW `agent0_` . ... ` . `hid` = `mysqlproce1_` ... | *         |       2737 |         0 |          0 | 00:01:49.62   | 1.06 s      | 40.05 ms    | 887.95 ms    |      2729 |             1 |         8335 |       2737 |            2737 |           0 |                 0 | 218d4bf81d6bd134908da4bc6570d3c0 |
+ * +-------------------------------------------------------------------+-----------+------------+-----------+------------+---------------+-------------+-------------+--------------+-----------+---------------+--------------+------------+-----------------+-------------+-------------------+----------------------------------+
+ * 5 rows in set (0.02 sec) *
+ * 
  * (Example from 5.6.6)
  *
  * Versions: 5.6.5+
@@ -29,17 +25,22 @@
 DROP VIEW IF EXISTS statement_analysis;
 
 CREATE SQL SECURITY INVOKER VIEW statement_analysis AS
-SELECT format_statement(DIGEST_TEXT) AS query,
+SELECT ps_helper.format_statement(DIGEST_TEXT) AS query,
        IF(SUM_NO_GOOD_INDEX_USED > 0 OR SUM_NO_INDEX_USED > 0, '*', '') AS full_scan,
        COUNT_STAR AS exec_count,
        SUM_ERRORS AS err_count,
        SUM_WARNINGS AS warn_count,
-       format_time(SUM_TIMER_WAIT) AS total_latency,
-       format_time(MAX_TIMER_WAIT) AS max_latency,
-       format_time(AVG_TIMER_WAIT) AS avg_latency,
+       ps_helper.format_time(SUM_TIMER_WAIT) AS total_latency,
+       ps_helper.format_time(MAX_TIMER_WAIT) AS max_latency,
+       ps_helper.format_time(AVG_TIMER_WAIT) AS avg_latency,
+       ps_helper.format_time(SUM_LOCK_TIME) AS lock_latency,
        SUM_ROWS_SENT AS rows_sent,
        ROUND(SUM_ROWS_SENT / COUNT_STAR) AS rows_sent_avg,
        SUM_ROWS_EXAMINED AS rows_scanned,
+       SUM_CREATED_TMP_TABLES AS tmp_tables,
+       SUM_CREATED_TMP_DISK_TABLES AS tmp_disk_tables,
+       SUM_SORT_ROWS AS rows_sorted,
+       SUM_SORT_MERGE_PASSES AS sort_merge_passes,
        DIGEST AS digest
   FROM performance_schema.events_statements_summary_by_digest
 ORDER BY SUM_TIMER_WAIT DESC;
@@ -51,21 +52,17 @@ ORDER BY SUM_TIMER_WAIT DESC;
  * mimics the MySQL Enterprise Monitor Query Analysis view,
  * ordered by the total execution time per normalized statement
  * 
- * mysql> select * from statement_analysis_raw LIMIT 1\G
- * *************************** 1. row ***************************
- *         query: SELECT * FROM `top_tables_by_latency` SELECT `performance_schema` . `objects_summary_global_by_type` . `OBJECT_SCHEMA` AS `db_name` ...
- *     full_scan: *
- *    exec_count: 2
- *     err_count: 0
- *    warn_count: 0
- * total_latency: 30075208207000
- *   max_latency: 28827579292000
- *   avg_latency: 15037604103000
- *     rows_sent: 220
- * rows_sent_avg: 110
- *  rows_scanned: 440
- *        digest: 44f1f3181975504b160c57b89c9ce23e
- * 1 row in set (0.01 sec) *
+ * mysql> select * from statement_analysis_raw limit 5;
+ * +-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------+------------+-----------+------------+------------------+---------------+-------------+-----------+---------------+--------------+----------------------------------+
+ * | query                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | full_scan | exec_count | err_count | warn_count | total_latency    | max_latency   | avg_latency | rows_sent | rows_sent_avg | rows_scanned | digest                           |
+ * +-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------+------------+-----------+------------+------------------+---------------+-------------+-----------+---------------+--------------+----------------------------------+
+ * | INSERT INTO `mem__quan` . `example_statements` ( `bytes` , `comments` , `connectionId` , ERRORS , `execTime` , `hostFrom` , `hostTo` , `noGoodIndexUsed` , `noIndexUsed` , ROWS , `source_location_id` , `text` , TIMESTAMP , SYSTEM_USER , WARNINGS , `round_robin_bin` , `normalized_statement_by_server_by_schema_id` ) VALUES (...) ON DUPLICATE KEY UPDATE `bytes` = IF ( VALUES ( `timestamp` ) >= `timestamp` , VALUES ( `bytes` ) , `bytes` ) , `comments` = IF ( VALUES ( `timestamp` ) >= `timestamp` , VALUES ( `comments` ) , `comments` ) , `connectionId` = IF ( VALUES ( `timestamp` ) >= `timestamp` , VALUES ( `connectionId` ) , `connectionId` ) , ERRORS = IF ( VALUES ( `timestamp` ) >= `timestamp` , VALUES ( ERRORS ) , ERRORS ) , `execTime` = IF ( VALUES ( `timestamp` ) >= `timestamp` , VALUES ( `execTime` ) , `execTime` ) , `hostFrom` = IF ( VALUES ( `timestamp` ) >= `timestamp` , VALUES ( `hostFrom` ) , `hostFrom` ) , `hostTo` = IF ( VALUES ( `timestamp` ) >= `timestamp` , VALUES ( `hostTo` ) , `hostTo` ) , ... |           |      48581 |         0 |          0 | 2064385387382000 |  663318001000 | 42493678000 |         0 |             0 |            0 | b0542e318db3e65d09574082d3f63cec |
+ * | INSERT INTO `mem__quan` . `normalized_statements_by_server_by_schema_data` ( `bytesMax` , `bytesMin` , `bytesTotal` , `collectionDuration` , `createdTmpDiskTables` , `createdTmpTables` , `errorCount` , `execCount` , `execTimeMax` , `execTimeMin` , `execTimeTotal` , `lockTimeTotal` , `noGoodIndexUsedCount` , `noIndexUsedCount` , `rowsExaminedTotal` , `rowsMax` , `rowsMin` , `rowsTotal` , `selectFullJoin` , `selectFullRangeJoin` , `selectRange` , `selectRangeCheck` , `selectScan` , `sortMergePasses` , `sortRange` , `sortRows` , `sortScan` , TIMESTAMP , `warningCount` , `round_robin_bin` , `normalized_statement_by_server_by_schema_id` ) VALUES (...) ON DUPLICATE KEY UPDATE `bytesMax` = IF ( VALUES ( `timestamp` ) >= `timestamp` , VALUES ( `bytesMax` ) , `bytesMax` ) , `bytesMin` = IF ( VALUES ( `timestamp` ) >= `timestamp` , VALUES ( `bytesMin` ) , `bytesMin` ) , `bytesTotal` = IF ( VALUES ( `timestamp` ) >= `timestamp` , VALUES ( `bytesTotal` ) , `bytesTotal` ) , `collectionDuration` = IF ( VALUES ( ...    |           |      48644 |         0 |          0 |  942743947256000 |  712569590000 | 19380477000 |         0 |             0 |            0 | 361bbfa1983c4ec4901cb2237f256138 |
+ * | INSERT INTO `mem__quan` . `normalized_statements_by_server_by_schema` ( `firstSeen` , `lastSeen` , `normalized_statement_id` , `schema` , SERVER , `id` ) VALUES (...) ON DUPLICATE KEY UPDATE `firstSeen` = COALESCE ( `LEAST` ( `firstSeen` , VALUES ( `firstSeen` ) ) , `firstSeen` ) , `lastSeen` = COALESCE ( `GREATEST` ( `lastSeen` , VALUES ( `lastSeen` ) ) , `lastSeen` )                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |           |      50063 |      1428 |          0 |  485443623892000 |  379567835000 |  9696654000 |         0 |             0 |            0 | 6134e9d6f25eb8e6cddf11f6938f202a |
+ * | COMMIT                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |           |     111994 |         0 |          0 |  463603956226000 | 1300702917000 |  4139542000 |         0 |             0 |            0 | e51be358a1cbf99c1acab35cc1c6b683 |
+ * | SELECT DISTINCTROW `agent0_` . `hid` AS `hid1776_` , `agent0_` . `id` AS `id2_1776_` , `agent0_` . `hostname` AS `hostname3_1776_` , `agent0_` . `hasHostname` AS `hasHostn4_1776_` , `agent0_` . `reachable` AS `reachable5_1776_` , `agent0_` . `hasReachable` AS `hasReach6_1776_` , `agent0_` . `timestamp` AS `timestamp7_1776_` , `agent0_` . `version` AS `version8_1776_` , `agent0_` . `hasVersion` AS `hasVersion9_1776_` , `agent0_` . `agentConfiguration` AS `agentCo10_1776_` , `agent0_` . `hasAgentConfiguration` AS `hasAgen11_1776_` , `agent0_` . `jvm` AS `jvm12_1776_` , `agent0_` . `hasJvm` AS `hasJvm13_1776_` , `agent0_` . `os` AS `os14_1776_` , `agent0_` . `hasOs` AS `hasOs15_1776_` , `agent0_` . `hasMysqlConnections` AS `hasMysq16_1776_` , `agent0_` . `hasMysqlProcesses` AS `hasMysq17_1776_` , `agent0_` . `hasMysqlServers` AS `hasMysq18_1776_` FROM `mem__inventory` . `Agent` `agent0_` INNER JOIN `mem__inventory` . `Agent_mysqlProcesses` `mysqlproce1_` ON `agent0_` . `hid` = `mysqlproce1_` ...             | *         |       2760 |         0 |          0 |  109905347333000 | 1062783078000 | 39820778000 |      2752 |             1 |         8410 | 218d4bf81d6bd134908da4bc6570d3c0 |
+ * +-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------+------------+-----------+------------+------------------+---------------+-------------+-----------+---------------+--------------+----------------------------------+
+ * 5 rows in set (0.10 sec)
  *
  * (Example from 5.6.6)
  *
@@ -86,6 +83,10 @@ SELECT DIGEST_TEXT AS query,
        SUM_ROWS_SENT AS rows_sent,
        ROUND(SUM_ROWS_SENT / COUNT_STAR) AS rows_sent_avg,
        SUM_ROWS_EXAMINED AS rows_scanned,
+       SUM_CREATED_TMP_TABLES AS tmp_tables,
+       SUM_CREATED_TMP_DISK_TABLES AS tmp_disk_tables,
+       SUM_SORT_ROWS AS rows_sorted,
+       SUM_SORT_MERGE_PASSES AS sort_merge_passes,
        DIGEST AS digest
   FROM performance_schema.events_statements_summary_by_digest
 ORDER BY SUM_TIMER_WAIT DESC;
