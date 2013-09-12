@@ -2,13 +2,13 @@
  * Procedure: analyze_statement_digest()
  *
  * Parameters
- *   digest_in:   The statement digest identifier you would like to analyze
- *   runtime:     The number of seconds to run analysis for (defaults to a minute)
- *   interval_in: The interval (in seconds, may be fractional) at which to try
- *                and take snapshots (defaults to a second)
- *   start_fresh: Whether to TRUNCATE the events_statements_history_long and
- *                events_stages_history_long tables before starting (default false)
- *   auto_enable: Whether to automatically turn on required consumers (default false)
+ *   in_digest:      The statement digest identifier you would like to analyze
+ *   in_runtime:     The number of seconds to run analysis for (defaults to a minute)
+ *   in_interval:    The interval (in seconds, may be fractional) at which to try
+ *                   and take snapshots (defaults to a second)
+ *   in_start_fresh: Whether to TRUNCATE the events_statements_history_long and
+ *                   events_stages_history_long tables before starting (default false)
+ *   in_auto_enable: Whether to automatically turn on required consumers (default false)
  *
  * mysql> call analyze_statement_digest('891ec6860f98ba46d89dd20b0c03652c', 10, 0.1, true, true);
  * +--------------------+
@@ -110,9 +110,9 @@ DROP PROCEDURE IF EXISTS analyze_statement_digest;
 
 DELIMITER $$
 
-CREATE PROCEDURE analyze_statement_digest(IN digest_in VARCHAR(32), IN runtime INT, 
-    IN interval_in DECIMAL(2,2), IN start_fresh BOOLEAN, IN auto_enable BOOLEAN)
-    COMMENT 'Parameters: digest_in (varchar(32)), runtime (int), interval_in (decimal(2,2)), start_fresh (boolean), auto_enable (boolean)'
+CREATE PROCEDURE analyze_statement_digest(IN in_digest VARCHAR(32), IN in_runtime INT, 
+    IN in_interval DECIMAL(2,2), IN in_start_fresh BOOLEAN, IN in_auto_enable BOOLEAN)
+    COMMENT 'Parameters: in_digest (varchar(32)), in_runtime (int), in_interval (decimal(2,2)), in_start_fresh (boolean), in_auto_enable (boolean)'
     SQL SECURITY INVOKER 
 BEGIN
 
@@ -152,25 +152,25 @@ BEGIN
        PRIMARY KEY (event_id)
     );
 
-    SET v_start_fresh = start_fresh;
+    SET v_start_fresh = in_start_fresh;
     IF v_start_fresh THEN
         TRUNCATE TABLE performance_schema.events_statements_history_long;
         TRUNCATE TABLE performance_schema.events_stages_history_long;
     END IF;
 
-    SET v_auto_enable = auto_enable;
+    SET v_auto_enable = in_auto_enable;
     IF v_auto_enable THEN
         CALL ps_helper.save_current_config();
     END IF;
 
-    WHILE v_runtime < runtime DO
+    WHILE v_runtime < in_runtime DO
         SELECT UNIX_TIMESTAMP() INTO v_start;
 
         INSERT IGNORE INTO stmt_trace
         SELECT thread_id, timer_start, event_id, sql_text, timer_wait, lock_time, errors, mysql_errno, 
                rows_affected, rows_examined, created_tmp_tables, created_tmp_disk_tables, no_index_used
           FROM performance_schema.events_statements_history_long
-        WHERE digest = digest_in;
+        WHERE digest = in_digest;
 
         INSERT IGNORE INTO stmt_stages
         SELECT stages.event_id, stmt_trace.event_id,
@@ -178,7 +178,7 @@ BEGIN
           FROM performance_schema.events_stages_history_long AS stages
           JOIN stmt_trace ON stages.nesting_event_id = stmt_trace.event_id;
 
-        SELECT SLEEP(interval_in) INTO @sleep;
+        SELECT SLEEP(in_interval) INTO @sleep;
         SET v_runtime = v_runtime + (UNIX_TIMESTAMP() - v_start);
     END WHILE;
 
