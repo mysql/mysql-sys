@@ -26,7 +26,7 @@
 DROP VIEW IF EXISTS statements_with_temp_tables;
 
 CREATE SQL SECURITY INVOKER VIEW statements_with_temp_tables AS
-SELECT format_statement(DIGEST_TEXT) AS query,
+SELECT ps_helper.format_statement(DIGEST_TEXT) AS query,
        COUNT_STAR AS exec_count,
        SUM_CREATED_TMP_TABLES AS memory_tmp_tables,
        SUM_CREATED_TMP_DISK_TABLES AS disk_tmp_tables,
