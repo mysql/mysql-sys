@@ -190,7 +190,7 @@ BEGIN
     SELECT CONCAT('Data collection starting for THREAD_ID = ', in_thread_id) AS 'Info';
 
     SET v_min_event_id = 0,
-        v_start        = UNIX_TIMESTAMP(NOW(2)),
+        v_start        = UNIX_TIMESTAMP(),
         in_interval    = IFNULL(in_interval, 1.00),
         in_max_runtime = IFNULL(in_max_runtime, 60.00);
 
@@ -210,8 +210,8 @@ BEGIN
         END LOOP;
         CLOSE c_stack;
 
-        DO SLEEP(in_interval);
-        SET v_runtime = (UNIX_TIMESTAMP(NOW(2)) - v_start);
+        SELECT SLEEP(in_interval) INTO @sleep;
+        SET v_runtime = v_runtime + (UNIX_TIMESTAMP() - v_start);
     END WHILE;
 
     /* Reset the settings for the performance schema */
