@@ -18,7 +18,7 @@ SOURCE ./procedures/enable_background_threads.sql
 SOURCE ./procedures/enable_current_thread.sql
 SOURCE ./procedures/only_enable.sql
 SOURCE ./procedures/reload_saved_config.sql
-SOURCE ./procedures/reset_to_default.sql
+SOURCE ./procedures/reset_to_default_57.sql
 SOURCE ./procedures/save_current_config.sql
 SOURCE ./procedures/truncate_all.sql
 
