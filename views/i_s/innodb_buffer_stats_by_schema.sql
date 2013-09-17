@@ -17,8 +17,9 @@
  * Versions: 5.5.28+
  */
 
-DROP VIEW IF EXISTS innodb_buffer_stats_by_schema;
+/*!50528 DROP VIEW IF EXISTS innodb_buffer_stats_by_schema */;
 
+/*!50528 
 CREATE SQL SECURITY INVOKER VIEW innodb_buffer_stats_by_schema AS
 SELECT IF(LOCATE('.', ibp.table_name) = 0, 'InnoDB System', REPLACE(SUBSTRING_INDEX(ibp.table_name, '.', 1), '`', '')) AS object_schema,
        format_bytes(SUM(IF(ibp.compressed_size = 0, 16384, compressed_size))) AS allocated,
@@ -30,7 +31,7 @@ SELECT IF(LOCATE('.', ibp.table_name) = 0, 'InnoDB System', REPLACE(SUBSTRING_IN
   FROM information_schema.innodb_buffer_page ibp 
  WHERE table_name IS NOT NULL
  GROUP BY object_schema
- ORDER BY SUM(IF(ibp.compressed_size = 0, 16384, compressed_size)) DESC;
+ ORDER BY SUM(IF(ibp.compressed_size = 0, 16384, compressed_size)) DESC */;
 
 /* 
  * View: innodb_buffer_stats_by_schema_raw
@@ -51,8 +52,9 @@ SELECT IF(LOCATE('.', ibp.table_name) = 0, 'InnoDB System', REPLACE(SUBSTRING_IN
  * Versions: 5.5.28+
  */
 
-DROP VIEW IF EXISTS innodb_buffer_stats_by_schema_raw;
+/*!50528 DROP VIEW IF EXISTS innodb_buffer_stats_by_schema_raw */;
 
+/*!50528 
 CREATE SQL SECURITY INVOKER VIEW innodb_buffer_stats_by_schema_raw AS
 SELECT IF(LOCATE('.', ibp.table_name) = 0, 'InnoDB System', REPLACE(SUBSTRING_INDEX(ibp.table_name, '.', 1), '`', '')) AS object_schema,
        SUM(IF(ibp.compressed_size = 0, 16384, compressed_size)) AS allocated,
@@ -64,4 +66,4 @@ SELECT IF(LOCATE('.', ibp.table_name) = 0, 'InnoDB System', REPLACE(SUBSTRING_IN
   FROM information_schema.innodb_buffer_page ibp 
  WHERE table_name IS NOT NULL
  GROUP BY object_schema
- ORDER BY SUM(IF(ibp.compressed_size = 0, 16384, compressed_size)) DESC;
+ ORDER BY SUM(IF(ibp.compressed_size = 0, 16384, compressed_size)) DESC */;
