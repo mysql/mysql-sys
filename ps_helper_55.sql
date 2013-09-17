@@ -26,7 +26,6 @@ SOURCE ./views/p_s/io_global_by_wait_by_latency_55.sql
 
 SOURCE ./views/p_s/wait_classes_global_by_avg_latency.sql
 SOURCE ./views/p_s/wait_classes_global_by_latency.sql
-SOURCE ./views/p_s/waits_by_user_by_latency.sql
 SOURCE ./views/p_s/waits_global_by_latency.sql
 
 SOURCE ./after_setup.sql
