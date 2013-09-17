@@ -71,6 +71,7 @@ DELIMITER $$
 
 CREATE FUNCTION reverse_format_time(time_string VARCHAR(32))
   RETURNS BIGINT
+  DETERMINISTIC
 BEGIN
   IF time_string IS NULL THEN RETURN NULL;
   ELSEIF time_string LIKE '% ps' THEN RETURN CAST(LEFT(time_string, LENGTH(time_string) - 3) AS DECIMAL);
