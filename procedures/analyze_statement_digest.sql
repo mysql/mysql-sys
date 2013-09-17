@@ -135,6 +135,7 @@ BEGIN
         lock_time BIGINT,
         errors BIGINT,
         mysql_errno BIGINT,
+        rows_sent BIGINT,
         rows_affected BIGINT,
         rows_examined BIGINT,
         created_tmp_tables BIGINT,
@@ -168,7 +169,7 @@ BEGIN
 
         INSERT IGNORE INTO stmt_trace
         SELECT thread_id, timer_start, event_id, sql_text, timer_wait, lock_time, errors, mysql_errno, 
-               rows_affected, rows_examined, created_tmp_tables, created_tmp_disk_tables, no_index_used
+               rows_sent, rows_affected, rows_examined, created_tmp_tables, created_tmp_disk_tables, no_index_used
           FROM performance_schema.events_statements_history_long
         WHERE digest = in_digest;
 
@@ -191,7 +192,8 @@ BEGIN
     SELECT COUNT(*) executions,
            format_time(SUM(timer_wait)) AS exec_time,
            format_time(SUM(lock_time)) AS lock_time,
-           SUM(rows_affected) AS rows_sent,
+           SUM(rows_sent) AS rows_sent,
+           SUM(rows_affected) AS rows_affected,
            SUM(rows_examined) AS rows_examined,
            SUM(created_tmp_tables) AS tmp_tables,
            SUM(no_index_used) AS full_scans
@@ -209,7 +211,8 @@ BEGIN
     SELECT thread_id,
            format_time(timer_wait) AS exec_time,
            format_time(lock_time) AS lock_time,
-           rows_affected AS rows_sent,
+           rows_sent,
+           rows_affected,
            rows_examined,
            created_tmp_tables AS tmp_tables,
            no_index_used AS full_scan
