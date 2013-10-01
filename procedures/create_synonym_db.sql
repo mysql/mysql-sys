@@ -1,6 +1,12 @@
 /* 
  * Procedure: create_synonym_db()
  *
+ * Takes a source database name and synonym name, and then creates the 
+ * synonym database with views that point to all of the tables within
+ * the source database.
+ *
+ * Useful for creating a "ps" synonym for "performance_schema" for example.
+ *
  * Parameters
  *   in_db_name: The database you would like to create a synonym for.
  *   in_synonym: The synonym you would like to create.
