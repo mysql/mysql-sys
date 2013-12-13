@@ -12,6 +12,7 @@
  *
  * Parameters
  *   in_thread_id  : The thread that you would like a stack trace for
+ *   in_outfile    : The filename the dot file will be written to
  *   in_max_runtime: The maximum time to keep collecting data. Use NULL to get the default which is 60 seconds.
  *   in_interval   : How long to sleep between data collections. Use NULL to get the default which is 1 second.
  *   in_start_fresh: Whether to reset all P_S data.
