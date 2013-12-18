@@ -96,6 +96,7 @@ SELECT format_statement(DIGEST_TEXT) AS query,
  * mysql> SELECT * FROM statements_with_runtimes_in_95th_percentile_raw LIMIT 1\G
  * *************************** 1. row ***************************
  *             query: SELECT `e` . `round_robin_bin` AS `round1_1706_0_` , `e` . `id` AS `id1706_0_` , `e` . `timestamp` AS `timestamp1706_0_` , `e` . `rxBytes` AS `rxBytes1706_0_` , `e` . `rxPackets` AS `rxPackets1706_0_` , `e` . `rxErrors` AS `rxErrors1706_0_` , `e` . `txBytes` AS `txBytes1706_0_` , `e` . `txPackets` AS `txPackets1706_0_` , `e` . `txErrors` AS `txErrors1706_0_` , `e` . `txCollisions` AS `txColli10_1706_0_` FROM `mem__instruments` . `NetworkTrafficAdvisor_NetworkTraffic` AS `e` JOIN ( SELECT `id` AS `t` , MAX ( TIMESTAMP ) AS `ts` FROM `mem__instruments` . `NetworkTrafficAdvisor_NetworkTraffic` WHERE `id` IN (?) GROUP BY `id` ORDER BY NULL ) `maxes` ON `e` . `id` = `maxes` . `t` AND `e` . `timestamp` = `maxes` . `ts`
+ *                db: mem
  *         full_scan: *
  *        exec_count: 14
  *         err_count: 0
@@ -122,6 +123,7 @@ DROP VIEW IF EXISTS statements_with_runtimes_in_95th_percentile_raw;
 
 CREATE SQL SECURITY INVOKER VIEW statements_with_runtimes_in_95th_percentile_raw AS
 SELECT DIGEST_TEXT AS query,
+       SCHEMA_NAME AS db,
        IF(SUM_NO_GOOD_INDEX_USED > 0 OR SUM_NO_INDEX_USED > 0, '*', '') AS full_scan,
        COUNT_STAR AS exec_count,
        SUM_ERRORS AS err_count,
