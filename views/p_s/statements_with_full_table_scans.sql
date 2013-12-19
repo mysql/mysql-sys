@@ -6,20 +6,20 @@
  * then by the number of times the statement executed
  *
  * mysql> select * from statements_with_full_table_scans limit 5;
- * +-------------------------------------------------------------------+------------+---------------------+--------------------------+-------------------+-----------+---------------+----------------------------------+
- * | query                                                             | exec_count | no_index_used_count | no_good_index_used_count | no_index_used_pct | rows_sent | rows_examined | digest                           |
- * +-------------------------------------------------------------------+------------+---------------------+--------------------------+-------------------+-----------+---------------+----------------------------------+
- * | SELECT DISTINCTROW `agent0_` . ... ERE `agent0_` . `id` IN (...)  |       1474 |                1474 |                        0 |               100 |      2948 |          2948 | 4f5d5cc354ebb4746ccb71d9c750e978 |
- * | SELECT COUNT ( * ) FROM `INFOR ... NE = ? AND `SUPPORT` IN (...)  |       1228 |                1228 |                        0 |               100 |      1228 |         11052 | 491ee7143ca1d98f36c24d7eb6d25272 |
- * | SELECT DISTINCTROW `mysqlconne ... conne0_` . `socketPath` AS ... |       1135 |                1132 |                        0 |               100 |         5 |          3393 | 15024988ff6ff3510057b48ca2dfd5d3 |
- * | SELECT `InterfaceAddress4` . ` ... . `hid` WHERE `Os` . `id` = ?  |       1132 |                1132 |                        0 |               100 |      7924 |         82588 | 42d79211cc5e82e32e00340bc6a50b14 |
- * | SELECT COUNT ( * ) FROM `infor ... NAME = ? AND `index_name` = ?  |        772 |                 772 |                        0 |               100 |       772 |          3301 | c8a721d366327a8170d4260fe789941a |
- * +-------------------------------------------------------------------+------------+---------------------+--------------------------+-------------------+-----------+---------------+----------------------------------+
- * 5 rows in set (0.03 sec) *
+ * +-------------------------------------------------------------------+-------+------------+---------------------+--------------------------+-------------------+-----------+---------------+---------------+-------------------+---------------------+---------------------+----------------------------------+
+ * | query                                                             | db    | exec_count | no_index_used_count | no_good_index_used_count | no_index_used_pct | rows_sent | rows_examined | rows_sent_avg | rows_examined_avg | first_seen          | last_seen           | digest                           |
+ * +-------------------------------------------------------------------+-------+------------+---------------------+--------------------------+-------------------+-----------+---------------+---------------+-------------------+---------------------+---------------------+----------------------------------+
+ * | SELECT `InterfaceAddress4` . ` ... . `hid` WHERE `Os` . `id` = ?  | mem   |     355189 |              355277 |                        0 |               100 |    404862 |       4987778 |             1 |                14 | 2013-12-04 20:04:54 | 2013-12-18 18:54:34 | 42d79211cc5e82e32e00340bc6a50b14 |
+ * | SELECT COUNT ( * ) FROM `INFOR ... NE = ? AND `SUPPORT` IN (...)  | mysql |     172765 |              172776 |                        0 |               100 |    172773 |       1554966 |             1 |                 9 | 2013-12-04 20:04:52 | 2013-12-18 18:54:34 | 491ee7143ca1d98f36c24d7eb6d25272 |
+ * | SELECT CAST ( `SUM_NUMBER_OF_B ... HERE `EVENT_NAME` = ? LIMIT ?  | mysql |     100455 |              100455 |                        0 |               100 |    100455 |       3094014 |             1 |                31 | 2013-12-04 20:04:52 | 2013-12-18 18:54:34 | b5a370d80095c69a2085547e3a24f552 |
+ * | SELECT COUNT ( * ) FROM `INFOR ... CHEMA` = ? AND TABLE_NAME = ?  | mysql |      80360 |               80360 |                        0 |               100 |     80360 |             0 |             1 |                 0 | 2013-12-04 20:05:37 | 2013-12-18 18:54:34 | 6567aa2ac8ad7fe7831b4114dee7c849 |
+ * | SELECT DISTINCTROW `mysqlconne ... conne0_` . `socketPath` AS ... | mem   |      67832 |               67821 |                        0 |               100 |        92 |        406943 |             0 |                 6 | 2013-12-04 20:04:54 | 2013-12-18 18:54:34 | fc358ad6384cc77adff425602a0a8fc1 |
+ * +-------------------------------------------------------------------+-------+------------+---------------------+--------------------------+-------------------+-----------+---------------+---------------+-------------------+---------------------+---------------------+----------------------------------+
+ * 5 rows in set (0.02 sec)
  * 
- * (Example from 5.6.6)
+ * (Example from 5.6.14)
  *
- * Versions: 5.6.5+
+ * Versions: 5.6.9+
  *
  */
 
@@ -27,12 +27,17 @@ DROP VIEW IF EXISTS statements_with_full_table_scans;
 
 CREATE SQL SECURITY INVOKER VIEW statements_with_full_table_scans AS
 SELECT ps_helper.format_statement(DIGEST_TEXT) AS query,
+       SCHEMA_NAME as db,
        COUNT_STAR AS exec_count,
        SUM_NO_INDEX_USED AS no_index_used_count,
        SUM_NO_GOOD_INDEX_USED AS no_good_index_used_count,
        ROUND((SUM_NO_INDEX_USED / COUNT_STAR) * 100) AS no_index_used_pct,
        SUM_ROWS_SENT AS rows_sent,
        SUM_ROWS_EXAMINED AS rows_examined,
+       ROUND(SUM_ROWS_SENT/COUNT_STAR) AS rows_sent_avg,
+       ROUND(SUM_ROWS_EXAMINED/COUNT_STAR) AS rows_examined_avg,
+       FIRST_SEEN as first_seen,
+       LAST_SEEN as last_seen,
        DIGEST AS digest
   FROM performance_schema.events_statements_summary_by_digest
  WHERE SUM_NO_INDEX_USED > 0
