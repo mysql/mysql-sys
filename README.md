@@ -360,8 +360,8 @@ Resets the Performance Schema setup to the default settings.
              mysql> CALL sys.ps_setup_reset_to_default(false)G
              Query OK, 0 rows affected (0.00 sec)
             
-*************************** 17. row ***************************
-ps_setup_save
+
+#### ps_setup_save
 
 ##### Description
 
@@ -391,8 +391,8 @@ None.
              mysql> CALL sys.ps_setup_reload_saved();
              Query OK, 0 rows affected (0.32 sec)
             
-*************************** 18. row ***************************
-ps_setup_show_disabled
+
+#### ps_setup_show_disabled
 
 ##### Description
 
@@ -475,8 +475,8 @@ Shows all currently disable Performance Schema configuration.
 
              Query OK, 0 rows affected (0.01 sec)
             
-*************************** 19. row ***************************
-ps_setup_show_enabled
+
+#### ps_setup_show_enabled
 
 ##### Description
 
