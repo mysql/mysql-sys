@@ -484,7 +484,6 @@ Shows all currently enabled Performance Schema configuration.
 
 ##### Parameters
 
-
 * in_show_instruments (BOOLEAN): Whether to print enabled instruments (can print many items)
 * in_show_threads (BOOLEAN): Whether to print enabled threads
 
@@ -609,11 +608,11 @@ Note this may fail, as Performance Schema truncates long SQL_TEXT values (and he
 
 ##### Parameters
 
-* in_digest: The statement digest identifier you would like to analyze
-* in_runtime: The number of seconds to run analysis for (defaults to a minute)
-* in_interval: The interval (in seconds, may be fractional) at which to try and take snapshots (defaults to a second)
-* in_start_fresh: Whether to TRUNCATE the events_statements_history_long and events_stages_history_long tables before starting (default false)
-* in_auto_enable: Whether to automatically turn on required consumers (default false)
+* in_digest VARCHAR(32): The statement digest identifier you would like to analyze
+* in_runtime (INT): The number of seconds to run analysis for (defaults to a minute)
+* in_interval (DECIMAL(2,2)): The interval (in seconds, may be fractional) at which to try and take snapshots (defaults to a second)
+* in_start_fresh (BOOLEAN): Whether to TRUNCATE the events_statements_history_long and events_stages_history_long tables before starting (default false)
+* in_auto_enable (BOOLEAN): Whether to automatically turn on required consumers (default false)
 
 ##### Example
 
