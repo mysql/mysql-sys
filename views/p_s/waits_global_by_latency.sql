@@ -1,3 +1,18 @@
+/* Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; version 2 of the License.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
+
 /*
  * View: waits_global_by_latency
  *
@@ -22,9 +37,9 @@ DROP VIEW IF EXISTS waits_global_by_latency;
 CREATE SQL SECURITY INVOKER VIEW waits_global_by_latency AS
 SELECT event_name AS event,
        count_star AS total_events,
-       ps_helper.format_time(sum_timer_wait) AS total_latency,
-       ps_helper.format_time(avg_timer_wait) AS avg_latency,
-       ps_helper.format_time(max_timer_wait) AS max_latency
+       sys.format_time(sum_timer_wait) AS total_latency,
+       sys.format_time(avg_timer_wait) AS avg_latency,
+       sys.format_time(max_timer_wait) AS max_latency
   FROM performance_schema.events_waits_summary_global_by_event_name
  WHERE event_name != 'idle'
    AND sum_timer_wait > 0

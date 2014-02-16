@@ -1,3 +1,18 @@
+/* Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; version 2 of the License.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
+
 /* 
  * View: memory_global_by_current_allocated
  * 
@@ -24,11 +39,11 @@ DROP VIEW IF EXISTS memory_global_by_current_allocated;
 CREATE SQL SECURITY INVOKER VIEW memory_global_by_current_allocated AS
 SELECT event_name,
        current_count_used AS current_count,
-       format_bytes(current_number_of_bytes_used) AS current_alloc,
-       format_bytes(current_number_of_bytes_used / current_count_used) AS current_avg_alloc,
+       sys.format_bytes(current_number_of_bytes_used) AS current_alloc,
+       sys.format_bytes(current_number_of_bytes_used / current_count_used) AS current_avg_alloc,
        high_count_used AS high_count,
-       format_bytes(high_number_of_bytes_used) AS high_alloc,
-       format_bytes(high_number_of_bytes_used / high_count_used) AS high_avg_alloc
+       sys.format_bytes(high_number_of_bytes_used) AS high_alloc,
+       sys.format_bytes(high_number_of_bytes_used / high_count_used) AS high_avg_alloc
   FROM performance_schema.memory_summary_global_by_event_name
  WHERE current_number_of_bytes_used > 0
  ORDER BY current_number_of_bytes_used DESC;

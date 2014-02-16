@@ -1,37 +1,109 @@
-/* 
- * Procedure: dump_thread_stack()
- *
- * Dumps all data within performance_schema for an instrumented thread
- * to create a DOT formatted graph file. 
- * Each resultset returned from the procedure should be used for a complete graph
- *
- * Example command line:
- *    CALL ps_helper.dump_thread_stack(218, '/tmp/stack.dot', 10.00, 1.0, TRUE, TRUE, FALSE)
- * 
- * After this dot file is generated, load in to a graphing package such as Graphviz
- *
- * Parameters
- *   in_thread_id  : The thread that you would like a stack trace for
- *   in_outfile    : The filename the dot file will be written to
- *   in_max_runtime: The maximum time to keep collecting data. Use NULL to get the default which is 60 seconds.
- *   in_interval   : How long to sleep between data collections. Use NULL to get the default which is 1 second.
- *   in_start_fresh: Whether to reset all P_S data.
- *   in_auto_setup : Whether to disable all other threads and enable all consumers/instruments. This will also reset
- *                   the settings at the end of the run.
- *   in_debug      : Whether you would like to include file:lineno in the graph
- *
- * Versions: 5.6.3+
- * 
- * Parts contributed by Jesper Krogh of MySQL Support @ Oracle
- */
+/* Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
 
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; version 2 of the License.
 
-DROP PROCEDURE IF EXISTS dump_thread_stack;
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA */
+
+DROP PROCEDURE IF EXISTS ps_trace_thread;
 
 DELIMITER $$
-CREATE PROCEDURE dump_thread_stack(IN in_thread_id INT, IN in_outfile varchar(255), IN in_max_runtime DECIMAL(20,2),
-    IN in_interval DECIMAL(20,2), IN in_start_fresh BOOLEAN, IN in_auto_setup BOOLEAN, IN in_debug BOOLEAN)
-    COMMENT 'Parameters: in_thread_id (int), in_outfile (varchar(255)), in_max_runtime (decumal(20,2) - default 60 seconds), in_interval (DECIMAL(20,2) - default 1 second), in_start_fresh (boolean), in_auto_setup(boolean), in_debug (boolean)'
+CREATE DEFINER='root'@'localhost' PROCEDURE ps_trace_thread (
+        IN in_thread_id INT,
+        IN in_outfile VARCHAR(255),
+        IN in_max_runtime DECIMAL(20,2),
+        IN in_interval DECIMAL(20,2),
+        IN in_start_fresh BOOLEAN,
+        IN in_auto_setup BOOLEAN,
+        IN in_debug BOOLEAN
+    )
+    COMMENT '
+             Description
+             -----------
+
+             Dumps all data within Performance Schema for an instrumented thread,
+             to create a DOT formatted graph file. 
+
+             Each resultset returned from the procedure should be used for a complete graph
+
+             Parameters
+             -----------
+
+             in_thread_id (INT): 
+               The thread that you would like a stack trace for
+             in_outfile  (VARCHAR(255)):
+               The filename the dot file will be written to
+             in_max_runtime (DECIMAL(20,2)):
+               The maximum time to keep collecting data.
+               Use NULL to get the default which is 60 seconds.
+             in_interval (DECIMAL(20,2)): 
+               How long to sleep between data collections. 
+               Use NULL to get the default which is 1 second.
+             in_start_fresh (BOOLEAN):
+               Whether to reset all Performance Schema data before tracing.
+             in_auto_setup (BOOLEAN):
+               Whether to disable all other threads and enable all consumers/instruments. 
+               This will also reset the settings at the end of the run.
+             in_debug (BOOLEAN):
+               Whether you would like to include file:lineno in the graph
+
+             Example
+             -----------
+
+             mysql> CALL sys.ps_dump_thread_stack(25, CONCAT(\'/tmp/stack-\', REPLACE(NOW(), \' \', \'-\'), \'.dot\'), NULL, NULL, TRUE, TRUE, TRUE);
+             +-------------------+
+             | summary           |
+             +-------------------+
+             | Disabled 1 thread |
+             +-------------------+
+             1 row in set (0.00 sec)
+
+             +---------------------------------------------+
+             | Info                                        |
+             +---------------------------------------------+
+             | Data collection starting for THREAD_ID = 25 |
+             +---------------------------------------------+
+             1 row in set (0.03 sec)
+
+             +-----------------------------------------------------------+
+             | Info                                                      |
+             +-----------------------------------------------------------+
+             | Stack trace written to /tmp/stack-2014-02-16-21:18:41.dot |
+             +-----------------------------------------------------------+
+             1 row in set (60.07 sec)
+
+             +-------------------------------------------------------------------+
+             | Convert to PDF                                                    |
+             +-------------------------------------------------------------------+
+             | dot -Tpdf -o /tmp/stack_25.pdf /tmp/stack-2014-02-16-21:18:41.dot |
+             +-------------------------------------------------------------------+
+             1 row in set (60.07 sec)
+
+             +-------------------------------------------------------------------+
+             | Convert to PNG                                                    |
+             +-------------------------------------------------------------------+
+             | dot -Tpng -o /tmp/stack_25.png /tmp/stack-2014-02-16-21:18:41.dot |
+             +-------------------------------------------------------------------+
+             1 row in set (60.07 sec)
+
+             +------------------+
+             | summary          |
+             +------------------+
+             | Enabled 1 thread |
+             +------------------+
+             1 row in set (60.32 sec)
+            '
+    SQL SECURITY INVOKER
+    NOT DETERMINISTIC
+    MODIFIES SQL DATA
 BEGIN
     DECLARE v_done bool DEFAULT FALSE;
     DECLARE v_start, v_runtime DECIMAL(20,2) DEFAULT 0.0;
@@ -41,7 +113,7 @@ BEGIN
         SELECT CONCAT(IF(nesting_event_id IS NOT NULL, CONCAT(nesting_event_id, ' -> '), ''), 
                     event_id, '; ', event_id, ' [label="',
                     /* Convert from picoseconds to microseconds */
-                    '(', ps_helper.format_time(timer_wait), ') ',
+                    '(', sys.format_time(timer_wait), ') ',
                     IF (event_name NOT LIKE 'wait/io%', 
                         SUBSTRING_INDEX(event_name, '/', -2), 
                         IF (event_name NOT LIKE 'wait/io/file%' OR event_name NOT LIKE 'wait/io/socket%',
@@ -95,7 +167,7 @@ BEGIN
                      CONCAT(sql_text, '\\n',
                             'errors: ', errors, '\\n',
                             'warnings: ', warnings, '\\n',
-                            'lock time: ', ps_helper.format_time(lock_time),'\\n',
+                            'lock time: ', sys.format_time(lock_time),'\\n',
                             'rows affected: ', rows_affected, '\\n',
                             'rows sent: ', rows_sent, '\\n',
                             'rows examined: ', rows_examined, '\\n',
@@ -145,10 +217,10 @@ BEGIN
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET v_done = TRUE;
 
     /* Do not track the current thread, it will kill the stack */
-    CALL ps_helper.disable_current_thread();
+    CALL sys.ps_setup_disable_thread(CONNECTION_ID());
 
     IF (in_auto_setup) THEN
-        CALL ps_helper.save_current_config();
+        CALL sys.ps_setup_save(0);
         
         /* Ensure only the thread to create the stack trace for is instrumented and that we instrument
            everything. */
@@ -215,11 +287,6 @@ BEGIN
         SET v_runtime = v_runtime + (UNIX_TIMESTAMP() - v_start);
     END WHILE;
 
-    /* Reset the settings for the performance schema */
-    IF (in_auto_setup) THEN
-        CALL ps_helper.reload_saved_config();
-    END IF;
-
     INSERT INTO tmp_events VALUES (v_min_event_id+1, '}');
    
     SET @query = CONCAT('SELECT event FROM tmp_events ORDER BY event_id INTO OUTFILE ''', in_outfile, ''' FIELDS ESCAPED BY '''' LINES TERMINATED BY ''''');
@@ -231,6 +298,12 @@ BEGIN
     SELECT CONCAT('dot -Tpdf -o /tmp/stack_', in_thread_id, '.pdf ', in_outfile) AS 'Convert to PDF';
     SELECT CONCAT('dot -Tpng -o /tmp/stack_', in_thread_id, '.png ', in_outfile) AS 'Convert to PNG';
     DROP TEMPORARY TABLE tmp_events;
+
+    /* Reset the settings for the performance schema */
+    IF (in_auto_setup) THEN
+        CALL sys.ps_setup_reload_saved();
+        CALL sys.ps_setup_enable_thread(CONNECTION_ID());
+    END IF;
 END$$
 
 DELIMITER ;

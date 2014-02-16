@@ -1,3 +1,18 @@
+/* Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; version 2 of the License.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
+
 /*
  * View: user_summary_by_statement_type
  *
@@ -25,9 +40,9 @@ CREATE SQL SECURITY INVOKER VIEW user_summary_by_statement_type AS
 SELECT user,
        SUBSTRING_INDEX(event_name, '/', -1) AS statement,
        count_star AS count,
-       format_time(sum_timer_wait) AS total_latency,
-       format_time(max_timer_wait) AS max_latency,
-       format_time(sum_lock_time) AS lock_latency,
+       sys.format_time(sum_timer_wait) AS total_latency,
+       sys.format_time(max_timer_wait) AS max_latency,
+       sys.format_time(sum_lock_time) AS lock_latency,
        sum_rows_sent AS rows_sent,
        sum_rows_examined AS rows_examined,
        sum_rows_affected AS rows_affected,

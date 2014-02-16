@@ -1,3 +1,18 @@
+/* Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; version 2 of the License.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
+
 /*
  * View: statement_analysis
  *
@@ -25,16 +40,16 @@
 DROP VIEW IF EXISTS statement_analysis;
 
 CREATE SQL SECURITY INVOKER VIEW statement_analysis AS
-SELECT ps_helper.format_statement(DIGEST_TEXT) AS query,
+SELECT sys.format_statement(DIGEST_TEXT) AS query,
        SCHEMA_NAME AS db,
        IF(SUM_NO_GOOD_INDEX_USED > 0 OR SUM_NO_INDEX_USED > 0, '*', '') AS full_scan,
        COUNT_STAR AS exec_count,
        SUM_ERRORS AS err_count,
        SUM_WARNINGS AS warn_count,
-       ps_helper.format_time(SUM_TIMER_WAIT) AS total_latency,
-       ps_helper.format_time(MAX_TIMER_WAIT) AS max_latency,
-       ps_helper.format_time(AVG_TIMER_WAIT) AS avg_latency,
-       ps_helper.format_time(SUM_LOCK_TIME) AS lock_latency,
+       sys.format_time(SUM_TIMER_WAIT) AS total_latency,
+       sys.format_time(MAX_TIMER_WAIT) AS max_latency,
+       sys.format_time(AVG_TIMER_WAIT) AS avg_latency,
+       sys.format_time(SUM_LOCK_TIME) AS lock_latency,
        SUM_ROWS_SENT AS rows_sent,
        ROUND(SUM_ROWS_SENT / COUNT_STAR) AS rows_sent_avg,
        SUM_ROWS_EXAMINED AS rows_examined,

@@ -1,3 +1,18 @@
+/* Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; version 2 of the License.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
+
 /*
  * View: processlist
  *
@@ -44,14 +59,14 @@ SELECT pps.thread_id AS thd_id,
        pps.processlist_command AS command,
        pps.processlist_state AS state,
        pps.processlist_time AS time,
-       format_statement(pps.processlist_info) AS current_statement,
+       sys.format_statement(pps.processlist_info) AS current_statement,
        IF(esc.timer_wait IS NOT NULL,
-          format_statement(esc.sql_text),
+          sys.format_statement(esc.sql_text),
           NULL) AS last_statement,
        IF(esc.timer_wait IS NOT NULL,
-          format_time(esc.timer_wait),
+          sys.format_time(esc.timer_wait),
           NULL) as last_statement_latency,
-       format_time(esc.lock_time) AS lock_latency,
+       sys.format_time(esc.lock_time) AS lock_latency,
        esc.rows_examined,
        esc.rows_sent,
        esc.rows_affected,
@@ -62,7 +77,7 @@ SELECT pps.thread_id AS thd_id,
        ewc.event_name AS last_wait,
        IF(ewc.timer_wait IS NULL AND ewc.event_name IS NOT NULL, 
           'Still Waiting', 
-          format_time(ewc.timer_wait)) last_wait_latency,
+          sys.format_time(ewc.timer_wait)) last_wait_latency,
        ewc.source
   FROM performance_schema.threads AS pps
   LEFT JOIN performance_schema.events_waits_current AS ewc USING (thread_id)

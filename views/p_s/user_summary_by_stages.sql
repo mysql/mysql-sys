@@ -1,3 +1,18 @@
+/* Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; version 2 of the License.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
+
 /*
  * View: user_summary_by_stages
  *
@@ -24,8 +39,8 @@ DROP VIEW IF EXISTS user_summary_by_stages;
 CREATE SQL SECURITY INVOKER VIEW user_summary_by_stages AS
 SELECT user, event_name,
        count_star AS count,
-       format_time(sum_timer_wait) AS wait_sum, 
-       format_time(avg_timer_wait) AS wait_avg 
+       sys.format_time(sum_timer_wait) AS wait_sum, 
+       sys.format_time(avg_timer_wait) AS wait_avg 
   FROM performance_schema.events_stages_summary_by_user_by_event_name
  WHERE user IS NOT NULL 
    AND sum_timer_wait != 0 

@@ -1,3 +1,18 @@
+/* Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; version 2 of the License.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
+
 /* 
  * View: schema_table_statistics
  *
@@ -36,21 +51,21 @@ CREATE SQL SECURITY INVOKER VIEW schema_table_statistics AS
 SELECT pst.object_schema AS table_schema,
        pst.object_name AS table_name,
        pst.count_fetch AS rows_fetched,
-       ps_helper.format_time(pst.sum_timer_fetch) AS fetch_latency,
+       sys.format_time(pst.sum_timer_fetch) AS fetch_latency,
        pst.count_insert AS rows_inserted,
-       ps_helper.format_time(pst.sum_timer_insert) AS insert_latency,
+       sys.format_time(pst.sum_timer_insert) AS insert_latency,
        pst.count_update AS rows_updated,
-       ps_helper.format_time(pst.sum_timer_update) AS update_latency,
+       sys.format_time(pst.sum_timer_update) AS update_latency,
        pst.count_delete AS rows_deleted,
-       ps_helper.format_time(pst.sum_timer_delete) AS delete_latency,
+       sys.format_time(pst.sum_timer_delete) AS delete_latency,
        SUM(fsbi.count_read) AS io_read_requests,
-       ps_helper.format_bytes(SUM(fsbi.sum_number_of_bytes_read)) AS io_read,
-       ps_helper.format_time(SUM(fsbi.sum_timer_read)) AS io_read_latency,
+       sys.format_bytes(SUM(fsbi.sum_number_of_bytes_read)) AS io_read,
+       sys.format_time(SUM(fsbi.sum_timer_read)) AS io_read_latency,
        SUM(fsbi.count_write) AS io_write_requests,
-       ps_helper.format_bytes(SUM(fsbi.sum_number_of_bytes_write)) AS io_write,
-       ps_helper.format_time(SUM(fsbi.sum_timer_write)) AS io_write_latency,
+       sys.format_bytes(SUM(fsbi.sum_number_of_bytes_write)) AS io_write,
+       sys.format_time(SUM(fsbi.sum_timer_write)) AS io_write_latency,
        SUM(fsbi.count_misc) AS io_misc_requests,
-       ps_helper.format_time(SUM(fsbi.sum_timer_misc)) AS io_misc_latency
+       sys.format_time(SUM(fsbi.sum_timer_misc)) AS io_misc_latency
   FROM performance_schema.table_io_waits_summary_by_table AS pst
   LEFT JOIN performance_schema.file_summary_by_instance AS fsbi
     ON pst.object_schema = extract_schema_from_file_name(fsbi.file_name)

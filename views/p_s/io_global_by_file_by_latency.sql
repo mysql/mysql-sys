@@ -1,3 +1,18 @@
+/* Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; version 2 of the License.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
+
 /*
  * View: io_global_by_file_by_latency
  *
@@ -21,15 +36,15 @@
 DROP VIEW IF EXISTS io_global_by_file_by_latency;
 
 CREATE SQL SECURITY INVOKER VIEW io_global_by_file_by_latency AS
-SELECT ps_helper.format_path(file_name) AS file, 
+SELECT sys.format_path(file_name) AS file, 
        count_star, 
-       ps_helper.format_time(sum_timer_wait) AS total_latency,
+       sys.format_time(sum_timer_wait) AS total_latency,
        count_read,
-       ps_helper.format_time(sum_timer_read) AS read_latency,
+       sys.format_time(sum_timer_read) AS read_latency,
        count_write,
-       ps_helper.format_time(sum_timer_write) AS write_latency,
+       sys.format_time(sum_timer_write) AS write_latency,
        count_misc,
-       ps_helper.format_time(sum_timer_misc) AS misc_latency
+       sys.format_time(sum_timer_misc) AS misc_latency
   FROM performance_schema.file_summary_by_instance
  ORDER BY sum_timer_wait DESC;
 

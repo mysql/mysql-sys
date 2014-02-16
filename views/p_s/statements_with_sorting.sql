@@ -1,10 +1,25 @@
+/* Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; version 2 of the License.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
+
 /*
  * View: statements_with_sorting
  *
  * List all normalized statements that have done sorts,
  * ordered by sort_merge_passes, sort_scans and sort_rows, all descending
  *
- * mysql> select * from ps_helper.statements_with_sorting limit 5;
+ * mysql> select * from statements_with_sorting limit 5;
  * +-------------------------------------------------------------------+-------+------------+-------------------+-----------------+-------------------+------------------+-------------+-----------------+---------------------+---------------------+----------------------------------+
  * | query                                                             | db    | exec_count | sort_merge_passes | avg_sort_merges | sorts_using_scans | sort_using_range | rows_sorted | avg_rows_sorted | first_seen          | last_seen           | digest                           |
  * +-------------------------------------------------------------------+-------+------------+-------------------+-----------------+-------------------+------------------+-------------+-----------------+---------------------+---------------------+----------------------------------+
@@ -23,7 +38,7 @@
 DROP VIEW IF EXISTS statements_with_sorting;
 
 CREATE SQL SECURITY INVOKER VIEW statements_with_sorting AS
-SELECT format_statement(DIGEST_TEXT) AS query,
+SELECT sys.format_statement(DIGEST_TEXT) AS query,
        SCHEMA_NAME db,
        COUNT_STAR AS exec_count,
        SUM_SORT_MERGE_PASSES AS sort_merge_passes,

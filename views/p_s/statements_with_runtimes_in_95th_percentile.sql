@@ -1,25 +1,40 @@
+/* Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; version 2 of the License.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
+
 /*
- * View: _digest_avg_latency_by_avg_us
+ * View: x$ps_digest_avg_latency_distribution
  *
- * Helper view for _digest_95th_percentile_by_avg_us
+ * Helper view for x$ps_digest_95th_percentile_by_avg_us
  *
  * Versions: 5.6.5+
  */
-DROP VIEW IF EXISTS _digest_avg_latency_by_avg_us;
+DROP VIEW IF EXISTS x$ps_digest_avg_latency_distribution;
 
-CREATE SQL SECURITY INVOKER VIEW _digest_avg_latency_by_avg_us AS
+CREATE SQL SECURITY INVOKER VIEW x$ps_digest_avg_latency_distribution AS
 SELECT COUNT(*) cnt, 
        ROUND(avg_timer_wait/1000000) AS avg_us
   FROM performance_schema.events_statements_summary_by_digest
  GROUP BY avg_us;
 
 /*
- * View: _digest_95th_percentile_by_avg_us
+ * View: x$ps_digest_95th_percentile_by_avg_us
  *
  * Helper view for statements_with_runtimes_in_95th_percentile.
  * Lists the 95th percentile runtime, for all statements
  *
- * mysql> select * from _digest_95th_percentile_by_avg_us;
+ * mysql> select * from x$ps_digest_95th_percentile_by_avg_us;
  * +--------+------------+
  * | avg_us | percentile |
  * +--------+------------+
@@ -28,13 +43,13 @@ SELECT COUNT(*) cnt,
  *
  * Versions: 5.6.5+
  */
-DROP VIEW IF EXISTS _digest_95th_percentile_by_avg_us;
+DROP VIEW IF EXISTS x$ps_digest_95th_percentile_by_avg_us;
 
-CREATE SQL SECURITY INVOKER VIEW _digest_95th_percentile_by_avg_us AS
+CREATE SQL SECURITY INVOKER VIEW x$ps_digest_95th_percentile_by_avg_us AS
 SELECT s2.avg_us avg_us,
        SUM(s1.cnt)/(SELECT COUNT(*) FROM performance_schema.events_statements_summary_by_digest) percentile
-  FROM _digest_avg_latency_by_avg_us AS s1
-  JOIN _digest_avg_latency_by_avg_us AS s2
+  FROM sys.x$ps_digest_avg_latency_distribution AS s1
+  JOIN sys.x$ps_digest_avg_latency_distribution AS s2
     ON s1.avg_us <= s2.avg_us
  GROUP BY s2.avg_us
 HAVING percentile > 0.95
@@ -67,15 +82,15 @@ HAVING percentile > 0.95
 DROP VIEW IF EXISTS statements_with_runtimes_in_95th_percentile;
 
 CREATE SQL SECURITY INVOKER VIEW statements_with_runtimes_in_95th_percentile AS
-SELECT format_statement(DIGEST_TEXT) AS query,
+SELECT sys.format_statement(DIGEST_TEXT) AS query,
        SCHEMA_NAME as db,
        IF(SUM_NO_GOOD_INDEX_USED > 0 OR SUM_NO_INDEX_USED > 0, '*', '') AS full_scan,
        COUNT_STAR AS exec_count,
        SUM_ERRORS AS err_count,
        SUM_WARNINGS AS warn_count,
-       format_time(SUM_TIMER_WAIT) AS total_latency,
-       format_time(MAX_TIMER_WAIT) AS max_latency,
-       format_time(AVG_TIMER_WAIT) AS avg_latency,
+       sys.format_time(SUM_TIMER_WAIT) AS total_latency,
+       sys.format_time(MAX_TIMER_WAIT) AS max_latency,
+       sys.format_time(AVG_TIMER_WAIT) AS avg_latency,
        SUM_ROWS_SENT AS rows_sent,
        ROUND(SUM_ROWS_SENT / COUNT_STAR) AS rows_sent_avg,
        SUM_ROWS_EXAMINED AS rows_examined,
@@ -84,7 +99,7 @@ SELECT format_statement(DIGEST_TEXT) AS query,
        LAST_SEEN AS last_seen,
        DIGEST AS digest
   FROM performance_schema.events_statements_summary_by_digest stmts
-  JOIN _digest_95th_percentile_by_avg_us AS top_percentile
+  JOIN sys.x$ps_digest_95th_percentile_by_avg_us AS top_percentile
     ON ROUND(stmts.avg_timer_wait/1000000) >= top_percentile.avg_us
  ORDER BY AVG_TIMER_WAIT DESC;
 
@@ -139,6 +154,6 @@ SELECT DIGEST_TEXT AS query,
        LAST_SEEN as last_seen,
        DIGEST AS digest
   FROM performance_schema.events_statements_summary_by_digest stmts
-  JOIN _digest_95th_percentile_by_avg_us AS top_percentile
+  JOIN sys.x$ps_digest_95th_percentile_by_avg_us AS top_percentile
     ON ROUND(stmts.avg_timer_wait/1000000) >= top_percentile.avg_us
  ORDER BY AVG_TIMER_WAIT DESC;

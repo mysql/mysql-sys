@@ -1,3 +1,18 @@
+/* Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; version 2 of the License.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
+
 /*
  * View: user_summary
  *
@@ -20,8 +35,8 @@ DROP VIEW IF EXISTS user_summary;
 CREATE SQL SECURITY INVOKER VIEW user_summary AS
 SELECT accounts.user,
        SUM(essbubem.count_star) AS total_statements,
-       ps_helper.format_time(SUM(essbubem.sum_timer_wait)) AS total_latency,
-       ps_helper.format_time(SUM(essbubem.sum_timer_wait) / SUM(count_star)) AS avg_latency,
+       sys.format_time(SUM(essbubem.sum_timer_wait)) AS total_latency,
+       sys.format_time(SUM(essbubem.sum_timer_wait) / SUM(count_star)) AS avg_latency,
        accounts.current_connections,
        accounts.total_connections,
        COUNT(DISTINCT host) AS unique_hosts,
@@ -29,7 +44,7 @@ SELECT accounts.user,
        mem.total_allocated AS total_memory_allocated
   FROM performance_schema.accounts
   JOIN performance_schema.events_statements_summary_by_user_by_event_name essbubem ON accounts.user = essbubem.user
-  JOIN ps_helper.memory_by_user_by_current_bytes mem ON accounts.user = mem.user
+  JOIN sys.memory_by_user_by_current_bytes mem ON accounts.user = mem.user
  WHERE accounts.user IS NOT NULL
  GROUP BY accounts.user
  ORDER BY SUM(sum_timer_wait) DESC;
@@ -65,7 +80,7 @@ SELECT accounts.user,
        mem.total_allocated AS total_memory_allocated
   FROM performance_schema.accounts
   JOIN performance_schema.events_statements_summary_by_user_by_event_name essbubem ON accounts.user = essbubem.user
-  JOIN ps_helper.memory_by_user_by_current_bytes_raw mem ON accounts.user = mem.user
+  JOIN sys.memory_by_user_by_current_bytes_raw mem ON accounts.user = mem.user
  WHERE accounts.user IS NOT NULL
  GROUP BY accounts.user
  ORDER BY SUM(sum_timer_wait) DESC;

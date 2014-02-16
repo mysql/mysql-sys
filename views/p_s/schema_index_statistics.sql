@@ -1,3 +1,18 @@
+/* Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; version 2 of the License.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
+
 /*
  * View: schema_index_statistics
  *
@@ -27,13 +42,13 @@ SELECT OBJECT_SCHEMA AS table_schema,
        OBJECT_NAME AS table_name,
        INDEX_NAME as index_name,
        COUNT_FETCH AS rows_selected,
-       ps_helper.format_time(SUM_TIMER_FETCH) AS select_latency,
+       sys.format_time(SUM_TIMER_FETCH) AS select_latency,
        COUNT_INSERT AS rows_inserted,
-       ps_helper.format_time(SUM_TIMER_INSERT) AS insert_latency,
+       sys.format_time(SUM_TIMER_INSERT) AS insert_latency,
        COUNT_UPDATE AS rows_updated,
-       ps_helper.format_time(SUM_TIMER_UPDATE) AS update_latency,
+       sys.format_time(SUM_TIMER_UPDATE) AS update_latency,
        COUNT_DELETE AS rows_deleted,
-       ps_helper.format_time(SUM_TIMER_INSERT) AS delete_latency
+       sys.format_time(SUM_TIMER_INSERT) AS delete_latency
   FROM performance_schema.table_io_waits_summary_by_index_usage
  WHERE index_name IS NOT NULL
  ORDER BY sum_timer_wait DESC;

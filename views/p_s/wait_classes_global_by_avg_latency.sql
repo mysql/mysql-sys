@@ -1,3 +1,18 @@
+/* Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; version 2 of the License.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
+
 /*
  * View: wait_classes_global_by_avg_latency
  * 
@@ -25,10 +40,10 @@ DROP VIEW IF EXISTS wait_classes_global_by_avg_latency;
 CREATE SQL SECURITY INVOKER VIEW wait_classes_global_by_avg_latency AS
 SELECT SUBSTRING_INDEX(event_name,'/', 3) event_class,
        SUM(COUNT_STAR) total_events,
-       format_time(CAST(SUM(sum_timer_wait) AS UNSIGNED)) total_latency,
-       format_time(MIN(min_timer_wait)) min_latency,
-       format_time(SUM(sum_timer_wait) / SUM(COUNT_STAR)) avg_latency,
-       format_time(CAST(MAX(max_timer_wait) AS UNSIGNED)) max_latency
+       sys.format_time(CAST(SUM(sum_timer_wait) AS UNSIGNED)) total_latency,
+       sys.format_time(MIN(min_timer_wait)) min_latency,
+       sys.format_time(SUM(sum_timer_wait) / SUM(COUNT_STAR)) avg_latency,
+       sys.format_time(CAST(MAX(max_timer_wait) AS UNSIGNED)) max_latency
   FROM performance_schema.events_waits_summary_global_by_event_name
  WHERE sum_timer_wait > 0
    AND event_name != 'idle'

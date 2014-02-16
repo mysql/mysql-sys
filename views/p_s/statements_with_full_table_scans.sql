@@ -1,3 +1,18 @@
+/* Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; version 2 of the License.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
+
 /*
  * View: statements_with_full_table_scans
  *
@@ -26,7 +41,7 @@
 DROP VIEW IF EXISTS statements_with_full_table_scans;
 
 CREATE SQL SECURITY INVOKER VIEW statements_with_full_table_scans AS
-SELECT ps_helper.format_statement(DIGEST_TEXT) AS query,
+SELECT sys.format_statement(DIGEST_TEXT) AS query,
        SCHEMA_NAME as db,
        COUNT_STAR AS exec_count,
        SUM_NO_INDEX_USED AS no_index_used_count,

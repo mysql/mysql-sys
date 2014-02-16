@@ -1,3 +1,18 @@
+/* Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; version 2 of the License.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
+
 /*
  * View: io_by_thread_by_latency
  *
@@ -27,16 +42,16 @@
 
 DROP VIEW IF EXISTS io_by_thread_by_latency;
 
-CREATE VIEW io_by_thread_by_latency AS
+CREATE SQL SECURITY INVOKER VIEW io_by_thread_by_latency AS
 SELECT IF(processlist_id IS NULL, 
              SUBSTRING_INDEX(name, '/', -1), 
              CONCAT(processlist_user, '@', processlist_host)
           ) user, 
        SUM(count_star) count_star,
-       format_time(SUM(sum_timer_wait)) total_latency,
-       format_time(MIN(min_timer_wait)) min_latency,
-       format_time(AVG(avg_timer_wait)) avg_latency,
-       format_time(MAX(max_timer_wait)) max_latency,
+       sys.format_time(SUM(sum_timer_wait)) total_latency,
+       sys.format_time(MIN(min_timer_wait)) min_latency,
+       sys.format_time(AVG(avg_timer_wait)) avg_latency,
+       sys.format_time(MAX(max_timer_wait)) max_latency,
        thread_id,
        processlist_id
   FROM performance_schema.events_waits_summary_by_thread_by_event_name 
@@ -78,7 +93,7 @@ SELECT IF(processlist_id IS NULL,
 
 DROP VIEW IF EXISTS io_by_thread_by_latency_raw;
 
-CREATE VIEW io_by_thread_by_latency_raw AS
+CREATE SQL SECURITY INVOKER VIEW io_by_thread_by_latency_raw AS
 SELECT IF(processlist_id IS NULL, 
              SUBSTRING_INDEX(name, '/', -1), 
              CONCAT(processlist_user, '@', processlist_host)

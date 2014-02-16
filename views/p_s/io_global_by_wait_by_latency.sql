@@ -1,3 +1,18 @@
+/* Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; version 2 of the License.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
+
 /*
  * View: io_global_by_wait_by_latency
  *
@@ -36,18 +51,18 @@ DROP VIEW IF EXISTS io_global_by_wait_by_latency;
 CREATE SQL SECURITY INVOKER VIEW io_global_by_wait_by_latency AS
 SELECT SUBSTRING_INDEX(event_name, '/', -2) event_name,
        count_star,
-       format_time(sum_timer_wait) total_latency,
-       format_time(avg_timer_wait) avg_latency,
-       format_time(max_timer_wait) max_latency,
-       format_time(sum_timer_read) read_latency,
-       format_time(sum_timer_write) write_latency,
-       format_time(sum_timer_misc) misc_latency,
+       sys.format_time(sum_timer_wait) total_latency,
+       sys.format_time(avg_timer_wait) avg_latency,
+       sys.format_time(max_timer_wait) max_latency,
+       sys.format_time(sum_timer_read) read_latency,
+       sys.format_time(sum_timer_write) write_latency,
+       sys.format_time(sum_timer_misc) misc_latency,
        count_read,
-       format_bytes(sum_number_of_bytes_read) total_read,
-       format_bytes(IFNULL(sum_number_of_bytes_read / count_read, 0)) avg_read,
+       sys.format_bytes(sum_number_of_bytes_read) total_read,
+       sys.format_bytes(IFNULL(sum_number_of_bytes_read / count_read, 0)) avg_read,
        count_write,
-       format_bytes(sum_number_of_bytes_write) total_written,
-       format_bytes(IFNULL(sum_number_of_bytes_write / count_write, 0)) avg_written
+       sys.format_bytes(sum_number_of_bytes_write) total_written,
+       sys.format_bytes(IFNULL(sum_number_of_bytes_write / count_write, 0)) avg_written
   FROM performance_schema.file_summary_by_event_name 
  WHERE event_name LIKE 'wait/io/file/%'
    AND count_star > 0

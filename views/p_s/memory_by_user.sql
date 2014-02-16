@@ -1,3 +1,18 @@
+/* Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; version 2 of the License.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
+
 /*
  * View: memory_by_user_by_current_bytes
  *
@@ -20,10 +35,10 @@ DROP VIEW IF EXISTS memory_by_user_by_current_bytes;
 CREATE SQL SECURITY INVOKER VIEW memory_by_user_by_current_bytes AS
 SELECT user,
        SUM(current_count_used) AS current_count_used,
-       ps_helper.format_bytes(SUM(current_number_of_bytes_used)) AS current_allocated,
-       ps_helper.format_bytes(SUM(current_number_of_bytes_used) / SUM(current_count_used)) AS current_avg_alloc,
-       ps_helper.format_bytes(MAX(current_number_of_bytes_used)) AS current_max_alloc,
-       ps_helper.format_bytes(SUM(sum_number_of_bytes_alloc)) AS total_allocated
+       sys.format_bytes(SUM(current_number_of_bytes_used)) AS current_allocated,
+       sys.format_bytes(SUM(current_number_of_bytes_used) / SUM(current_count_used)) AS current_avg_alloc,
+       sys.format_bytes(MAX(current_number_of_bytes_used)) AS current_max_alloc,
+       sys.format_bytes(SUM(sum_number_of_bytes_alloc)) AS total_allocated
   FROM performance_schema.memory_summary_by_user_by_event_name
  GROUP BY user
  ORDER BY SUM(current_number_of_bytes_used) DESC;
