@@ -1,7 +1,5 @@
 # The MySQL sys schema
 
-=========
-
 A collection of views, functions and procedures to help MySQL administrators get insight in to MySQL Database usage.
 
 There are install files available for 5.6 and 5.7 respectively. To load these, you must position yourself within the directory that you downloaded to, as these top level files SOURCE individual files that are shared across versions in most cases (though not all).
