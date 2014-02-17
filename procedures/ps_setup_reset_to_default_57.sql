@@ -39,7 +39,7 @@ CREATE DEFINER='root'@'localhost' PROCEDURE ps_setup_reset_to_default (
              Example
              -----------
 
-             mysql> CALL sys.ps_setup_reset_to_default(true)\G
+             mysql> CALL sys.ps_setup_reset_to_default(true)\\G
              *************************** 1. row ***************************
              status: Resetting: setup_actors
              DELETE

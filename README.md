@@ -135,7 +135,7 @@ To disable all mutex instruments:
              +--------------------------+
              1 row in set (0.02 sec)
 
-             To disable just a the scpecific TCP/IP based network IO instrument:
+To disable just a the scpecific TCP/IP based network IO instrument:
 
              mysql> CALL sys.ps_setup_disable_instrument('wait/io/socket/sql/server_tcpip_socket');
              +------------------------+
@@ -145,7 +145,7 @@ To disable all mutex instruments:
              +------------------------+
              1 row in set (0.00 sec)
 
-             To enable all instruments:
+To enable all instruments:
 
              mysql> CALL sys.ps_setup_disable_instrument('');
              +--------------------------+
@@ -178,7 +178,7 @@ Requires the SUPER privilege for "SET sql_log_bin = 0;".
              +-------------------+
              1 row in set (0.01 sec)
 
-             To disable the current connection:
+To disable the current connection:
 
              mysql> CALL sys.ps_setup_disable_thread(CONNECTION_ID());
              +-------------------+
@@ -342,7 +342,7 @@ Resets the Performance Schema setup to the default settings.
 ##### Example
 
 
-             mysql> CALL sys.ps_setup_reset_to_default(true)G
+             mysql> CALL sys.ps_setup_reset_to_default(true)\G
              *************************** 1. row ***************************
              status: Resetting: setup_actors
              DELETE
