@@ -22,7 +22,6 @@ SOURCE ./functions/format_path.sql
 SOURCE ./functions/format_statement.sql
 SOURCE ./functions/format_time.sql
 SOURCE ./functions/ps_is_account_enabled.sql
-SOURCE ./functions/reverse_format_time.sql
 
 SOURCE ./procedures/create_synonym_db.sql
 
