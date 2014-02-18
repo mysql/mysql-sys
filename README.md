@@ -23,6 +23,241 @@ Alternatively, you could just choose to load individual files based on your need
 
 ## Overview of objects
 
+### Functions
+
+#### extract_schema_from_file_name
+
+##### Description
+
+Takes a raw file path, and attempts to extract the schema name from it.
+
+Useful for when interacting with Performance Schema data concerning IO statistics, for example.
+
+Currently relies on the fact that a table data file will be within a specified database directory (will not work with partitions or tables that specify an individual DATA_DIRECTORY).
+
+##### Parameters
+
+* path (VARCHAR(512)): The full file path to a data file to extract the schema name from.
+
+##### Returns
+
+VARCHAR(512)
+
+##### Example
+
+             mysql> SELECT sys.extract_schema_from_file_name('/var/lib/mysql/employees/employee.ibd');
+             +----------------------------------------------------------------------------+
+             | sys.extract_schema_from_file_name('/var/lib/mysql/employees/employee.ibd') |
+             +----------------------------------------------------------------------------+
+             | employees                                                                  |
+             +----------------------------------------------------------------------------+
+             1 row in set (0.00 sec)
+            
+
+#### extract_table_from_file_name
+
+##### Description
+
+Takes a raw file path, and extracts the table name from it.
+
+Useful for when interacting with Performance Schema data concerning IO statistics, for example.
+
+##### Parameters
+
+* path (VARCHAR(512)): The full file path to a data file to extract the table name from.
+
+##### Returns
+
+VARCHAR(512)
+
+##### Example
+
+             mysql> SELECT sys.extract_table_from_file_name('/var/lib/mysql/employees/employee.ibd');
+             +---------------------------------------------------------------------------+
+             | sys.extract_table_from_file_name('/var/lib/mysql/employees/employee.ibd') |
+             +---------------------------------------------------------------------------+
+             | employee                                                                  |
+             +---------------------------------------------------------------------------+
+             1 row in set (0.02 sec)
+            
+
+#### format_bytes
+
+##### Description
+
+Takes a raw bytes value, and converts it to a human readable format.
+
+##### Parameters
+
+* bytes (BIGINT): A raw bytes value.
+
+##### Returns
+
+VARCHAR(16)
+
+##### Example
+
+             mysql> SELECT sys.format_bytes(2348723492723746) AS size;
+             +----------+
+             | size     |
+             +----------+
+             | 2.09 PiB |
+             +----------+
+             1 row in set (0.00 sec)
+
+             mysql> SELECT sys.format_bytes(2348723492723) AS size;
+             +----------+
+             | size     |
+             +----------+
+             | 2.14 TiB |
+             +----------+
+             1 row in set (0.00 sec)
+
+             mysql> SELECT sys.format_bytes(23487234) AS size;
+             +-----------+
+             | size      |
+             +-----------+
+             | 22.40 MiB |
+             +-----------+
+             1 row in set (0.00 sec)
+            
+
+#### format_path
+
+##### Description
+
+Takes a raw path value, and strips out the datadir or tmpdir replacing with @@datadir and @@tmpdir respectively. 
+
+Also normalizes the paths across operating systems, so backslashes on Windows are converted to forward slashes.
+
+##### Parameters
+
+* path (VARCHAR(260)): The raw file path value to format.
+
+##### Returns
+
+VARCHAR(260) CHARSET UTF8
+
+##### Example
+
+             mysql> select @@datadir;
+             +-----------------------------------------------+
+             | @@datadir                                     |
+             +-----------------------------------------------+
+             | /Users/mark/sandboxes/SmallTree/AMaster/data/ |
+             +-----------------------------------------------+
+             1 row in set (0.06 sec)
+
+             mysql> select format_path('/Users/mark/sandboxes/SmallTree/AMaster/data/mysql/proc.MYD') AS path;
+             +--------------------------+
+             | path                     |
+             +--------------------------+
+             | @@datadir/mysql/proc.MYD |
+             +--------------------------+
+             1 row in set (0.03 sec)
+            
+
+#### format_statement
+
+##### Description
+
+Formats a normalized statement, truncating it if it's > 64 characters long.
+
+Useful for printing statement related data from Performance Schema from the command line.
+
+##### Parameters
+
+* statement (LONGTEXT): The statement to format.
+
+##### Returns
+
+VARCHAR(65)
+
+##### Example
+
+             mysql> SELECT sys.format_statement(digest_text)
+                 ->   FROM performance_schema.events_statements_summary_by_digest
+                 ->  ORDER by sum_timer_wait DESC limit 5;
+             +-------------------------------------------------------------------+
+             | sys.format_statement(digest_text)                                 |
+             +-------------------------------------------------------------------+
+             | CREATE SQL SECURITY INVOKER VI ... KE ? AND `variable_value` > ?  |
+             | CREATE SQL SECURITY INVOKER VI ... ait` IS NOT NULL , `esc` . ... |
+             | CREATE SQL SECURITY INVOKER VI ... ait` IS NOT NULL , `sys` . ... |
+             | CREATE SQL SECURITY INVOKER VI ...  , `compressed_size` ) ) DESC  |
+             | CREATE SQL SECURITY INVOKER VI ... LIKE ? ORDER BY `timer_start`  |
+             +-------------------------------------------------------------------+
+             5 rows in set (0.00 sec)
+            
+
+#### format_time
+
+##### Description
+
+Takes a raw picoseconds value, and converts it to a human readable form.
+             
+Picoseconds are the precision that all latency values are printed in within Performance Schema, however are not user friendly when wanting to scan output from the command line.
+
+##### Parameters
+
+* picoseconds (BIGINT UNSIGNED): The raw picoseconds value to convert.
+
+##### Returns
+
+VARCHAR(16) CHARSET UTF8
+
+##### Example
+
+             mysql> select format_time(342342342342345);
+             +------------------------------+
+             | format_time(342342342342345) |
+             +------------------------------+
+             | 00:05:42                     |
+             +------------------------------+
+             1 row in set (0.00 sec)
+
+             mysql> select format_time(342342342);
+             +------------------------+
+             | format_time(342342342) |
+             +------------------------+
+             | 342.34 µs              |
+             +------------------------+
+             1 row in set (0.00 sec)
+
+             mysql> select format_time(34234);
+              +--------------------+
+             | format_time(34234) |
+             +--------------------+
+             | 34.23 ns           |
+             +--------------------+
+             1 row in set (0.00 sec)
+            
+
+#### ps_is_account_enabled
+
+##### Description
+
+Determines whether instrumentation of an account is enabled within Performance Schema.
+
+##### Parameters
+
+* in_host VARCHAR(60): The hostname of the account to check.
+* in_user (VARCHAR(16)): The username of the account to check.
+
+##### Returns
+
+ENUM('YES', 'NO', 'PARTIAL')
+
+##### Example
+
+             mysql> SELECT sys.ps_is_account_enabled('localhost', 'root');
+             +------------------------------------------------+
+             | sys.ps_is_account_enabled('localhost', 'root') |
+             +------------------------------------------------+
+             | YES                                            |
+             +------------------------------------------------+
+             1 row in set (0.01 sec)
+
 ### Procedures
 
 #### create_synonym_db

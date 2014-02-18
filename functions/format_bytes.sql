@@ -11,47 +11,63 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
-
-/*
- * Function: format_bytes()
- * 
- * Takes a raw bytes value, and converts it to a human readable form
- *
- * Parameters
- *   bytes: The raw bytes value to convert
- *
- * mysql> select format_bytes(2348723492723746);
- * +--------------------------------+
- * | format_bytes(2348723492723746) |
- * +--------------------------------+
- * | 2.09 PiB                       |
- * +--------------------------------+
- * 1 row in set (0.00 sec)
- * 
- * mysql> select format_bytes(2348723492723);
- * +-----------------------------+
- * | format_bytes(2348723492723) |
- * +-----------------------------+
- * | 2.14 TiB                    |
- * +-----------------------------+
- * 1 row in set (0.00 sec)
- * 
- * mysql> select format_bytes(23487234);
- * +------------------------+
- * | format_bytes(23487234) |
- * +------------------------+
- * | 22.40 MiB              |
- * +------------------------+
- * 1 row in set (0.00 sec)
- */
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA */
 
 DROP FUNCTION IF EXISTS format_bytes;
 
 DELIMITER $$
 
-CREATE FUNCTION format_bytes(bytes BIGINT)
-  RETURNS VARCHAR(16) DETERMINISTIC
+CREATE DEFINER='root'@'localhost' FUNCTION format_bytes (
+        bytes BIGINT
+    )
+    RETURNS VARCHAR(16)
+    COMMENT '
+             Description
+             -----------
+
+             Takes a raw bytes value, and converts it to a human readable format.
+
+             Parameters
+             -----------
+
+             bytes (BIGINT):
+               A raw bytes value.
+
+             Returns
+             -----------
+
+             VARCHAR(16)
+
+             Example
+             -----------
+
+             mysql> SELECT sys.format_bytes(2348723492723746) AS size;
+             +----------+
+             | size     |
+             +----------+
+             | 2.09 PiB |
+             +----------+
+             1 row in set (0.00 sec)
+
+             mysql> SELECT sys.format_bytes(2348723492723) AS size;
+             +----------+
+             | size     |
+             +----------+
+             | 2.14 TiB |
+             +----------+
+             1 row in set (0.00 sec)
+
+             mysql> SELECT sys.format_bytes(23487234) AS size;
+             +-----------+
+             | size      |
+             +-----------+
+             | 22.40 MiB |
+             +-----------+
+             1 row in set (0.00 sec)
+            '
+    SQL SECURITY INVOKER
+    DETERMINISTIC
+    NO SQL
 BEGIN
   IF bytes IS NULL THEN RETURN NULL;
   ELSEIF bytes >= 1125899906842624 THEN RETURN CONCAT(ROUND(bytes / 1125899906842624, 2), ' PiB');

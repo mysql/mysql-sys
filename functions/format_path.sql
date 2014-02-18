@@ -11,43 +11,59 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
-
-/*
- * Function: format_path()
- * 
- * Takes a raw path value, and strips out the datadir or tmpdir
- * replacing with @@datadir and @@tmpdir respectively. 
- *
- * Also normalizes the paths across operating systems, so backslashes
- * on Windows are converted to forward slashes
- *
- * Parameters
- *   path: The raw file path value to format
- *
- * mysql> select @@datadir;
- * +-----------------------------------------------+
- * | @@datadir                                     |
- * +-----------------------------------------------+
- * | /Users/mark/sandboxes/SmallTree/AMaster/data/ |
- * +-----------------------------------------------+
- * 1 row in set (0.06 sec)
- * 
- * mysql> select format_path('/Users/mark/sandboxes/SmallTree/AMaster/data/mysql/proc.MYD');
- * +----------------------------------------------------------------------------+
- * | format_path('/Users/mark/sandboxes/SmallTree/AMaster/data/mysql/proc.MYD') |
- * +----------------------------------------------------------------------------+
- * | @@datadir/mysql/proc.MYD                                                   |
- * +----------------------------------------------------------------------------+
- * 1 row in set (0.03 sec)
- */
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA */
 
 DROP FUNCTION IF EXISTS format_path;
 
 DELIMITER $$
 
-CREATE FUNCTION format_path(path VARCHAR(260))
-  RETURNS VARCHAR(260) CHARSET UTF8 DETERMINISTIC
+CREATE DEFINER='root'@'localhost' FUNCTION format_path (
+        path VARCHAR(260)
+    )
+    RETURNS VARCHAR(260) CHARSET UTF8
+    COMMENT '
+             Description
+             -----------
+
+             Takes a raw path value, and strips out the datadir or tmpdir
+             replacing with @@datadir and @@tmpdir respectively. 
+
+             Also normalizes the paths across operating systems, so backslashes
+             on Windows are converted to forward slashes
+
+             Parameters
+             -----------
+
+             path (VARCHAR(260)): 
+               The raw file path value to format.
+
+             Returns
+             -----------
+
+             VARCHAR(260) CHARSET UTF8
+
+             Example
+             -----------
+
+             mysql> select @@datadir;
+             +-----------------------------------------------+
+             | @@datadir                                     |
+             +-----------------------------------------------+
+             | /Users/mark/sandboxes/SmallTree/AMaster/data/ |
+             +-----------------------------------------------+
+             1 row in set (0.06 sec)
+
+             mysql> select format_path(\'/Users/mark/sandboxes/SmallTree/AMaster/data/mysql/proc.MYD\') AS path;
+             +--------------------------+
+             | path                     |
+             +--------------------------+
+             | @@datadir/mysql/proc.MYD |
+             +--------------------------+
+             1 row in set (0.03 sec)
+            '
+    SQL SECURITY INVOKER
+    DETERMINISTIC
+    NO SQL
 BEGIN
   DECLARE v_path VARCHAR(260);
 
