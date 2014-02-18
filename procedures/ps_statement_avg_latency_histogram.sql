@@ -66,7 +66,7 @@ CREATE DEFINER='root'@'localhost' PROCEDURE ps_statement_avg_latency_histogram (
             '
     SQL SECURITY INVOKER
     NOT DETERMINISTIC
-    MODIFIES SQL DATA
+    READS SQL DATA
 BEGIN
 SELECT CONCAT('\n',
        '\n  . = 1 unit',
