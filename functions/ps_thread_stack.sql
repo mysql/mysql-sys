@@ -163,8 +163,8 @@ BEGIN
                             CONCAT('"mysql_version": "', VERSION(), '"'),
                             CONCAT('"mysql_user": "', CURRENT_USER(), '"'),
                             CONCAT('"events": [', IFNULL(json_objects,''), ']')
-							             ),
-				          '}');
+                           ),
+                  '}');
 
 END$$
 
