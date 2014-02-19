@@ -44,7 +44,7 @@ Currently relies on the fact that a table data file will be within a specified d
 VARCHAR(512)
 
 ##### Example
-
+```SQL
              mysql> SELECT sys.extract_schema_from_file_name('/var/lib/mysql/employees/employee.ibd');
              +----------------------------------------------------------------------------+
              | sys.extract_schema_from_file_name('/var/lib/mysql/employees/employee.ibd') |
@@ -52,7 +52,7 @@ VARCHAR(512)
              | employees                                                                  |
              +----------------------------------------------------------------------------+
              1 row in set (0.00 sec)
-            
+```
 
 #### extract_table_from_file_name
 
@@ -71,7 +71,7 @@ Useful for when interacting with Performance Schema data concerning IO statistic
 VARCHAR(512)
 
 ##### Example
-
+```SQL
              mysql> SELECT sys.extract_table_from_file_name('/var/lib/mysql/employees/employee.ibd');
              +---------------------------------------------------------------------------+
              | sys.extract_table_from_file_name('/var/lib/mysql/employees/employee.ibd') |
@@ -79,7 +79,7 @@ VARCHAR(512)
              | employee                                                                  |
              +---------------------------------------------------------------------------+
              1 row in set (0.02 sec)
-            
+```         
 
 #### format_bytes
 
@@ -96,7 +96,7 @@ Takes a raw bytes value, and converts it to a human readable format.
 VARCHAR(16)
 
 ##### Example
-
+```SQL
              mysql> SELECT sys.format_bytes(2348723492723746) AS size;
              +----------+
              | size     |
@@ -120,7 +120,7 @@ VARCHAR(16)
              | 22.40 MiB |
              +-----------+
              1 row in set (0.00 sec)
-            
+```
 
 #### format_path
 
@@ -139,7 +139,7 @@ Also normalizes the paths across operating systems, so backslashes on Windows ar
 VARCHAR(260) CHARSET UTF8
 
 ##### Example
-
+```SQL
              mysql> select @@datadir;
              +-----------------------------------------------+
              | @@datadir                                     |
@@ -155,7 +155,7 @@ VARCHAR(260) CHARSET UTF8
              | @@datadir/mysql/proc.MYD |
              +--------------------------+
              1 row in set (0.03 sec)
-            
+```
 
 #### format_statement
 
@@ -174,7 +174,7 @@ Useful for printing statement related data from Performance Schema from the comm
 VARCHAR(65)
 
 ##### Example
-
+```SQL
              mysql> SELECT sys.format_statement(digest_text)
                  ->   FROM performance_schema.events_statements_summary_by_digest
                  ->  ORDER by sum_timer_wait DESC limit 5;
@@ -188,7 +188,7 @@ VARCHAR(65)
              | CREATE SQL SECURITY INVOKER VI ... LIKE ? ORDER BY `timer_start`  |
              +-------------------------------------------------------------------+
              5 rows in set (0.00 sec)
-            
+```
 
 #### format_time
 
@@ -207,7 +207,7 @@ Picoseconds are the precision that all latency values are printed in within Perf
 VARCHAR(16) CHARSET UTF8
 
 ##### Example
-
+```SQL
              mysql> select format_time(342342342342345);
              +------------------------------+
              | format_time(342342342342345) |
@@ -231,7 +231,7 @@ VARCHAR(16) CHARSET UTF8
              | 34.23 ns           |
              +--------------------+
              1 row in set (0.00 sec)
-            
+```
 
 #### ps_is_account_enabled
 
@@ -249,7 +249,7 @@ Determines whether instrumentation of an account is enabled within Performance S
 ENUM('YES', 'NO', 'PARTIAL')
 
 ##### Example
-
+```SQL
              mysql> SELECT sys.ps_is_account_enabled('localhost', 'root');
              +------------------------------------------------+
              | sys.ps_is_account_enabled('localhost', 'root') |
@@ -257,6 +257,7 @@ ENUM('YES', 'NO', 'PARTIAL')
              | YES                                            |
              +------------------------------------------------+
              1 row in set (0.01 sec)
+```
 
 ### Procedures
 
@@ -276,7 +277,7 @@ Useful for creating a "ps" synonym for "performance_schema", or "is" instead of 
 ** The database synonym name.
 
 ##### Example
-
+```SQL
              mysql> SHOW DATABASES;
              +--------------------+
              | Database           |
@@ -321,7 +322,7 @@ Useful for creating a "ps" synonym for "performance_schema", or "is" instead of 
              | events_stages_current                                | VIEW       |
              | events_stages_history                                | VIEW       |
              ...
-            
+```
 
 #### ps_setup_disable_background_threads
 
@@ -336,7 +337,7 @@ Requires the SUPER privilege for "SET sql_log_bin = 0;".
 None.
 
 ##### Example
-
+```SQL
              mysql> CALL sys.ps_setup_disable_background_threads();
              +--------------------------------+
              | summary                        |
@@ -344,7 +345,7 @@ None.
              | Disabled 18 background threads |
              +--------------------------------+
              1 row in set (0.00 sec)
-            
+```
 
 #### ps_setup_disable_instrument
 
@@ -361,7 +362,7 @@ Requires the SUPER privilege for "SET sql_log_bin = 0;".
 ##### Example
 
 To disable all mutex instruments:
-
+```SQL
              mysql> CALL sys.ps_setup_disable_instrument('wait/synch/mutex');
              +--------------------------+
              | summary                  |
@@ -369,9 +370,9 @@ To disable all mutex instruments:
              | Disabled 155 instruments |
              +--------------------------+
              1 row in set (0.02 sec)
-
+```
 To disable just a the scpecific TCP/IP based network IO instrument:
-
+```SQL
              mysql> CALL sys.ps_setup_disable_instrument('wait/io/socket/sql/server_tcpip_socket');
              +------------------------+
              | summary                |
@@ -379,9 +380,9 @@ To disable just a the scpecific TCP/IP based network IO instrument:
              | Disabled 1 instruments |
              +------------------------+
              1 row in set (0.00 sec)
-
+```
 To enable all instruments:
-
+```SQL
              mysql> CALL sys.ps_setup_disable_instrument('');
              +--------------------------+
              | summary                  |
@@ -389,7 +390,7 @@ To enable all instruments:
              | Disabled 547 instruments |
              +--------------------------+
              1 row in set (0.01 sec)
-            
+```
 
 #### ps_setup_disable_thread
 
@@ -404,7 +405,7 @@ Requires the SUPER privilege for "SET sql_log_bin = 0;".
 * in_connection_id (BIGINT): The connection ID (PROCESSLIST_ID from performance_schema.threads or the ID shown within SHOW PROCESSLIST)
 
 ##### Example
-
+```SQL
              mysql> CALL sys.ps_setup_disable_thread(3);
              +-------------------+
              | summary           |
@@ -412,9 +413,9 @@ Requires the SUPER privilege for "SET sql_log_bin = 0;".
              | Disabled 1 thread |
              +-------------------+
              1 row in set (0.01 sec)
-
+```
 To disable the current connection:
-
+```SQL
              mysql> CALL sys.ps_setup_disable_thread(CONNECTION_ID());
              +-------------------+
              | summary           |
@@ -422,7 +423,7 @@ To disable the current connection:
              | Disabled 1 thread |
              +-------------------+
              1 row in set (0.00 sec)
-            
+```
 
 #### ps_setup_enable_background_threads
 
@@ -437,7 +438,7 @@ Requires the SUPER privilege for "SET sql_log_bin = 0;".
 None.
 
 ##### Example
-
+```SQL
              mysql> CALL sys.ps_setup_enable_background_threads();
              +-------------------------------+
              | summary                       |
@@ -445,7 +446,7 @@ None.
              | Enabled 18 background threads |
              +-------------------------------+
              1 row in set (0.00 sec)
-            
+```
 
 #### ps_setup_enable_instrument
 
@@ -463,7 +464,7 @@ Requires the SUPER privilege for "SET sql_log_bin = 0;".
 ##### Example
 
 To enable all mutex instruments:
-
+```SQL
              mysql> CALL sys.ps_setup_enable_instrument('wait/synch/mutex');
              +-------------------------+
              | summary                 |
@@ -473,9 +474,9 @@ To enable all mutex instruments:
              1 row in set (0.02 sec)
 
              Query OK, 0 rows affected (0.02 sec)
-
+```
 To enable just a the scpecific TCP/IP based network IO instrument:
-
+```SQL
              mysql> CALL sys.ps_setup_enable_instrument('wait/io/socket/sql/server_tcpip_socket');
              +-----------------------+
              | summary               |
@@ -485,9 +486,9 @@ To enable just a the scpecific TCP/IP based network IO instrument:
              1 row in set (0.00 sec)
 
              Query OK, 0 rows affected (0.00 sec)
-
+```
 To enable all instruments:
-
+```SQL
              mysql> CALL sys.ps_setup_enable_instrument('');
              +-------------------------+
              | summary                 |
@@ -497,7 +498,7 @@ To enable all instruments:
              1 row in set (0.01 sec)
 
              Query OK, 0 rows affected (0.01 sec)
-            
+```
 
 #### ps_setup_enable_thread
 
@@ -513,8 +514,7 @@ Requires the SUPER privilege for "SET sql_log_bin = 0;".
 * in_connection_id (BIGINT): The connection ID (PROCESSLIST_ID from performance_schema.threads or the ID shown within SHOW PROCESSLIST)
 
 ##### Example
-
-
+```SQL
              mysql> CALL sys.ps_setup_enable_thread(3);
              +------------------+
              | summary          |
@@ -522,9 +522,9 @@ Requires the SUPER privilege for "SET sql_log_bin = 0;".
              | Enabled 1 thread |
              +------------------+
              1 row in set (0.01 sec)
-
+```
 To enable the current connection:
-
+```SQL
              mysql> CALL sys.ps_setup_enable_thread(CONNECTION_ID());
              +------------------+
              | summary          |
@@ -532,7 +532,7 @@ To enable the current connection:
              | Enabled 1 thread |
              +------------------+
              1 row in set (0.00 sec)
-            
+```
 
 #### ps_setup_reload_saved
 
@@ -549,8 +549,7 @@ Requires the SUPER privilege for "SET sql_log_bin = 0;".
 None.
 
 ##### Example
-
-
+```SQL
              mysql> CALL sys.ps_setup_save();
              Query OK, 0 rows affected (0.08 sec)
 
@@ -562,7 +561,7 @@ None.
 
              mysql> CALL sys.ps_setup_reload_saved();
              Query OK, 0 rows affected (0.32 sec)
-            
+```
 
 #### ps_setup_reset_to_default
 
@@ -575,8 +574,7 @@ Resets the Performance Schema setup to the default settings.
 * in_verbose (BOOLEAN): Whether to print each setup stage (including the SQL) whilst running.
 
 ##### Example
-
-
+```SQL
              mysql> CALL sys.ps_setup_reset_to_default(true)\G
              *************************** 1. row ***************************
              status: Resetting: setup_actors
@@ -594,7 +592,7 @@ Resets the Performance Schema setup to the default settings.
 
              mysql> CALL sys.ps_setup_reset_to_default(false)G
              Query OK, 0 rows affected (0.00 sec)
-            
+```
 
 #### ps_setup_save
 
@@ -611,8 +609,7 @@ Requires the SUPER privilege for "SET sql_log_bin = 0;".
 None.
 
 ##### Example
-
-
+```SQL
              mysql> CALL sys.ps_setup_save();
              Query OK, 0 rows affected (0.08 sec)
 
@@ -625,7 +622,7 @@ None.
 
              mysql> CALL sys.ps_setup_reload_saved();
              Query OK, 0 rows affected (0.32 sec)
-            
+```
 
 #### ps_setup_show_disabled
 
@@ -639,8 +636,7 @@ Shows all currently disable Performance Schema configuration.
 * in_in_show_threads (BOOLEAN): Whether to print disabled threads
 
 ##### Example
-
-
+```SQL
              mysql> CALL sys.ps_setup_show_disabled(TRUE, TRUE);
              +----------------------------+
              | performance_schema_enabled |
@@ -709,7 +705,7 @@ Shows all currently disable Performance Schema configuration.
              547 rows in set (0.00 sec)
 
              Query OK, 0 rows affected (0.01 sec)
-            
+```
 
 #### ps_setup_show_enabled
 
@@ -723,8 +719,7 @@ Shows all currently enabled Performance Schema configuration.
 * in_show_threads (BOOLEAN): Whether to print enabled threads
 
 ##### Example
-
-
+```SQL
              mysql> CALL sys.ps_setup_show_enabled(TRUE, TRUE);
              +----------------------------+
              | performance_schema_enabled |
@@ -784,7 +779,7 @@ Shows all currently enabled Performance Schema configuration.
              210 rows in set (0.08 sec)
 
              Query OK, 0 rows affected (0.89 sec)
-            
+```
 
 #### ps_statement_avg_latency_histogram
 
@@ -799,8 +794,7 @@ Can be used to show a very high level picture of what kind of latency distributi
 None.
 
 ##### Example
-
-
+```SQL
              mysql> CALL sys.ps_statement_avg_latency_histogram()G
              *************************** 1. row ***************************
              Performance Schema Statement Digest Average Latency Histogram:
@@ -827,7 +821,7 @@ None.
              (576 - 615ms)  1   | .
 
                Total Statements: 350; Buckets: 16; Bucket Size: 38 ms;
-            
+```
 
 #### ps_trace_statement_digest
 
@@ -850,7 +844,7 @@ Note this may fail, as Performance Schema truncates long SQL_TEXT values (and he
 * in_auto_enable (BOOLEAN): Whether to automatically turn on required consumers (default false)
 
 ##### Example
-
+```SQL
              mysql> call ps_analyze_statement_digest('891ec6860f98ba46d89dd20b0c03652c', 10, 0.1, true, true);
              +--------------------+
              | SUMMARY STATISTICS |
@@ -922,7 +916,7 @@ Note this may fail, as Performance Schema truncates long SQL_TEXT values (and he
              1 row in set (9.27 sec)
 
              Query OK, 0 rows affected (9.28 sec)
-            
+```
 
 #### ps_trace_thread
 
@@ -943,8 +937,7 @@ Each resultset returned from the procedure should be used for a complete graph
 * in_debug (BOOLEAN): Whether you would like to include file:lineno in the graph
 
 ##### Example
-
-
+```SQL
              mysql> CALL sys.ps_dump_thread_stack(25, CONCAT('/tmp/stack-', REPLACE(NOW(), ' ', '-'), '.dot'), NULL, NULL, TRUE, TRUE, TRUE);
              +-------------------+
              | summary           |
@@ -987,7 +980,7 @@ Each resultset returned from the procedure should be used for a complete graph
              | Enabled 1 thread |
              +------------------+
              1 row in set (60.32 sec)
-
+```
 
 #### ps_truncate_all_tables
 
@@ -1002,8 +995,7 @@ Requires the SUPER privilege for "SET sql_log_bin = 0;".
 * in_verbose (BOOLEAN): Whether to print each TRUNCATE statement before running
 
 ##### Example
-
-
+```SQL
              mysql> CALL sys.ps_truncate_all_tables(false);
              +---------------------+
              | summary             |
@@ -1011,5 +1003,4 @@ Requires the SUPER privilege for "SET sql_log_bin = 0;".
              | Truncated 44 tables |
              +---------------------+
              1 row in set (0.10 sec)
-
-             Query OK, 0 rows affected (0.10 sec)
+```
