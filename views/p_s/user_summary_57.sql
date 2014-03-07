@@ -19,12 +19,12 @@
  * Summarizes statement activity and connections by user
  *
  * mysql> select * from user_summary;
- * +------+------------------+---------------+-------------+---------------------+-------------------+--------------+----------------+------------------------+
- * | user | total_statements | total_latency | avg_latency | current_connections | total_connections | unique_hosts | current_memory | total_memory_allocated |
- * +------+------------------+---------------+-------------+---------------------+-------------------+--------------+----------------+------------------------+
- * | root |             5663 | 00:01:47.14   | 18.92 ms    |                   1 |                 1 |            1 | 1.41 MiB       | 543.55 MiB             |
- * | mark |              225 | 14.49 s       | 64.40 ms    |                   1 |                 1 |            1 | 707.60 KiB     | 81.02 MiB              |
- * +------+------------------+---------------+-------------+---------------------+-------------------+--------------+----------------+------------------------+
+ * +------+------------+---------------+-------------+---------------------+-------------------+--------------+----------------+------------------------+
+ * | user | statements | total_latency | avg_latency | current_connections | total_connections | unique_hosts | current_memory | total_memory_allocated |
+ * +------+------------+---------------+-------------+---------------------+-------------------+--------------+----------------+------------------------+
+ * | root |       5663 | 00:01:47.14   | 18.92 ms    |                   1 |                 1 |            1 | 1.41 MiB       | 543.55 MiB             |
+ * | mark |        225 | 14.49 s       | 64.40 ms    |                   1 |                 1 |            1 | 707.60 KiB     | 81.02 MiB              |
+ * +------+------------+---------------+-------------+---------------------+-------------------+--------------+----------------+------------------------+
  *
  */
 
@@ -32,11 +32,24 @@ CREATE OR REPLACE
   ALGORITHM = TEMPTABLE
   DEFINER = 'root'@'localhost'
   SQL SECURITY INVOKER 
-VIEW user_summary AS
+VIEW user_summary (
+  user,
+  statements,
+  statement_latency,
+  statement_avg_latency,
+  table_scans,
+  file_ios,
+  file_io_latency,
+  current_connections,
+  total_connections,
+  unique_hosts,
+  current_memory,
+  total_memory_allocated
+) AS
 SELECT accounts.user,
-       SUM(stmt.count) AS statements,
+       SUM(stmt.total) AS statements,
        sys.format_time(SUM(stmt.total_latency)) AS statement_latency,
-       sys.format_time(SUM(stmt.total_latency) / SUM(stmt.count)) AS statement_avg_latency,
+       sys.format_time(SUM(stmt.total_latency) / SUM(stmt.total)) AS statement_avg_latency,
        SUM(stmt.full_scans) AS table_scans,
        SUM(io.ios) AS file_ios,
        sys.format_time(SUM(io.io_latency)) AS file_io_latency,
@@ -58,12 +71,12 @@ SELECT accounts.user,
  * Summarizes statement activity and connections by user
  *
  * mysql> select * from x$user_summary;
- * +------+------------------+-----------------+------------------+---------------------+-------------------+--------------+----------------+------------------------+
- * | user | total_statements | total_latency   | avg_latency      | current_connections | total_connections | unique_hosts | current_memory | total_memory_allocated |
- * +------+------------------+-----------------+------------------+---------------------+-------------------+--------------+----------------+------------------------+
- * | root |             5685 | 107175100271000 | 18852260381.8821 |                   1 |                 1 |            1 |        1459022 |              572855680 |
- * | mark |              225 |  14489223428000 | 64396548568.8889 |                   1 |                 1 |            1 |         724578 |               84958286 |
- * +------+------------------+-----------------+------------------+---------------------+-------------------+--------------+----------------+------------------------+
+ * +------+------------+-----------------+------------------+---------------------+-------------------+--------------+----------------+------------------------+
+ * | user | statements | total_latency   | avg_latency      | current_connections | total_connections | unique_hosts | current_memory | total_memory_allocated |
+ * +------+------------+-----------------+------------------+---------------------+-------------------+--------------+----------------+------------------------+
+ * | root |       5685 | 107175100271000 | 18852260381.8821 |                   1 |                 1 |            1 |        1459022 |              572855680 |
+ * | mark |        225 |  14489223428000 | 64396548568.8889 |                   1 |                 1 |            1 |         724578 |               84958286 |
+ * +------+------------+-----------------+------------------+---------------------+-------------------+--------------+----------------+------------------------+
  * 
  */
 
@@ -71,11 +84,24 @@ CREATE OR REPLACE
   ALGORITHM = TEMPTABLE
   DEFINER = 'root'@'localhost'
   SQL SECURITY INVOKER 
-VIEW x$user_summary AS
+VIEW x$user_summary (
+  user,
+  statements,
+  statement_latency,
+  statement_avg_latency,
+  table_scans,
+  file_ios,
+  file_io_latency,
+  current_connections,
+  total_connections,
+  unique_hosts,
+  current_memory,
+  total_memory_allocated
+) AS
 SELECT accounts.user,
-       SUM(stmt.count) AS statements,
+       SUM(stmt.total) AS statements,
        SUM(stmt.total_latency) AS statement_latency,
-       SUM(stmt.total_latency) / SUM(stmt.count) AS statement_avg_latency,
+       SUM(stmt.total_latency) / SUM(stmt.total) AS statement_avg_latency,
        SUM(stmt.full_scans) AS table_scans,
        SUM(io.ios) AS file_ios,
        SUM(io.io_latency) AS file_io_latency,
@@ -90,4 +116,3 @@ SELECT accounts.user,
   JOIN sys.x$memory_by_user_by_current_bytes mem ON accounts.user = mem.user
  WHERE accounts.user IS NOT NULL
  GROUP BY accounts.user;
-

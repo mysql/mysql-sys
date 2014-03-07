@@ -58,9 +58,9 @@ VIEW user_summary_by_file_io_type (
 ) AS
 SELECT IF(user IS NULL, 'background', user) AS user,
        event_name,
-       count_star total,
-       sys.format_time(sum_timer_wait) latency,
-       sys.format_time(max_timer_wait) max_latency
+       count_star AS total,
+       sys.format_time(sum_timer_wait) AS latency,
+       sys.format_time(max_timer_wait) AS max_latency
   FROM performance_schema.events_waits_summary_by_user_by_event_name
  WHERE event_name LIKE 'wait/io/file%'
    AND count_star > 0
@@ -111,9 +111,9 @@ VIEW x$user_summary_by_file_io_type (
 ) AS
 SELECT IF(user IS NULL, 'background', user) AS user,
        event_name,
-       count_star total,
-       sum_timer_wait latency,
-       max_timer_wait max_latency
+       count_star AS total,
+       sum_timer_wait AS latency,
+       max_timer_wait AS max_latency
   FROM performance_schema.events_waits_summary_by_user_by_event_name
  WHERE event_name LIKE 'wait/io/file%'
    AND count_star > 0

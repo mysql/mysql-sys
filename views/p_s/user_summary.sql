@@ -31,11 +31,22 @@ CREATE OR REPLACE
   ALGORITHM = TEMPTABLE
   DEFINER = 'root'@'localhost'
   SQL SECURITY INVOKER 
-VIEW user_summary AS
+VIEW user_summary (
+  user,
+  statements,
+  statement_latency,
+  statement_avg_latency,
+  table_scans,
+  file_ios,
+  file_io_latency,
+  current_connections,
+  total_connections,
+  unique_hosts
+) AS
 SELECT accounts.user,
-       SUM(stmt.count) AS statements,
+       SUM(stmt.total) AS statements,
        sys.format_time(SUM(stmt.total_latency)) AS statement_latency,
-       sys.format_time(SUM(stmt.total_latency) / SUM(stmt.count)) AS statement_avg_latency,
+       sys.format_time(SUM(stmt.total_latency) / SUM(stmt.total)) AS statement_avg_latency,
        SUM(stmt.full_scans) AS table_scans,
        SUM(io.ios) AS file_ios,
        sys.format_time(SUM(io.io_latency)) AS file_io_latency,
@@ -66,11 +77,22 @@ CREATE OR REPLACE
   ALGORITHM = TEMPTABLE
   DEFINER = 'root'@'localhost'
   SQL SECURITY INVOKER 
-VIEW x$user_summary AS
+VIEW x$user_summary (
+  user,
+  statements,
+  statement_latency,
+  statement_avg_latency,
+  table_scans,
+  file_ios,
+  file_io_latency,
+  current_connections,
+  total_connections,
+  unique_hosts
+) AS
 SELECT accounts.user,
-       SUM(stmt.count) AS statements,
+       SUM(stmt.total) AS statements,
        SUM(stmt.total_latency) AS statement_latency,
-       SUM(stmt.total_latency) / SUM(stmt.count) AS statement_avg_latency,
+       SUM(stmt.total_latency) / SUM(stmt.total) AS statement_avg_latency,
        SUM(stmt.full_scans) AS table_scans,
        SUM(io.ios) AS file_ios,
        SUM(io.io_latency) AS file_io_latency,

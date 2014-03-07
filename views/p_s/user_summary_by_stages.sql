@@ -20,7 +20,7 @@
  * 
  * mysql> select * from user_summary_by_stages;
  * +------+--------------------------------+-------+-----------+-----------+
- * | user | event_name                     | count | wait_sum  | wait_avg  |
+ * | user | event_name                     | total | wait_sum  | wait_avg  |
  * +------+--------------------------------+-------+-----------+-----------+
  * | root | stage/sql/Opening tables       |   889 | 1.97 ms   | 2.22 us   |
  * | root | stage/sql/Creating sort index  |     4 | 1.79 ms   | 446.30 us |
@@ -49,13 +49,13 @@ CREATE OR REPLACE
 VIEW user_summary_by_stages (
   user,
   event_name,
-  count,
+  total,
   wait_sum,
   wait_avg
 ) AS
 SELECT user,
        event_name,
-       count_star AS count,
+       count_star AS total,
        sys.format_time(sum_timer_wait) AS wait_sum, 
        sys.format_time(avg_timer_wait) AS wait_avg 
   FROM performance_schema.events_stages_summary_by_user_by_event_name
@@ -70,7 +70,7 @@ SELECT user,
  * 
  * mysql> select * from x$user_summary_by_stages;
  * +------+--------------------------------+-------+-------------+-----------+
- * | user | event_name                     | count | wait_sum    | wait_avg  |
+ * | user | event_name                     | total | wait_sum    | wait_avg  |
  * +------+--------------------------------+-------+-------------+-----------+
  * | root | stage/sql/Opening tables       |  1114 | 71919037000 |  64559000 |
  * | root | stage/sql/Creating sort index  |     5 |  2245762000 | 449152000 |
@@ -98,13 +98,13 @@ CREATE OR REPLACE
 VIEW x$user_summary_by_stages (
   user,
   event_name,
-  count,
+  total,
   wait_sum,
   wait_avg
 ) AS
 SELECT user,
        event_name,
-       count_star AS count,
+       count_star AS total,
        sum_timer_wait AS wait_sum, 
        avg_timer_wait AS wait_avg 
   FROM performance_schema.events_stages_summary_by_user_by_event_name
