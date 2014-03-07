@@ -11,12 +11,12 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA */
 
 /*
  * View: user_summary_by_statement_type
  *
- * Summarizes the types of statements executed by each user
+ * Summarizes the types of statements executed by each user.
  *
  * mysql> select * from user_summary_by_statement_type;
  * +------+----------------------+--------+---------------+-------------+--------------+-----------+---------------+---------------+------------+
@@ -29,14 +29,25 @@
  * | root | create_table         |     19 | 3.04 s        | 431.71 ms   | 0 ps         |         0 |             0 |             0 |          0 |
  * ...
  * +------+----------------------+--------+---------------+-------------+--------------+-----------+---------------+---------------+------------+
- * 41 rows in set (0.24 sec)
  * 
- * Versions: 5.6.3+
  */
 
-DROP VIEW IF EXISTS user_summary_by_statement_type;
-
-CREATE SQL SECURITY INVOKER VIEW user_summary_by_statement_type AS
+CREATE OR REPLACE
+  ALGORITHM = MERGE
+  DEFINER = 'root'@'localhost'
+  SQL SECURITY INVOKER 
+VIEW user_summary_by_statement_type (
+  user,
+  statement,
+  count,
+  total_latency,
+  max_latency,
+  lock_latency,
+  rows_sent,
+  rows_examined,
+  rows_affected,
+  full_scans
+) AS
 SELECT user,
        SUBSTRING_INDEX(event_name, '/', -1) AS statement,
        count_star AS count,
@@ -53,11 +64,11 @@ SELECT user,
  ORDER BY user, sum_timer_wait DESC;
 
 /*
- * View: user_summary_by_statement_type_raw
+ * View: x$user_summary_by_statement_type
  *
- * Summarizes the types of statements executed by each user
+ * Summarizes the types of statements executed by each user.
  *
- * mysql> select * from user_summary_by_statement_type_raw;
+ * mysql> select * from x$user_summary_by_statement_type;
  * +------+----------------------+--------+-----------------+----------------+----------------+-----------+---------------+---------------+------------+
  * | user | statement            | count  | total_latency   | max_latency    | lock_latency   | rows_sent | rows_examined | rows_affected | full_scans |
  * +------+----------------------+--------+-----------------+----------------+----------------+-----------+---------------+---------------+------------+
@@ -68,14 +79,25 @@ SELECT user,
  * | root | create_table         |     19 |   3035120946000 |   431706815000 |              0 |         0 |             0 |             0 |          0 |
  * ...
  * +------+----------------------+--------+-----------------+----------------+----------------+-----------+---------------+---------------+------------+
- * 41 rows in set (0.01 sec)
  * 
- * Versions: 5.6.3+
  */
 
-DROP VIEW IF EXISTS user_summary_by_statement_type_raw;
-
-CREATE SQL SECURITY INVOKER VIEW user_summary_by_statement_type_raw AS
+CREATE OR REPLACE
+  ALGORITHM = MERGE
+  DEFINER = 'root'@'localhost'
+  SQL SECURITY INVOKER 
+VIEW x$user_summary_by_statement_type (
+  user,
+  statement,
+  count,
+  total_latency,
+  max_latency,
+  lock_latency,
+  rows_sent,
+  rows_examined,
+  rows_affected,
+  full_scans
+) AS
 SELECT user,
        SUBSTRING_INDEX(event_name, '/', -1) AS statement,
        count_star AS count,

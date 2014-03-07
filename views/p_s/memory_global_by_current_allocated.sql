@@ -11,12 +11,12 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA */
 
 /* 
  * View: memory_global_by_current_allocated
  * 
- * Shows the current memory usage within the server globally broken down by allocation type
+ * Shows the current memory usage within the server globally broken down by allocation type.
  *
  * mysql> select * from memory_global_by_current_allocated;
  * +----------------------------------------+---------------+---------------+-------------------+------------+------------+----------------+
@@ -29,14 +29,22 @@
  * | memory/mysys/array_buffer              |            82 | 121.66 KiB    | 1.48 KiB          |       1124 | 852.55 KiB | 777 bytes      |
  * ...
  * +----------------------------------------+---------------+---------------+-------------------+------------+------------+----------------+
- * 26 rows in set (0.30 sec)
  *
- * Versions: 5.7.2+
  */
 
-DROP VIEW IF EXISTS memory_global_by_current_allocated;
-
-CREATE SQL SECURITY INVOKER VIEW memory_global_by_current_allocated AS
+CREATE OR REPLACE
+  ALGORITHM = MERGE
+  DEFINER = 'root'@'localhost'
+  SQL SECURITY INVOKER 
+VIEW memory_global_by_current_allocated (
+  event_name,
+  current_count,
+  current_alloc,
+  current_avg_alloc,
+  high_count,
+  high_alloc,
+  high_avg_alloc
+) AS
 SELECT event_name,
        current_count_used AS current_count,
        sys.format_bytes(current_number_of_bytes_used) AS current_alloc,
@@ -49,11 +57,11 @@ SELECT event_name,
  ORDER BY current_number_of_bytes_used DESC;
 
 /* 
- * View: memory_global_by_current_allocated_raw
+ * View: x$memory_global_by_current_allocated
  * 
- * Shows the current memory usage within the server globally broken down by allocation type
+ * Shows the current memory usage within the server globally broken down by allocation type.
  *
- * mysql> select * from memory_global_by_current_allocated_raw;
+ * mysql> select * from x$memory_global_by_current_allocated;
  * +----------------------------------------+---------------+---------------+-------------------+------------+------------+----------------+
  * | event_name                             | current_count | current_alloc | current_avg_alloc | high_count | high_alloc | high_avg_alloc |
  * +----------------------------------------+---------------+---------------+-------------------+------------+------------+----------------+
@@ -64,14 +72,22 @@ SELECT event_name,
  * | memory/mysys/array_buffer              |            82 |        124576 |         1519.2195 |       1124 |     873008 |       776.6975 |
  * ...
  * +----------------------------------------+---------------+---------------+-------------------+------------+------------+----------------+
- * 26 rows in set (0.00 sec)
  *
- * Versions: 5.7.2+
  */
 
-DROP VIEW IF EXISTS memory_global_by_current_allocated_raw;
-
-CREATE SQL SECURITY INVOKER VIEW memory_global_by_current_allocated_raw AS
+CREATE OR REPLACE
+  ALGORITHM = MERGE
+  DEFINER = 'root'@'localhost'
+  SQL SECURITY INVOKER 
+VIEW x$memory_global_by_current_allocated (
+  event_name,
+  current_count,
+  current_alloc,
+  current_avg_alloc,
+  high_count,
+  high_alloc,
+  high_avg_alloc
+) AS
 SELECT event_name,
        current_count_used AS current_count,
        current_number_of_bytes_used AS current_alloc,

@@ -11,12 +11,12 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA */
 
 /*
  * View: latest_file_io
  *
- * Latest file IO, by file / thread
+ * Shows the latest file IO, by file / thread.
  *
  * mysql> select * from latest_file_io limit 5;
  * +----------------------+----------------------------------------+------------+-----------+-----------+
@@ -28,14 +28,20 @@
  * | msandbox@localhost:1 | @@tmpdir/#sqlcf28_1_4e.MYD             | 53.93 µs   | close     | NULL      |
  * | msandbox@localhost:1 | @@tmpdir/#sqlcf28_1_4e.MYI             | 104.05 ms  | delete    | NULL      |
  * +----------------------+----------------------------------------+------------+-----------+-----------+
- * 5 rows in set (0.05 sec)
  *
- * Versions: 5.5+
  */
 
-DROP VIEW IF EXISTS latest_file_io;
-
-CREATE SQL SECURITY INVOKER VIEW latest_file_io AS
+CREATE OR REPLACE
+  ALGORITHM = MERGE
+  DEFINER = 'root'@'localhost'
+  SQL SECURITY INVOKER 
+VIEW latest_file_io (
+  thread,
+  file,
+  latency,
+  operation,
+  requested
+) AS
 SELECT IF(id IS NULL, 
              CONCAT(SUBSTRING_INDEX(name, '/', -1), ':', thread_id), 
              CONCAT(user, '@', host, ':', id)
@@ -52,11 +58,11 @@ SELECT IF(id IS NULL,
  ORDER BY timer_start;
 
 /*
- * View: latest_file_io_raw
+ * View: x$latest_file_io
  *
- * Latest file IO, by file / thread without formatting
+ * Shows the latest file IO, by file / thread.
  *
- * mysql> SELECT * FROM latest_file_io_raw LIMIT 5;
+ * mysql> SELECT * FROM x$latest_file_io LIMIT 5;
  * +------------------+------------------------------------------------------------------------------------+-------------+-----------+-----------+
  * | thread           | file                                                                               | latency     | operation | requested |
  * +------------------+------------------------------------------------------------------------------------+-------------+-----------+-----------+
@@ -66,14 +72,20 @@ SELECT IF(id IS NULL,
  * | root@localhost:6 | /Users/mark/sandboxes/msb_5_7_2/data/ps_helper/check_lost_instrumentation.frm      |   113001980 | open      |      NULL |
  * | root@localhost:6 | /Users/mark/sandboxes/msb_5_7_2/data/ps_helper/check_lost_instrumentation.frm      |     9553180 | read      |        10 |
  * +------------------+------------------------------------------------------------------------------------+-------------+-----------+-----------+
- * 5 rows in set (0.10 sec)
  *
- * Versions: 5.5+
  */
 
-DROP VIEW IF EXISTS latest_file_io_raw;
-
-CREATE SQL SECURITY INVOKER VIEW latest_file_io_raw AS
+CREATE OR REPLACE
+  ALGORITHM = MERGE
+  DEFINER = 'root'@'localhost'
+  SQL SECURITY INVOKER 
+VIEW x$latest_file_io (
+  thread,
+  file,
+  latency,
+  operation,
+  requested
+) AS
 SELECT IF(id IS NULL, 
              CONCAT(SUBSTRING_INDEX(name, '/', -1), ':', thread_id), 
              CONCAT(user, '@', host, ':', id)

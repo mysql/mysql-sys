@@ -11,7 +11,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA */
 
 /* 
  * View: schema_object_overview
@@ -22,27 +22,31 @@
  *       some time to execute, and is not recommended.
  *
  * mysql> select * from schema_object_overview;
- * +--------------------+---------------+-------+
- * | db                 | object_type   | count |
- * +--------------------+---------------+-------+
- * | information_schema | SYSTEM VIEW   |    59 |
- * | mysql              | BASE TABLE    |    28 |
- * | mysql              | INDEX (BTREE) |    63 |
- * | performance_schema | BASE TABLE    |    52 |
- * | ps_helper          | FUNCTION      |     8 |
- * | ps_helper          | PROCEDURE     |    12 |
- * | ps_helper          | VIEW          |    49 |
- * | test               | BASE TABLE    |     2 |
- * | test               | INDEX (BTREE) |     2 |
- * +--------------------+---------------+-------+
- * 9 rows in set (0.08 sec)
+ * +---------------------------------+---------------+-------+
+ * | db                              | object_type   | count |
+ * +---------------------------------+---------------+-------+
+ * | information_schema              | SYSTEM VIEW   |    59 |
+ * | mem30_test__instruments         | BASE TABLE    |     1 |
+ * | mem30_test__instruments         | INDEX (BTREE) |     2 |
+ * | mem30_test__test                | BASE TABLE    |     9 |
+ * | mem30_test__test                | INDEX (BTREE) |    19 |
+ * ...
+ * | sys                             | FUNCTION      |     8 |
+ * | sys                             | PROCEDURE     |    16 |
+ * | sys                             | VIEW          |    59 |
+ * +---------------------------------+---------------+-------+
  *
- * Versions: 5.1+
  */
 
-DROP VIEW IF EXISTS schema_object_overview;
-
-CREATE SQL SECURITY INVOKER VIEW schema_object_overview AS
+CREATE OR REPLACE
+  ALGORITHM = TEMPTABLE
+  DEFINER = 'root'@'localhost'
+  SQL SECURITY INVOKER 
+VIEW schema_object_overview (
+  db,
+  object_type,
+  count
+) AS
 SELECT ROUTINE_SCHEMA AS db, ROUTINE_TYPE AS object_type, COUNT(*) AS count FROM INFORMATION_SCHEMA.ROUTINES GROUP BY ROUTINE_SCHEMA, ROUTINE_TYPE
  UNION 
 SELECT TABLE_SCHEMA, TABLE_TYPE, COUNT(*) FROM INFORMATION_SCHEMA.TABLES GROUP BY TABLE_SCHEMA, TABLE_TYPE

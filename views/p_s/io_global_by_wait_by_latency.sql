@@ -11,46 +11,59 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA */
 
 /*
  * View: io_global_by_wait_by_latency
  *
- * Show the top global IO consumers by latency
+ * Shows the top global IO consumers by latency.
  *
  * mysql> SELECT * FROM io_global_by_wait_by_latency;
- * +-------------------------+------------+---------------+-------------+-------------+--------------+---------------+--------------+------------+------------+-----------+-------------+---------------+-------------+
- * | event_name              | count_star | total_latency | avg_latency | max_latency | read_latency | write_latency | misc_latency | count_read | total_read | avg_read  | count_write | total_written | avg_written |
- * +-------------------------+------------+---------------+-------------+-------------+--------------+---------------+--------------+------------+------------+-----------+-------------+---------------+-------------+
- * | sql/file_parser         |       5433 | 30.20 s       | 5.56 ms     | 203.65 ms   | 22.08 ms     | 24.89 ms      | 30.16 s      |         24 | 6.18 KiB   | 264 bytes |         737 | 2.15 MiB      | 2.99 KiB    |
- * | innodb/innodb_data_file |       1344 | 1.52 s        | 1.13 ms     | 350.70 ms   | 203.82 ms    | 450.96 ms     | 868.21 ms    |        147 | 2.30 MiB   | 16.00 KiB |        1001 | 53.61 MiB     | 54.84 KiB   |
- * | innodb/innodb_log_file  |        828 | 893.48 ms     | 1.08 ms     | 30.11 ms    | 16.32 ms     | 705.89 ms     | 171.27 ms    |          6 | 68.00 KiB  | 11.33 KiB |         413 | 2.19 MiB      | 5.42 KiB    |
- * | myisam/kfile            |       7642 | 242.34 ms     | 31.71 us    | 19.27 ms    | 73.60 ms     | 23.48 ms      | 145.26 ms    |        758 | 135.63 KiB | 183 bytes |        4386 | 232.52 KiB    | 54 bytes    |
- * | myisam/dfile            |      12540 | 223.47 ms     | 17.82 us    | 32.50 ms    | 87.76 ms     | 16.97 ms      | 118.74 ms    |       5390 | 4.49 MiB   | 873 bytes |        1448 | 2.65 MiB      | 1.88 KiB    |
- * | csv/metadata            |          8 | 28.98 ms      | 3.62 ms     | 20.15 ms    | 399.27 us    | 0 ps          | 28.58 ms     |          2 | 70 bytes   | 35 bytes  |           0 | 0 bytes       | 0 bytes     |
- * | mysys/charset           |          3 | 24.24 ms      | 8.08 ms     | 24.15 ms    | 24.15 ms     | 0 ps          | 93.18 us     |          1 | 17.31 KiB  | 17.31 KiB |           0 | 0 bytes       | 0 bytes     |
- * | sql/ERRMSG              |          5 | 20.43 ms      | 4.09 ms     | 19.31 ms    | 20.32 ms     | 0 ps          | 103.20 us    |          3 | 58.97 KiB  | 19.66 KiB |           0 | 0 bytes       | 0 bytes     |
- * | mysys/cnf               |          5 | 11.37 ms      | 2.27 ms     | 11.28 ms    | 11.29 ms     | 0 ps          | 78.22 us     |          3 | 56 bytes   | 19 bytes  |           0 | 0 bytes       | 0 bytes     |
- * | sql/dbopt               |         57 | 4.04 ms       | 70.92 us    | 843.70 us   | 0 ps         | 186.43 us     | 3.86 ms      |          0 | 0 bytes    | 0 bytes   |           7 | 431 bytes     | 62 bytes    |
- * | csv/data                |          4 | 411.55 us     | 102.89 us   | 234.89 us   | 0 ps         | 0 ps          | 411.55 us    |          0 | 0 bytes    | 0 bytes   |           0 | 0 bytes       | 0 bytes     |
- * | sql/misc                |         22 | 340.38 us     | 15.47 us    | 33.77 us    | 0 ps         | 0 ps          | 340.38 us    |          0 | 0 bytes    | 0 bytes   |           0 | 0 bytes       | 0 bytes     |
- * | archive/data            |         39 | 277.86 us     | 7.12 us     | 16.18 us    | 0 ps         | 0 ps          | 277.86 us    |          0 | 0 bytes    | 0 bytes   |           0 | 0 bytes       | 0 bytes     |
- * | sql/pid                 |          3 | 218.03 us     | 72.68 us    | 154.84 us   | 0 ps         | 21.64 us      | 196.39 us    |          0 | 0 bytes    | 0 bytes   |           1 | 6 bytes       | 6 bytes     |
- * | sql/casetest            |          5 | 197.15 us     | 39.43 us    | 126.31 us   | 0 ps         | 0 ps          | 197.15 us    |          0 | 0 bytes    | 0 bytes   |           0 | 0 bytes       | 0 bytes     |
- * | sql/global_ddl_log      |          2 | 14.60 us      | 7.30 us     | 12.12 us    | 0 ps         | 0 ps          | 14.60 us     |          0 | 0 bytes    | 0 bytes   |           0 | 0 bytes       | 0 bytes     |
- * +-------------------------+------------+---------------+-------------+-------------+--------------+---------------+--------------+------------+------------+-----------+-------------+---------------+-------------+
- * 17 rows in set (0.00 sec)
+ * +-------------------------+------------+-----------+-------------+-------------+--------------+---------------+--------------+------------+------------+-----------+-------------+---------------+-------------+
+ * | event_name              | count_star | total     | avg_latency | max_latency | read_latency | write_latency | misc_latency | count_read | total_read | avg_read  | count_write | total_written | avg_written |
+ * +-------------------------+------------+-----------+-------------+-------------+--------------+---------------+--------------+------------+------------+-----------+-------------+---------------+-------------+
+ * | sql/file_parser         |       5433 | 30.20 s   | 5.56 ms     | 203.65 ms   | 22.08 ms     | 24.89 ms      | 30.16 s      |         24 | 6.18 KiB   | 264 bytes |         737 | 2.15 MiB      | 2.99 KiB    |
+ * | innodb/innodb_data_file |       1344 | 1.52 s    | 1.13 ms     | 350.70 ms   | 203.82 ms    | 450.96 ms     | 868.21 ms    |        147 | 2.30 MiB   | 16.00 KiB |        1001 | 53.61 MiB     | 54.84 KiB   |
+ * | innodb/innodb_log_file  |        828 | 893.48 ms | 1.08 ms     | 30.11 ms    | 16.32 ms     | 705.89 ms     | 171.27 ms    |          6 | 68.00 KiB  | 11.33 KiB |         413 | 2.19 MiB      | 5.42 KiB    |
+ * | myisam/kfile            |       7642 | 242.34 ms | 31.71 us    | 19.27 ms    | 73.60 ms     | 23.48 ms      | 145.26 ms    |        758 | 135.63 KiB | 183 bytes |        4386 | 232.52 KiB    | 54 bytes    |
+ * | myisam/dfile            |      12540 | 223.47 ms | 17.82 us    | 32.50 ms    | 87.76 ms     | 16.97 ms      | 118.74 ms    |       5390 | 4.49 MiB   | 873 bytes |        1448 | 2.65 MiB      | 1.88 KiB    |
+ * | csv/metadata            |          8 | 28.98 ms  | 3.62 ms     | 20.15 ms    | 399.27 us    | 0 ps          | 28.58 ms     |          2 | 70 bytes   | 35 bytes  |           0 | 0 bytes       | 0 bytes     |
+ * | mysys/charset           |          3 | 24.24 ms  | 8.08 ms     | 24.15 ms    | 24.15 ms     | 0 ps          | 93.18 us     |          1 | 17.31 KiB  | 17.31 KiB |           0 | 0 bytes       | 0 bytes     |
+ * | sql/ERRMSG              |          5 | 20.43 ms  | 4.09 ms     | 19.31 ms    | 20.32 ms     | 0 ps          | 103.20 us    |          3 | 58.97 KiB  | 19.66 KiB |           0 | 0 bytes       | 0 bytes     |
+ * | mysys/cnf               |          5 | 11.37 ms  | 2.27 ms     | 11.28 ms    | 11.29 ms     | 0 ps          | 78.22 us     |          3 | 56 bytes   | 19 bytes  |           0 | 0 bytes       | 0 bytes     |
+ * | sql/dbopt               |         57 | 4.04 ms   | 70.92 us    | 843.70 us   | 0 ps         | 186.43 us     | 3.86 ms      |          0 | 0 bytes    | 0 bytes   |           7 | 431 bytes     | 62 bytes    |
+ * | csv/data                |          4 | 411.55 us | 102.89 us   | 234.89 us   | 0 ps         | 0 ps          | 411.55 us    |          0 | 0 bytes    | 0 bytes   |           0 | 0 bytes       | 0 bytes     |
+ * | sql/misc                |         22 | 340.38 us | 15.47 us    | 33.77 us    | 0 ps         | 0 ps          | 340.38 us    |          0 | 0 bytes    | 0 bytes   |           0 | 0 bytes       | 0 bytes     |
+ * | archive/data            |         39 | 277.86 us | 7.12 us     | 16.18 us    | 0 ps         | 0 ps          | 277.86 us    |          0 | 0 bytes    | 0 bytes   |           0 | 0 bytes       | 0 bytes     |
+ * | sql/pid                 |          3 | 218.03 us | 72.68 us    | 154.84 us   | 0 ps         | 21.64 us      | 196.39 us    |          0 | 0 bytes    | 0 bytes   |           1 | 6 bytes       | 6 bytes     |
+ * | sql/casetest            |          5 | 197.15 us | 39.43 us    | 126.31 us   | 0 ps         | 0 ps          | 197.15 us    |          0 | 0 bytes    | 0 bytes   |           0 | 0 bytes       | 0 bytes     |
+ * | sql/global_ddl_log      |          2 | 14.60 us  | 7.30 us     | 12.12 us    | 0 ps         | 0 ps          | 14.60 us     |          0 | 0 bytes    | 0 bytes   |           0 | 0 bytes       | 0 bytes     |
+ * +-------------------------+------------+-----------+-------------+-------------+--------------+---------------+--------------+------------+------------+-----------+-------------+---------------+-------------+
  *
- * (Example from 5.6.6)
- *
- * Versions: 5.6+
  */
 
-DROP VIEW IF EXISTS io_global_by_wait_by_latency;
-
-CREATE SQL SECURITY INVOKER VIEW io_global_by_wait_by_latency AS
+CREATE OR REPLACE
+  ALGORITHM = MERGE
+  DEFINER = 'root'@'localhost'
+  SQL SECURITY INVOKER 
+VIEW io_global_by_wait_by_latency (
+  event_name,
+  total,
+  total_latency,
+  avg_latency,
+  max_latency,
+  read_latency,
+  write_latency,
+  misc_latency,
+  count_read,
+  total_read,
+  avg_read,
+  count_write,
+  total_written,
+  avg_written
+) AS
 SELECT SUBSTRING_INDEX(event_name, '/', -2) event_name,
-       count_star,
+       count_star AS total,
        sys.format_time(sum_timer_wait) total_latency,
        sys.format_time(avg_timer_wait) avg_latency,
        sys.format_time(max_timer_wait) max_latency,
@@ -69,13 +82,13 @@ SELECT SUBSTRING_INDEX(event_name, '/', -2) event_name,
  ORDER BY sum_timer_wait DESC;
 
 /*
- * View: io_global_by_wait_by_latency_raw
+ * View: x$io_global_by_wait_by_latency
  *
- * Show the top global IO consumers by latency, without any formatting
+ * Shows the top global IO consumers by latency.
  *
- * mysql> select * from io_global_by_wait_by_latency_raw;
+ * mysql> select * from x$io_global_by_wait_by_latency;
  * +-------------------------+------------+----------------+-------------+--------------+--------------+---------------+----------------+------------+------------+------------+-------------+---------------+-------------+
- * | event_name              | count_star | total_latency  | avg_latency | max_latency  | read_latency | write_latency | misc_latency   | count_read | total_read | avg_read   | count_write | total_written | avg_written |
+ * | event_name              | count_star | total          | avg_latency | max_latency  | read_latency | write_latency | misc_latency   | count_read | total_read | avg_read   | count_write | total_written | avg_written |
  * +-------------------------+------------+----------------+-------------+--------------+--------------+---------------+----------------+------------+------------+------------+-------------+---------------+-------------+
  * | sql/file_parser         |       5945 | 33615441247050 |  5654405471 | 203652881640 |  22093704230 |   27389668280 | 33565957874540 |         26 |       7008 |   269.5385 |         808 |       2479209 |   3068.3280 |
  * | sql/FRM                 |       6332 |  1755386796800 |   277224688 | 145624702340 | 519139578620 |    1677016640 |  1234570201540 |       2040 |     865905 |   424.4632 |         439 |        103445 |    235.6378 |
@@ -95,18 +108,31 @@ SELECT SUBSTRING_INDEX(event_name, '/', -2) event_name,
  * | sql/casetest            |          5 |      197152150 |    39430430 |    126310080 |            0 |             0 |      197152150 |          0 |          0 |     0.0000 |           0 |             0 |      0.0000 |
  * | sql/global_ddl_log      |          2 |       14604980 |     7302490 |     12120550 |            0 |             0 |       14604980 |          0 |          0 |     0.0000 |           0 |             0 |      0.0000 |
  * +-------------------------+------------+----------------+-------------+--------------+--------------+---------------+----------------+------------+------------+------------+-------------+---------------+-------------+
- * 17 rows in set (0.00 sec)
  *
- * (Example from 5.6.6)
- *
- * Versions: 5.6+
  */
 
-DROP VIEW IF EXISTS io_global_by_wait_by_latency_raw;
-
-CREATE SQL SECURITY INVOKER VIEW io_global_by_wait_by_latency_raw AS
+CREATE OR REPLACE
+  ALGORITHM = MERGE
+  DEFINER = 'root'@'localhost'
+  SQL SECURITY INVOKER 
+VIEW x$io_global_by_wait_by_latency (
+  event_name,
+  total,
+  total_latency,
+  avg_latency,
+  max_latency,
+  read_latency,
+  write_latency,
+  misc_latency,
+  count_read,
+  total_read,
+  avg_read,
+  count_write,
+  total_written,
+  avg_written
+) AS
 SELECT SUBSTRING_INDEX(event_name, '/', -2) event_name,
-       count_star,
+       count_star AS total,
        sum_timer_wait total_latency,
        avg_timer_wait avg_latency,
        max_timer_wait max_latency,

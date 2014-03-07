@@ -11,33 +11,50 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA */
 
 /*
  * View: user_summary_by_stages
  *
- * Summarizes stages by user, ordered by user and total latency per stage
+ * Summarizes stages by user, ordered by user and total latency per stage.
  * 
  * mysql> select * from user_summary_by_stages;
- * +------+-------------------------------------+--------+-------------+-----------+
- * | user | event_name                          | count  | wait_sum    | wait_avg  |
- * +------+-------------------------------------+--------+-------------+-----------+
- * | root | stage/sql/System lock               |   9230 | 00:03:11.40 | 20.74 ms  |
- * | root | stage/sql/Opening tables            | 534362 | 00:01:36.18 | 180.00 us |
- * | root | stage/sql/checking permissions      |  22119 | 31.84 s     | 1.44 ms   |
- * | root | stage/sql/Creating sort index       |    307 | 30.26 s     | 98.57 ms  |
- * | root | stage/sql/creating table            |     22 | 3.59 s      | 163.13 ms |
- * ...
- * +------+-------------------------------------+--------+-------------+-----------+
- * 27 rows in set (0.00 sec)
- * 
- * Versions: 5.6.3+
+ * +------+--------------------------------+-------+-----------+-----------+
+ * | user | event_name                     | count | wait_sum  | wait_avg  |
+ * +------+--------------------------------+-------+-----------+-----------+
+ * | root | stage/sql/Opening tables       |   889 | 1.97 ms   | 2.22 us   |
+ * | root | stage/sql/Creating sort index  |     4 | 1.79 ms   | 446.30 us |
+ * | root | stage/sql/init                 |    10 | 312.27 us | 31.23 us  |
+ * | root | stage/sql/checking permissions |    10 | 300.62 us | 30.06 us  |
+ * | root | stage/sql/freeing items        |     5 | 85.89 us  | 17.18 us  |
+ * | root | stage/sql/statistics           |     5 | 79.15 us  | 15.83 us  |
+ * | root | stage/sql/preparing            |     5 | 69.12 us  | 13.82 us  |
+ * | root | stage/sql/optimizing           |     5 | 53.11 us  | 10.62 us  |
+ * | root | stage/sql/Sending data         |     5 | 44.66 us  | 8.93 us   |
+ * | root | stage/sql/closing tables       |     5 | 37.54 us  | 7.51 us   |
+ * | root | stage/sql/System lock          |     5 | 34.28 us  | 6.86 us   |
+ * | root | stage/sql/query end            |     5 | 24.37 us  | 4.87 us   |
+ * | root | stage/sql/end                  |     5 | 8.60 us   | 1.72 us   |
+ * | root | stage/sql/Sorting result       |     5 | 8.33 us   | 1.67 us   |
+ * | root | stage/sql/executing            |     5 | 5.37 us   | 1.07 us   |
+ * | root | stage/sql/cleaning up          |     5 | 4.60 us   | 919.00 ns |
+ * +------+--------------------------------+-------+-----------+-----------+
+ *
  */
 
-DROP VIEW IF EXISTS user_summary_by_stages;
-
-CREATE SQL SECURITY INVOKER VIEW user_summary_by_stages AS
-SELECT user, event_name,
+CREATE OR REPLACE
+  ALGORITHM = MERGE
+  DEFINER = 'root'@'localhost'
+  SQL SECURITY INVOKER 
+VIEW user_summary_by_stages (
+  user,
+  event_name,
+  count,
+  wait_sum,
+  wait_avg
+) AS
+SELECT user,
+       event_name,
        count_star AS count,
        sys.format_time(sum_timer_wait) AS wait_sum, 
        sys.format_time(avg_timer_wait) AS wait_avg 
@@ -47,30 +64,46 @@ SELECT user, event_name,
  ORDER BY user, sum_timer_wait DESC;
 
 /*
- * View: user_summary_by_stages_raw
+ * View: x$user_summary_by_stages
  *
- * Summarizes stages by user, ordered by user and total latency per stage
+ * Summarizes stages by user, ordered by user and total latency per stage.
  * 
- * mysql> select * from user_summary_by_stages_raw;
- * +------+-------------------------------------+--------+-----------------+--------------+
- * | user | event_name                          | count  | wait_sum        | wait_avg     |
- * +------+-------------------------------------+--------+-----------------+--------------+
- * | root | stage/sql/System lock               |   9231 | 191395549684000 |  20733999000 |
- * | root | stage/sql/Opening tables            | 534704 |  96185600966000 |    179885000 |
- * | root | stage/sql/checking permissions      |  22123 |  31840645121000 |   1439255000 |
- * | root | stage/sql/Creating sort index       |    308 |  30260103983000 |  98247090000 |
- * | root | stage/sql/creating table            |     22 |   3588876152000 | 163130734000 |
- * ...
- * +------+-------------------------------------+--------+-----------------+--------------+
- * 27 rows in set (0.00 sec)
- * 
- * Versions: 5.6.3+
+ * mysql> select * from x$user_summary_by_stages;
+ * +------+--------------------------------+-------+-------------+-----------+
+ * | user | event_name                     | count | wait_sum    | wait_avg  |
+ * +------+--------------------------------+-------+-------------+-----------+
+ * | root | stage/sql/Opening tables       |  1114 | 71919037000 |  64559000 |
+ * | root | stage/sql/Creating sort index  |     5 |  2245762000 | 449152000 |
+ * | root | stage/sql/init                 |    13 |   428798000 |  32984000 |
+ * | root | stage/sql/checking permissions |    13 |   363231000 |  27940000 |
+ * | root | stage/sql/freeing items        |     7 |   137728000 |  19675000 |
+ * | root | stage/sql/statistics           |     6 |    93955000 |  15659000 |
+ * | root | stage/sql/preparing            |     6 |    82571000 |  13761000 |
+ * | root | stage/sql/optimizing           |     6 |    63338000 |  10556000 |
+ * | root | stage/sql/Sending data         |     6 |    53400000 |   8900000 |
+ * | root | stage/sql/closing tables       |     7 |    46922000 |   6703000 |
+ * | root | stage/sql/System lock          |     6 |    40175000 |   6695000 |
+ * | root | stage/sql/query end            |     7 |    31723000 |   4531000 |
+ * | root | stage/sql/Sorting result       |     6 |     9855000 |   1642000 |
+ * | root | stage/sql/end                  |     6 |     9556000 |   1592000 |
+ * | root | stage/sql/cleaning up          |     7 |     7312000 |   1044000 |
+ * | root | stage/sql/executing            |     6 |     6487000 |   1081000 |
+ * +------+--------------------------------+-------+-------------+-----------+ *
  */
 
-DROP VIEW IF EXISTS user_summary_by_stages_raw;
-
-CREATE SQL SECURITY INVOKER VIEW user_summary_by_stages_raw AS
-SELECT user, event_name,
+CREATE OR REPLACE
+  ALGORITHM = MERGE
+  DEFINER = 'root'@'localhost'
+  SQL SECURITY INVOKER 
+VIEW x$user_summary_by_stages (
+  user,
+  event_name,
+  count,
+  wait_sum,
+  wait_avg
+) AS
+SELECT user,
+       event_name,
        count_star AS count,
        sum_timer_wait AS wait_sum, 
        avg_timer_wait AS wait_avg 

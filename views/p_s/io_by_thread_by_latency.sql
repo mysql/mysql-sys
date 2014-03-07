@@ -11,7 +11,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA */
 
 /*
  * View: io_by_thread_by_latency
@@ -35,14 +35,23 @@
  * | signal_handler      |          3 | 218.03 us     | 21.64 us    | 72.68 us    | 154.84 us   |        19 |           NULL |
  * +---------------------+------------+---------------+-------------+-------------+-------------+-----------+----------------+
  *
- * (Example taken from 5.6.13)
- *
- * Versions: 5.5+
  */
 
-DROP VIEW IF EXISTS io_by_thread_by_latency;
-
-CREATE SQL SECURITY INVOKER VIEW io_by_thread_by_latency AS
+CREATE OR REPLACE
+  ALGORITHM = TEMPTABLE
+  DEFINER = 'root'@'localhost'
+  SQL SECURITY INVOKER 
+VIEW io_by_thread_by_latency (
+  user,
+  count_star,
+  total_latency,
+  min_latency,
+  avg_latency,
+  max_latency,
+  thread_id,
+  processlist_id
+)
+AS
 SELECT IF(processlist_id IS NULL, 
              SUBSTRING_INDEX(name, '/', -1), 
              CONCAT(processlist_user, '@', processlist_host)
@@ -62,13 +71,11 @@ SELECT IF(processlist_id IS NULL,
  ORDER BY SUM(sum_timer_wait) DESC;
 
 /*
- * View: io_by_thread_by_latency_raw
+ * View: x$io_by_thread_by_latency
  *
  * Show the top IO consumers by thread, ordered by total latency
  *
- * Versions: 5.5+
- *
- * mysql> select * from io_by_thread_by_latency_raw;
+ * mysql> select * from x$io_by_thread_by_latency;
  * +---------------------+------------+----------------+-------------+-----------------+--------------+-----------+----------------+
  * | user                | count_star | total_latency  | min_latency | avg_latency     | max_latency  | thread_id | processlist_id |
  * +---------------------+------------+----------------+-------------+-----------------+--------------+-----------+----------------+
@@ -84,16 +91,24 @@ SELECT IF(processlist_id IS NULL,
  * | io_write_thread     |         19 |      951385890 |     9745450 |   50072763.0000 |    297468080 |        10 |           NULL |
  * | signal_handler      |          3 |      218026640 |    21639800 |   72675421.0000 |    154841440 |        19 |           NULL |
  * +---------------------+------------+----------------+-------------+-----------------+--------------+-----------+----------------+
-11 rows in set (0.01 sec)
  *
- * (Example taken from 5.6.13)
- *
- * Versions: 5.5+
  */
 
-DROP VIEW IF EXISTS io_by_thread_by_latency_raw;
-
-CREATE SQL SECURITY INVOKER VIEW io_by_thread_by_latency_raw AS
+CREATE OR REPLACE
+  ALGORITHM = TEMPTABLE
+  DEFINER = 'root'@'localhost'
+  SQL SECURITY INVOKER 
+VIEW x$io_by_thread_by_latency (
+  user,
+  count_star,
+  total_latency,
+  min_latency,
+  avg_latency,
+  max_latency,
+  thread_id,
+  processlist_id
+)
+AS
 SELECT IF(processlist_id IS NULL, 
              SUBSTRING_INDEX(name, '/', -1), 
              CONCAT(processlist_user, '@', processlist_host)

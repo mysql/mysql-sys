@@ -49,7 +49,7 @@ SOURCE ./views/i_s/innodb_buffer_stats_by_schema.sql
 SOURCE ./views/i_s/innodb_buffer_stats_by_table.sql
 SOURCE ./views/i_s/schema_object_overview.sql
 
-SOURCE ./views/p_s/check_lost_instrumentation.sql
+SOURCE ./views/p_s/ps_check_lost_instrumentation.sql
 SOURCE ./views/p_s/processlist_57.sql
 
 SOURCE ./views/p_s/latest_file_io.sql
@@ -76,9 +76,12 @@ SOURCE ./views/p_s/statements_with_runtimes_in_95th_percentile.sql
 SOURCE ./views/p_s/statements_with_sorting.sql
 SOURCE ./views/p_s/statements_with_temp_tables.sql
 
-SOURCE ./views/p_s/user_summary_57.sql
+SOURCE ./views/p_s/user_summary_by_file_io_type.sql
+SOURCE ./views/p_s/user_summary_by_file_io.sql
 SOURCE ./views/p_s/user_summary_by_statement_type.sql
+SOURCE ./views/p_s/user_summary_by_statement_latency.sql
 SOURCE ./views/p_s/user_summary_by_stages.sql
+SOURCE ./views/p_s/user_summary_57.sql
 
 SOURCE ./views/p_s/wait_classes_global_by_avg_latency.sql
 SOURCE ./views/p_s/wait_classes_global_by_latency.sql

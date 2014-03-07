@@ -11,15 +11,14 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA */
 
 /*
  * View: schema_index_statistics
  *
- * Mimic INDEX_STATISTICS from Google et al
- * However, order by the total wait time descending - top indexes are most contended
+ * Statistics around indexes.
  *
- * Versions: 5.6.2+
+ * Ordered by the total wait time descending - top indexes are most contended.
  *
  * mysql> select * from schema_index_statistics limit 5;
  * +------------------+-------------+------------+---------------+----------------+---------------+----------------+--------------+----------------+--------------+----------------+
@@ -32,12 +31,25 @@
  * | mem              | querycache  | PRIMARY    |          1698 | 27.99 ms       |             0 | 0 ps           |         1698 | 371.72 ms      |            0 | 0 ps           |
  * +------------------+-------------+------------+---------------+----------------+---------------+----------------+--------------+----------------+--------------+----------------+
  *
- * (Example from 5.6.6)
  */
 
-DROP VIEW IF EXISTS schema_index_statistics;
-
-CREATE SQL SECURITY INVOKER VIEW schema_index_statistics AS
+CREATE OR REPLACE
+  ALGORITHM = MERGE
+  DEFINER = 'root'@'localhost'
+  SQL SECURITY INVOKER 
+VIEW schema_index_statistics (
+  table_schema,
+  table_name,
+  index_name,
+  rows_selected,
+  select_latency,
+  rows_inserted,
+  insert_latency,
+  rows_updated,
+  update_latency,
+  rows_deleted,
+  delete_latency
+) AS
 SELECT OBJECT_SCHEMA AS table_schema,
        OBJECT_NAME AS table_name,
        INDEX_NAME as index_name,
@@ -54,14 +66,13 @@ SELECT OBJECT_SCHEMA AS table_schema,
  ORDER BY sum_timer_wait DESC;
 
 /*
- * View: schema_index_statistics_raw
+ * View: x$schema_index_statistics
  *
- * Mimic INDEX_STATISTICS from Google et al
- * However, order by the total wait time descending - top indexes are most contended
+ * Statistics around indexes.
  *
- * Versions: 5.6.2+
+ * Ordered by the total wait time descending - top indexes are most contended.
  *
- * mysql> SELECT * FROM schema_index_statistics_raw LIMIT 5;
+ * mysql> SELECT * FROM x$schema_index_statistics LIMIT 5;
  * +---------------+----------------------+-------------------+---------------+----------------+---------------+----------------+--------------+----------------+--------------+----------------+
  * | table_schema  | table_name           | index_name        | rows_selected | select_latency | rows_inserted | insert_latency | rows_updated | update_latency | rows_deleted | delete_latency |
  * +---------------+----------------------+-------------------+---------------+----------------+---------------+----------------+--------------+----------------+--------------+----------------+
@@ -71,14 +82,26 @@ SELECT OBJECT_SCHEMA AS table_schema,
  * | common_schema | _global_qs_variables | PRIMARY           |             0 |              0 |             0 |              0 |            0 |              0 |           16 |              0 |
  * | common_schema | metadata             | PRIMARY           |             5 |       76730810 |             0 |              0 |            4 |      114310170 |            0 |              0 |
  * +---------------+----------------------+-------------------+---------------+----------------+---------------+----------------+--------------+----------------+--------------+----------------+
- * 5 rows in set (0.01 sec) *
  *
- * (Example from 5.6.6)
  */
 
-DROP VIEW IF EXISTS schema_index_statistics_raw;
-
-CREATE SQL SECURITY INVOKER VIEW schema_index_statistics_raw AS
+CREATE OR REPLACE
+  ALGORITHM = MERGE
+  DEFINER = 'root'@'localhost'
+  SQL SECURITY INVOKER 
+VIEW x$schema_index_statistics (
+  table_schema,
+  table_name,
+  index_name,
+  rows_selected,
+  select_latency,
+  rows_inserted,
+  insert_latency,
+  rows_updated,
+  update_latency,
+  rows_deleted,
+  delete_latency
+) AS
 SELECT OBJECT_SCHEMA AS table_schema,
        OBJECT_NAME AS table_name,
        INDEX_NAME as index_name,

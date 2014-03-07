@@ -11,32 +11,39 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA */
 
 /* 
  * View: schema_unused_indexes
  * 
- * Find indexes that have had no events against them (and hence, no usage)
+ * Finds indexes that have had no events against them (and hence, no usage).
  *
- * mysql> select * from schema_unused_indexes;
- * +---------------------------+-------------------------------+--------------------------------------------------------+
- * | object_schema             | object_name                   | index_name                                             |
- * +---------------------------+-------------------------------+--------------------------------------------------------+
- * | mem                       | dc_p_double                   | PRIMARY                                                |
- * | mem                       | dc_p_double                   | end_time                                               |
- * | mem                       | dc_p_long                     | PRIMARY                                                |
- * | mem                       | dc_p_long                     | end_time                                               |
- * | mem                       | dc_p_string                   | begin_time                                             |
- * | mem                       | dc_p_string                   | end_time                                               |
- * ...
+ * To trust whether the data from this view is representative of your workload,
+ * you should ensure that the server has been up for a representative amount of
+ * time before using it.
  *
- * Versions: 5.6.2+
+ * mysql> select * from schema_unused_indexes limit 5;
+ * +-------------------------+----------------------------------------+------------+
+ * | object_schema           | object_name                            | index_name |
+ * +-------------------------+----------------------------------------+------------+
+ * | mem30_test__instruments | mysqlavailabilityadvisor$observedstate | PRIMARY    |
+ * | mem30_test__test        | compressme                             | PRIMARY    |
+ * | mem30_test__test        | compressmekeyblocksize                 | PRIMARY    |
+ * | mem30_test__test        | dontcompressme                         | PRIMARY    |
+ * | mem30_test__test        | round_robin_test                       | PRIMARY    |
+ * +-------------------------+----------------------------------------+------------+
  *
  */
 
-DROP VIEW IF EXISTS schema_unused_indexes;
- 
-CREATE SQL SECURITY INVOKER VIEW schema_unused_indexes AS
+CREATE OR REPLACE
+  ALGORITHM = MERGE
+  DEFINER = 'root'@'localhost'
+  SQL SECURITY INVOKER 
+VIEW schema_unused_indexes (
+  object_schema,
+  object_name,
+  index_name
+) AS
 SELECT object_schema,
        object_name,
        index_name

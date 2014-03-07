@@ -11,12 +11,14 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA */
 
 /* 
  * View: schema_table_statistics
  *
- * Mimic TABLE_STATISTICS from Google et al ordered by the total wait time descending
+ * Statistics around tables.
+ *
+ * Ordered by the total wait time descending - top tables are most contended.
  * 
  * mysql> select * from schema_table_statistics limit 1\G
  * *************************** 1. row ***************************
@@ -38,18 +40,37 @@
  *              io_write_latency: 14.17 ms
  *              io_misc_requests: 2698
  *               io_misc_latency: 433.66 ms
- * 
- * (Example from 5.6.6)
- *
- * Versions: 5.6.2+
  *
  */ 
- 
-DROP VIEW IF EXISTS schema_table_statistics;
 
-CREATE SQL SECURITY INVOKER VIEW schema_table_statistics AS 
+CREATE OR REPLACE
+  ALGORITHM = TEMPTABLE
+  DEFINER = 'root'@'localhost'
+  SQL SECURITY INVOKER 
+VIEW schema_table_statistics (
+  table_schema,
+  table_name,
+  total_latency,
+  rows_fetched,
+  fetch_latency,
+  rows_inserted,
+  insert_latency,
+  rows_updated,
+  update_latency,
+  rows_deleted,
+  delete_latency,
+  io_read_requests,
+  io_read,
+  io_read_latency,
+  io_write_requests,
+  io_write,
+  io_write_latency,
+  io_misc_requests,
+  io_misc_latency
+) AS
 SELECT pst.object_schema AS table_schema,
        pst.object_name AS table_name,
+       sys.format_time(pst.sum_timer_wait) AS total_latency,
        pst.count_fetch AS rows_fetched,
        sys.format_time(pst.sum_timer_fetch) AS fetch_latency,
        pst.count_insert AS rows_inserted,
@@ -74,11 +95,13 @@ SELECT pst.object_schema AS table_schema,
  ORDER BY pst.sum_timer_wait DESC;
 
 /* 
- * View: schema_table_statistics_raw
+ * View: x$schema_table_statistics
  *
- * Mimic TABLE_STATISTICS from Google et al ordered by the total wait time descending
+ * Statistics around tables.
+ *
+ * Ordered by the total wait time descending - top tables are most contended.
  * 
- * mysql> SELECT * FROM schema_table_statistics_raw LIMIT 1\G
+ * mysql> SELECT * FROM x$schema_table_statistics LIMIT 1\G
  * *************************** 1. row ***************************
  *      table_schema: common_schema
  *        table_name: help_content
@@ -98,19 +121,37 @@ SELECT pst.object_schema AS table_schema,
  *  io_write_latency: 133726902790
  *  io_misc_requests: 61
  *   io_misc_latency: 209081089750
- * 1 row in set (1.24 sec)
- * 
- * (Example from 5.6.6)
- *
- * Versions: 5.6.2+
  *
  */ 
  
-DROP VIEW IF EXISTS schema_table_statistics_raw;
-
-CREATE SQL SECURITY INVOKER VIEW schema_table_statistics_raw AS 
+CREATE OR REPLACE
+  ALGORITHM = TEMPTABLE
+  DEFINER = 'root'@'localhost'
+  SQL SECURITY INVOKER 
+VIEW x$schema_table_statistics (
+  table_schema,
+  table_name,
+  total_latency,
+  rows_fetched,
+  fetch_latency,
+  rows_inserted,
+  insert_latency,
+  rows_updated,
+  update_latency,
+  rows_deleted,
+  delete_latency,
+  io_read_requests,
+  io_read,
+  io_read_latency,
+  io_write_requests,
+  io_write,
+  io_write_latency,
+  io_misc_requests,
+  io_misc_latency
+) AS
 SELECT pst.object_schema AS table_schema,
        pst.object_name AS table_name,
+       pst.sum_timer_wait AS total_latency,
        pst.count_fetch AS rows_fetched,
        pst.sum_timer_fetch AS fetch_latency,
        pst.count_insert AS rows_inserted,

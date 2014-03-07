@@ -11,12 +11,12 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA */
 
 /*
  * View: io_global_by_file_by_bytes
  *
- * Show the top global IO consumers by bytes usage by file
+ * Shows the top global IO consumers by bytes usage by file.
  *
  * mysql> SELECT * FROM io_global_by_file_by_bytes LIMIT 5;
  * +--------------------------------------------+------------+------------+-----------+-------------+---------------+-----------+------------+-----------+
@@ -28,14 +28,24 @@
  * | /opt/mysql/5.5.33/share/english/errmsg.sys |          3 | 43.68 KiB  | 14.56 KiB |           0 | 0 bytes       | 0 bytes   | 43.68 KiB  |      0.00 |
  * | /opt/mysql/5.5.33/share/charsets/Index.xml |          1 | 17.89 KiB  | 17.89 KiB |           0 | 0 bytes       | 0 bytes   | 17.89 KiB  |      0.00 |
  * +--------------------------------------------+------------+------------+-----------+-------------+---------------+-----------+------------+-----------+
- * 5 rows in set (0.01 sec) *
  *
- * Versions: 5.5+
  */
 
-DROP VIEW IF EXISTS io_global_by_file_by_bytes;
-
-CREATE SQL SECURITY INVOKER VIEW io_global_by_file_by_bytes AS
+CREATE OR REPLACE
+  ALGORITHM = MERGE
+  DEFINER = 'root'@'localhost'
+  SQL SECURITY INVOKER 
+VIEW io_global_by_file_by_bytes (
+  file,
+  count_read,
+  total_read,
+  avg_read,
+  count_write,
+  total_written,
+  avg_write,
+  total,
+  write_pct
+) AS
 SELECT sys.format_path(file_name) AS file, 
        count_read, 
        sys.format_bytes(sum_number_of_bytes_read) AS total_read,
@@ -49,11 +59,11 @@ SELECT sys.format_path(file_name) AS file,
  ORDER BY sum_number_of_bytes_read + sum_number_of_bytes_write DESC;
 
 /*
- * View: io_global_by_file_by_bytes_raw
+ * View: x$io_global_by_file_by_bytes
  *
- * Show the top global IO consumers by bytes usage by file
+ * Shows the top global IO consumers by bytes usage by file.
  *
- * mysql> SELECT * FROM io_global_by_file_by_bytes_raw LIMIT 5;
+ * mysql> SELECT * FROM x$io_global_by_file_by_bytes LIMIT 5;
  * +------------------------------------------------------+------------+------------+------------+-------------+---------------+------------+---------+-----------+
  * | file                                                 | count_read | total_read | avg_read   | count_write | total_written | avg_write  | total   | write_pct |
  * +------------------------------------------------------+------------+------------+------------+-------------+---------------+------------+---------+-----------+
@@ -63,14 +73,24 @@ SELECT sys.format_path(file_name) AS file,
  * | /opt/mysql/5.5.33/share/english/errmsg.sys           |          3 |      44724 | 14908.0000 |           0 |             0 |     0.0000 |   44724 |      0.00 |
  * | /opt/mysql/5.5.33/share/charsets/Index.xml           |          1 |      18317 | 18317.0000 |           0 |             0 |     0.0000 |   18317 |      0.00 |
  * +------------------------------------------------------+------------+------------+------------+-------------+---------------+------------+---------+-----------+
- * 5 rows in set (0.00 sec)
  *
- * Versions: 5.5+
  */
 
-DROP VIEW IF EXISTS io_global_by_file_by_bytes_raw;
-
-CREATE SQL SECURITY INVOKER VIEW io_global_by_file_by_bytes_raw AS
+CREATE OR REPLACE
+  ALGORITHM = MERGE
+  DEFINER = 'root'@'localhost'
+  SQL SECURITY INVOKER 
+VIEW x$io_global_by_file_by_bytes (
+  file,
+  count_read,
+  total_read,
+  avg_read,
+  count_write,
+  total_written,
+  avg_write,
+  total,
+  write_pct
+) AS
 SELECT file_name AS file, 
        count_read, 
        sum_number_of_bytes_read AS total_read,

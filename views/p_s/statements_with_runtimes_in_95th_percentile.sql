@@ -11,18 +11,23 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA */
 
 /*
  * View: x$ps_digest_avg_latency_distribution
  *
  * Helper view for x$ps_digest_95th_percentile_by_avg_us
  *
- * Versions: 5.6.5+
  */
-DROP VIEW IF EXISTS x$ps_digest_avg_latency_distribution;
 
-CREATE SQL SECURITY INVOKER VIEW x$ps_digest_avg_latency_distribution AS
+CREATE OR REPLACE
+  ALGORITHM = TEMPTABLE
+  DEFINER = 'root'@'localhost'
+  SQL SECURITY INVOKER 
+VIEW x$ps_digest_avg_latency_distribution (
+  cnt,
+  avg_us
+) AS
 SELECT COUNT(*) cnt, 
        ROUND(avg_timer_wait/1000000) AS avg_us
   FROM performance_schema.events_statements_summary_by_digest
@@ -41,11 +46,16 @@ SELECT COUNT(*) cnt,
  * |    964 |     0.9525 |
  * +--------+------------+
  *
- * Versions: 5.6.5+
  */
-DROP VIEW IF EXISTS x$ps_digest_95th_percentile_by_avg_us;
 
-CREATE SQL SECURITY INVOKER VIEW x$ps_digest_95th_percentile_by_avg_us AS
+CREATE OR REPLACE
+  ALGORITHM = TEMPTABLE
+  DEFINER = 'root'@'localhost'
+  SQL SECURITY INVOKER 
+VIEW x$ps_digest_95th_percentile_by_avg_us (
+  avg_us,
+  percentile
+) AS
 SELECT s2.avg_us avg_us,
        SUM(s1.cnt)/(SELECT COUNT(*) FROM performance_schema.events_statements_summary_by_digest) percentile
   FROM sys.x$ps_digest_avg_latency_distribution AS s1
@@ -71,17 +81,31 @@ HAVING percentile > 0.95
  * | SELECT `e` . `round_robin_bin` ...  `timestamp` = `maxes` . `ts`  | mem  | *         |          1 |         0 |          0 | 1.97 s        | 1.97 s      | 1.97 s      |         1 |             1 |         40322 |             40322 | 2013-12-04 20:05:39 | 2013-12-04 20:05:39 | a07488137ea5c1bccf3e291c50bfd21f |
  * | SELECT `e` . `round_robin_bin` ...  `timestamp` = `maxes` . `ts`  | mem  | *         |          2 |         0 |          0 | 3.91 s        | 3.91 s      | 1.96 s      |         1 |             1 |         13126 |              6563 | 2013-12-04 20:05:04 | 2013-12-04 20:06:34 | b8bddc6566366dafc7e474f67096a93b |
  * +-------------------------------------------------------------------+------+-----------+------------+-----------+------------+---------------+-------------+-------------+-----------+---------------+---------------+-------------------+---------------------+---------------------+----------------------------------+
- * 5 rows in set (1.58 sec)
- *
- * (Example from 5.6.14)
- *
- * Versions: 5.6.9+
  *
  */
 
-DROP VIEW IF EXISTS statements_with_runtimes_in_95th_percentile;
-
-CREATE SQL SECURITY INVOKER VIEW statements_with_runtimes_in_95th_percentile AS
+CREATE OR REPLACE
+  ALGORITHM = MERGE
+  DEFINER = 'root'@'localhost'
+  SQL SECURITY INVOKER 
+VIEW statements_with_runtimes_in_95th_percentile (
+  query,
+  db,
+  full_scan,
+  exec_count,
+  err_count,
+  warn_count,
+  total_latency,
+  max_latency,
+  avg_latency,
+  rows_sent,
+  rows_sent_avg,
+  rows_examined,
+  rows_examined_avg,
+  first_seen,
+  last_seen,
+  digest
+) AS
 SELECT sys.format_statement(DIGEST_TEXT) AS query,
        SCHEMA_NAME as db,
        IF(SUM_NO_GOOD_INDEX_USED > 0 OR SUM_NO_INDEX_USED > 0, '*', '') AS full_scan,
@@ -104,11 +128,11 @@ SELECT sys.format_statement(DIGEST_TEXT) AS query,
  ORDER BY AVG_TIMER_WAIT DESC;
 
 /*
- * View: statements_with_runtimes_in_95th_percentile_raw
+ * View: x$statements_with_runtimes_in_95th_percentile
  *
  * List all statements who's average runtime, in microseconds, is in the top 95th percentile.
  * 
- * mysql> SELECT * FROM statements_with_runtimes_in_95th_percentile_raw LIMIT 1\G
+ * mysql> SELECT * FROM x$statements_with_runtimes_in_95th_percentile LIMIT 1\G
  * *************************** 1. row ***************************
  *             query: SELECT `e` . `round_robin_bin` AS `round1_1706_0_` , `e` . `id` AS `id1706_0_` , `e` . `timestamp` AS `timestamp1706_0_` , `e` . `rxBytes` AS `rxBytes1706_0_` , `e` . `rxPackets` AS `rxPackets1706_0_` , `e` . `rxErrors` AS `rxErrors1706_0_` , `e` . `txBytes` AS `txBytes1706_0_` , `e` . `txPackets` AS `txPackets1706_0_` , `e` . `txErrors` AS `txErrors1706_0_` , `e` . `txCollisions` AS `txColli10_1706_0_` FROM `mem__instruments` . `NetworkTrafficAdvisor_NetworkTraffic` AS `e` JOIN ( SELECT `id` AS `t` , MAX ( TIMESTAMP ) AS `ts` FROM `mem__instruments` . `NetworkTrafficAdvisor_NetworkTraffic` WHERE `id` IN (?) GROUP BY `id` ORDER BY NULL ) `maxes` ON `e` . `id` = `maxes` . `t` AND `e` . `timestamp` = `maxes` . `ts`
  *                db: mem
@@ -126,17 +150,31 @@ SELECT sys.format_statement(DIGEST_TEXT) AS query,
  *        first_seen: 2013-12-04 20:05:01
  *         last_seen: 2013-12-04 20:06:34
  *            digest: 29ba002bf039bb6439357a10134407de
- * 1 row in set (1.50 sec)
- *
- * (Example from 5.6.14)
- *
- * Versions: 5.6.9+
  *
  */
 
-DROP VIEW IF EXISTS statements_with_runtimes_in_95th_percentile_raw;
-
-CREATE SQL SECURITY INVOKER VIEW statements_with_runtimes_in_95th_percentile_raw AS
+CREATE OR REPLACE
+  ALGORITHM = MERGE
+  DEFINER = 'root'@'localhost'
+  SQL SECURITY INVOKER 
+VIEW x$statements_with_runtimes_in_95th_percentile (
+  query,
+  db,
+  full_scan,
+  exec_count,
+  err_count,
+  warn_count,
+  total_latency,
+  max_latency,
+  avg_latency,
+  rows_sent,
+  rows_sent_avg,
+  rows_examined,
+  rows_examined_avg,
+  first_seen,
+  last_seen,
+  digest
+) AS
 SELECT DIGEST_TEXT AS query,
        SCHEMA_NAME AS db,
        IF(SUM_NO_GOOD_INDEX_USED > 0 OR SUM_NO_INDEX_USED > 0, '*', '') AS full_scan,

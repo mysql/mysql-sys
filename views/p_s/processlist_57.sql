@@ -11,21 +11,23 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA */
 
 /*
  * View: processlist
  *
  * A detailed non-blocking processlist view to replace 
  * [INFORMATION_SCHEMA. | SHOW FULL] PROCESSLIST
+ * 
+ * Performs less locking than the legacy sources, whilst giving extra information.
  *
- * mysql> select * from processlist_full where conn_id is not null\G
+ * mysql> select * from processlist where conn_id is not null\G
  * ...
  * *************************** 8. row ***************************
  *                 thd_id: 31
  *                conn_id: 12
  *                   user: root@localhost
- *                     db: ps_helper
+ *                     db: information_schema
  *                command: Query
  *                  state: Sending data
  *                   time: 0
@@ -44,13 +46,35 @@
  *      last_wait_latency: 260.13 ns
  *                 source: sql_optimizer.cc:1075
  *
- * Versions: 5.7.2+
- *
  */
  
-DROP VIEW IF EXISTS processlist;
-
-CREATE SQL SECURITY INVOKER VIEW processlist AS
+CREATE OR REPLACE
+  ALGORITHM = TEMPTABLE
+  DEFINER = 'root'@'localhost'
+  SQL SECURITY INVOKER 
+VIEW processlist (
+  thd_id,
+  conn_id,
+  user,
+  db,
+  command,
+  state,
+  time,
+  current_statement,
+  lock_latency,
+  rows_examined,
+  rows_sent,
+  rows_affected,
+  tmp_tables,
+  tmp_disk_tables,
+  full_scan,
+  current_memory,
+  last_statement,
+  last_statement_latency,
+  last_wait,
+  last_wait_latency,
+  source
+) AS
 SELECT pps.thread_id AS thd_id,
        pps.processlist_id AS conn_id,
        IF(pps.name = 'thread/sql/one_connection', 
@@ -85,25 +109,27 @@ SELECT pps.thread_id AS thd_id,
   LEFT JOIN performance_schema.events_waits_current AS ewc USING (thread_id)
   LEFT JOIN performance_schema.events_statements_current as esc USING (thread_id)
   LEFT JOIN performance_schema.memory_summary_by_thread_by_event_name as mem USING (thread_id)
-GROUP BY thread_id
-ORDER BY pps.processlist_time DESC, last_wait_latency DESC;
+ GROUP BY thread_id
+ ORDER BY pps.processlist_time DESC, last_wait_latency DESC;
 
 /*
- * View: processlist_raw
+ * View: x$processlist
  *
  * A detailed non-blocking processlist view to replace 
  * [INFORMATION_SCHEMA. | SHOW FULL] PROCESSLIST
  * 
- * mysql> select * from processlist_full where conn_id is not null\G
+ * Performs less locking than the legacy sources, whilst giving extra information.
+ *
+ * mysql> select * from x$processlist where conn_id is not null\G
  * *************************** 1. row ***************************
  *                 thd_id: 31
  *                conn_id: 12
  *                   user: root@localhost
- *                     db: ps_helper
+ *                     db: information_schema
  *                command: Query
  *                  state: Sending data
  *                   time: 0
- *      current_statement: select * from processlist_raw limit 5
+ *      current_statement: select * from processlist limit 5
  *           lock_latency: 1066000000
  *          rows_examined: 0
  *              rows_sent: 0
@@ -118,13 +144,35 @@ ORDER BY pps.processlist_time DESC, last_wait_latency DESC;
  *      last_wait_latency: 1602250
  *                 source: mf_iocache.c:163
  *
- * Versions: 5.7.2+
- *
  */
  
-DROP VIEW IF EXISTS processlist_raw;
-
-CREATE SQL SECURITY INVOKER VIEW processlist_raw AS
+CREATE OR REPLACE
+  ALGORITHM = TEMPTABLE
+  DEFINER = 'root'@'localhost'
+  SQL SECURITY INVOKER 
+VIEW x$processlist (
+  thd_id,
+  conn_id,
+  user,
+  db,
+  command,
+  state,
+  time,
+  current_statement,
+  lock_latency,
+  rows_examined,
+  rows_sent,
+  rows_affected,
+  tmp_tables,
+  tmp_disk_tables,
+  full_scan,
+  current_memory,
+  last_statement,
+  last_statement_latency,
+  last_wait,
+  last_wait_latency,
+  source
+) AS
 SELECT pps.thread_id AS thd_id,
        pps.processlist_id AS conn_id,
        IF(pps.name = 'thread/sql/one_connection', 
@@ -159,5 +207,5 @@ SELECT pps.thread_id AS thd_id,
   LEFT JOIN performance_schema.events_waits_current AS ewc USING (thread_id)
   LEFT JOIN performance_schema.events_statements_current as esc USING (thread_id)
   LEFT JOIN performance_schema.memory_summary_by_thread_by_event_name as mem USING (thread_id)
-GROUP BY thread_id
-ORDER BY pps.processlist_time DESC, last_wait_latency DESC;
+ GROUP BY thread_id
+ ORDER BY pps.processlist_time DESC, last_wait_latency DESC;

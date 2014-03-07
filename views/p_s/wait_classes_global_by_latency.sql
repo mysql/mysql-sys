@@ -11,12 +11,12 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA */
 
 /*
  * View: wait_classes_global_by_latency
  * 
- * Lists the top wait classes by total latency, ignoring idle (this may be very large)
+ * Lists the top wait classes by total latency, ignoring idle (this may be very large).
  *
  * mysql> select * from wait_classes_global_by_latency;
  * +-------------------+--------------+---------------+-------------+-------------+-------------+
@@ -30,14 +30,20 @@
  * | wait/synch/rwlock |        61287 | 7.62 ms       | 21.38 ns    | 124.37 ns   | 34.65 µs    |
  * +-------------------+--------------+---------------+-------------+-------------+-------------+
  *
- * (Example from 5.6.6)
- *
- * Versions: 5.5+
  */
 
-DROP VIEW IF EXISTS wait_classes_global_by_latency;
-
-CREATE SQL SECURITY INVOKER VIEW wait_classes_global_by_latency AS
+CREATE OR REPLACE
+  ALGORITHM = TEMPTABLE
+  DEFINER = 'root'@'localhost'
+  SQL SECURITY INVOKER 
+VIEW wait_classes_global_by_latency (
+  event_class,
+  total_events,
+  total_latency,
+  min_latency,
+  avg_latency,
+  max_latency
+) AS
 SELECT SUBSTRING_INDEX(event_name,'/', 3) event_class, 
        SUM(COUNT_STAR) total_events,
        sys.format_time(SUM(sum_timer_wait)) total_latency,
@@ -51,11 +57,11 @@ SELECT SUBSTRING_INDEX(event_name,'/', 3) event_class,
  ORDER BY SUM(sum_timer_wait) DESC;
 
 /*
- * View: wait_classes_global_by_latency_raw
+ * View: x$wait_classes_global_by_latency
  * 
- * Lists the top wait classes by total latency, ignoring idle (this may be very large)
+ * Lists the top wait classes by total latency, ignoring idle (this may be very large).
  *
- * mysql> SELECT * FROM wait_classes_global_by_latency_raw;
+ * mysql> SELECT * FROM x$wait_classes_global_by_latency;
  * +-------------------+--------------+----------------+-------------+----------------+--------------+
  * | event_class       | total_events | total_latency  | min_latency | avg_latency    | max_latency  |
  * +-------------------+--------------+----------------+-------------+----------------+--------------+
@@ -66,16 +72,21 @@ SELECT SUBSTRING_INDEX(event_name,'/', 3) event_class,
  * | wait/lock/table   |         6972 |     3674766030 |      109330 |    527074.8752 |      8855730 |
  * | wait/synch/rwlock |        13646 |     1579833580 |       37700 |    115772.6499 |     28293850 |
  * +-------------------+--------------+----------------+-------------+----------------+--------------+
- * 6 rows in set (0.01 sec)
  *
- * (Example from 5.6.6)
- *
- * Versions: 5.5+
  */
 
-DROP VIEW IF EXISTS wait_classes_global_by_latency_raw;
-
-CREATE SQL SECURITY INVOKER VIEW wait_classes_global_by_latency_raw AS
+CREATE OR REPLACE
+  ALGORITHM = TEMPTABLE
+  DEFINER = 'root'@'localhost'
+  SQL SECURITY INVOKER 
+VIEW x$wait_classes_global_by_latency (
+  event_class,
+  total_events,
+  total_latency,
+  min_latency,
+  avg_latency,
+  max_latency
+) AS
 SELECT SUBSTRING_INDEX(event_name,'/', 3) event_class, 
        SUM(COUNT_STAR) total_events,
        SUM(sum_timer_wait) total_latency,

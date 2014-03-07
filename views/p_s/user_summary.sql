@@ -11,68 +11,74 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA */
 
 /*
  * View: user_summary
  *
- * Summarizes statement activity and connections by user
+ * Summarizes statement activity, file IO and connections by user.
  *
  * mysql> select * from user_summary;
- * +------+------------------+---------------+-------------+---------------------+-------------------+
- * | user | total_statements | total_latency | avg_latency | current_connections | total_connections |
- * +------+------------------+---------------+-------------+---------------------+-------------------+
- * | root |             1967 | 00:03:35.99   | 109.81 ms   |                   2 |                 7 |
- * +------+------------------+---------------+-------------+---------------------+-------------------+
- * 1 row in set (0.00 sec)
- * 
- * Versions: 5.6.3+
+ * +------+------------+-------------------+-----------------------+-------------+----------+-----------------+---------------------+-------------------+--------------+
+ * | user | statements | statement_latency | statement_avg_latency | table_scans | file_ios | file_io_latency | current_connections | total_connections | unique_hosts |
+ * +------+------------+-------------------+-----------------------+-------------+----------+-----------------+---------------------+-------------------+--------------+
+ * | root |       2924 | 00:03:59.53       | 81.92 ms              |          82 |    54702 | 55.61 s         |                   1 |                 1 |            1 |
+ * +------+------------+-------------------+-----------------------+-------------+----------+-----------------+---------------------+-------------------+--------------+
+ *
  */
 
-DROP VIEW IF EXISTS user_summary;
-
-CREATE SQL SECURITY INVOKER VIEW user_summary AS
+CREATE OR REPLACE
+  ALGORITHM = TEMPTABLE
+  DEFINER = 'root'@'localhost'
+  SQL SECURITY INVOKER 
+VIEW user_summary AS
 SELECT accounts.user,
-       SUM(essbubem.count_star) AS total_statements,
-       sys.format_time(SUM(essbubem.sum_timer_wait)) AS total_latency,
-       sys.format_time(SUM(essbubem.sum_timer_wait) / SUM(count_star)) AS avg_latency,
-       accounts.current_connections,
-       accounts.total_connections,
+       SUM(stmt.count) AS statements,
+       sys.format_time(SUM(stmt.total_latency)) AS statement_latency,
+       sys.format_time(SUM(stmt.total_latency) / SUM(stmt.count)) AS statement_avg_latency,
+       SUM(stmt.full_scans) AS table_scans,
+       SUM(io.ios) AS file_ios,
+       sys.format_time(SUM(io.io_latency)) AS file_io_latency,
+       SUM(accounts.current_connections) AS current_connections,
+       SUM(accounts.total_connections) AS total_connections,
        COUNT(DISTINCT host) AS unique_hosts
   FROM performance_schema.accounts
-  JOIN performance_schema.events_statements_summary_by_user_by_event_name essbubem USING (user)
- WHERE user IS NOT NULL
- GROUP BY user
- ORDER BY SUM(sum_timer_wait) DESC;
+  JOIN sys.x$user_summary_by_statement_latency AS stmt ON accounts.user = stmt.user
+  JOIN sys.x$user_summary_by_file_io AS io ON accounts.user = io.user
+ WHERE accounts.user IS NOT NULL
+ GROUP BY accounts.user;
 
 /*
- * View: user_summary_raw
+ * View: x$user_summary
  *
- * Summarizes statement activity and connections by user
+ * Summarizes statement activity, file IO and connections by user.
  *
- * mysql> select * from user_summary_raw;
- * +------+------------------+-----------------+-------------------+---------------------+-------------------+--------------+
- * | user | total_statements | total_latency   | avg_latency       | current_connections | total_connections | unique_hosts |
- * +------+------------------+-----------------+-------------------+---------------------+-------------------+--------------+
- * | root |             2110 | 223924839893000 | 106125516536.9668 |                   2 |                 7 |            1 |
- * +------+------------------+-----------------+-------------------+---------------------+-------------------+--------------+
- * 1 row in set (0.00 sec)
- * 
- * Versions: 5.6.3+
+ * mysql> select * from x$user_summary;
+ * +------+------------+-------------------+-----------------------+-------------+----------+-----------------+---------------------+-------------------+--------------+
+ * | user | statements | statement_latency | statement_avg_latency | table_scans | file_ios | file_io_latency | current_connections | total_connections | unique_hosts |
+ * +------+------------+-------------------+-----------------------+-------------+----------+-----------------+---------------------+-------------------+--------------+
+ * | root |       2925 |   239577283481000 |      81906763583.2479 |          83 |    54709 |  55605611965150 |                   1 |                 1 |            1 |
+ * +------+------------+-------------------+-----------------------+-------------+----------+-----------------+---------------------+-------------------+--------------+
+ *
  */
 
-DROP VIEW IF EXISTS user_summary_raw;
-
-CREATE SQL SECURITY INVOKER VIEW user_summary_raw AS
+CREATE OR REPLACE
+  ALGORITHM = TEMPTABLE
+  DEFINER = 'root'@'localhost'
+  SQL SECURITY INVOKER 
+VIEW x$user_summary AS
 SELECT accounts.user,
-       SUM(essbubem.count_star) AS total_statements,
-       SUM(essbubem.sum_timer_wait) AS total_latency,
-       SUM(essbubem.sum_timer_wait) / SUM(count_star) AS avg_latency,
-       accounts.current_connections,
-       accounts.total_connections,
+       SUM(stmt.count) AS statements,
+       SUM(stmt.total_latency) AS statement_latency,
+       SUM(stmt.total_latency) / SUM(stmt.count) AS statement_avg_latency,
+       SUM(stmt.full_scans) AS table_scans,
+       SUM(io.ios) AS file_ios,
+       SUM(io.io_latency) AS file_io_latency,
+       SUM(accounts.current_connections) AS current_connections,
+       SUM(accounts.total_connections) AS total_connections,
        COUNT(DISTINCT host) AS unique_hosts
   FROM performance_schema.accounts
-  JOIN performance_schema.events_statements_summary_by_user_by_event_name essbubem USING (user)
- WHERE user IS NOT NULL
- GROUP BY user
- ORDER BY SUM(sum_timer_wait) DESC;
+  JOIN sys.x$user_summary_by_statement_latency AS stmt ON accounts.user = stmt.user
+  JOIN sys.x$user_summary_by_file_io AS io ON accounts.user = io.user
+ WHERE accounts.user IS NOT NULL
+ GROUP BY accounts.user;

@@ -11,12 +11,12 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA */
 
 /*
  * View: waits_global_by_latency
  *
- * Lists the top wait events by their total latency, ignoring idle (this may be very large)
+ * Lists the top wait events by their total latency, ignoring idle (this may be very large).
  *
  * mysql> select * from waits_global_by_latency limit 5;
  * +--------------------------------------+--------------+---------------+-------------+-------------+
@@ -29,12 +29,19 @@
  * | wait/io/file/innodb/innodb_data_file |      2829403 | 00:08:12.89   | 174.20 us   | 455.22 ms   |
  * +--------------------------------------+--------------+---------------+-------------+-------------+
  * 
- * Versions: 5.5+
  */
 
-DROP VIEW IF EXISTS waits_global_by_latency;
-
-CREATE SQL SECURITY INVOKER VIEW waits_global_by_latency AS
+CREATE OR REPLACE
+  ALGORITHM = MERGE
+  DEFINER = 'root'@'localhost'
+  SQL SECURITY INVOKER 
+VIEW waits_global_by_latency (
+  events,
+  total_events,
+  total_latency,
+  avg_latency,
+  max_latency
+) AS
 SELECT event_name AS event,
        count_star AS total_events,
        sys.format_time(sum_timer_wait) AS total_latency,
@@ -46,11 +53,11 @@ SELECT event_name AS event,
  ORDER BY sum_timer_wait DESC;
 
 /*
- * View: waits_global_by_latency_raw
+ * View: x$waits_global_by_latency
  *
- * Lists the top wait events by their total latency, ignoring idle (this may be very large)
+ * Lists the top wait events by their total latency, ignoring idle (this may be very large).
  *
- * mysql> select * from waits_global_by_latency_raw limit 5;
+ * mysql> select * from x$waits_global_by_latency limit 5;
  * +--------------------------------------+--------------+---------------+-------------+--------------+
  * | event                                | total_events | total_latency | avg_latency | max_latency  |
  * +--------------------------------------+--------------+---------------+-------------+--------------+
@@ -60,14 +67,20 @@ SELECT event_name AS event,
  * | wait/io/file/innodb/innodb_log_file  |           20 |   54298899070 |  2714944765 |  30108124800 |
  * | wait/io/file/mysys/charset           |            3 |   24244722970 |  8081574072 |  24151547420 |
  * +--------------------------------------+--------------+---------------+-------------+--------------+
- * 5 rows in set (0.01 sec)
- * 
- * Versions: 5.5+
+ *
  */
 
-DROP VIEW IF EXISTS waits_global_by_latency_raw;
-
-CREATE SQL SECURITY INVOKER VIEW waits_global_by_latency_raw AS
+CREATE OR REPLACE
+  ALGORITHM = MERGE
+  DEFINER = 'root'@'localhost'
+  SQL SECURITY INVOKER 
+VIEW x$waits_global_by_latency (
+  events,
+  total_events,
+  total_latency,
+  avg_latency,
+  max_latency
+) AS
 SELECT event_name AS event,
        count_star AS total_events,
        sum_timer_wait AS total_latency,

@@ -11,12 +11,12 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA */
 
 /*
  * View: io_global_by_wait_by_bytes
  *
- * Show the top global IO consumer classes by bytes usage
+ * Shows the top global IO consumer classes by bytes usage.
  *
  * mysql> select * from io_global_by_wait_by_bytes;
  * +--------------------+------------+---------------+-------------+-------------+-------------+------------+------------+-----------+-------------+---------------+-------------+-----------------+
@@ -40,14 +40,27 @@
  * | sql/misc           |         23 | 2.73 ms       | 65.14 µs    | 118.50 µs   | 255.31 µs   |          0 | 0 bytes    | 0 bytes   |           0 | 0 bytes       | 0 bytes     | 0 bytes         |
  * +--------------------+------------+---------------+-------------+-------------+-------------+------------+------------+-----------+-------------+---------------+-------------+-----------------+
  *
- * (Example from 5.6.6)
- *
- * Versions: 5.5+
  */
 
-DROP VIEW IF EXISTS io_global_by_wait_by_bytes;
-
-CREATE SQL SECURITY INVOKER VIEW io_global_by_wait_by_bytes AS
+CREATE OR REPLACE
+  ALGORITHM = MERGE
+  DEFINER = 'root'@'localhost'
+  SQL SECURITY INVOKER 
+VIEW io_global_by_wait_by_bytes (
+  event_name,
+  count_star,
+  total_latency,
+  min_latency,
+  avg_latency,
+  max_latency,
+  count_read,
+  total_read,
+  avg_read,
+  count_write,
+  total_written,
+  avg_written,
+  total_requested
+) AS
 SELECT SUBSTRING_INDEX(event_name, '/', -2) event_name,
        count_star,
        sys.format_time(sum_timer_wait) total_latency,
@@ -67,11 +80,11 @@ SELECT SUBSTRING_INDEX(event_name, '/', -2) event_name,
  ORDER BY sum_number_of_bytes_write + sum_number_of_bytes_read DESC;
 
 /*
- * View: io_global_by_wait_by_bytes_raw
+ * View: x$io_global_by_wait_by_bytes
  *
- * Show the top global IO consumer classes by bytes usage
+ * Shows the top global IO consumer classes by bytes usage.
  *
- * mysql> select * from io_global_by_wait_by_bytes_raw;
+ * mysql> select * from x$io_global_by_wait_by_bytes;
  * +-------------------------+------------+---------------+-------------+-------------+--------------+------------+------------+------------+-------------+---------------+-------------+-----------------+
  * | event_name              | count_star | total_latency | min_latency | avg_latency | max_latency  | count_read | total_read | avg_read   | count_write | total_written | avg_written | total_requested |
  * +-------------------------+------------+---------------+-------------+-------------+--------------+------------+------------+------------+-------------+---------------+-------------+-----------------+
@@ -87,16 +100,28 @@ SELECT SUBSTRING_INDEX(event_name, '/', -2) event_name,
  * | sql/global_ddl_log      |          2 |      21538010 |     3121560 |    10769005 |     18416450 |          0 |          0 |     0.0000 |           0 |             0 |      0.0000 |               0 |
  * | sql/dbopt               |         10 |    1004267680 |     1164930 |   100426768 |    939894930 |          0 |          0 |     0.0000 |           0 |             0 |      0.0000 |               0 |
  * +-------------------------+------------+---------------+-------------+-------------+--------------+------------+------------+------------+-------------+---------------+-------------+-----------------+
- * 11 rows in set (0.03 sec) *
  *
- * (Example from 5.6.6)
- *
- * Versions: 5.5+
  */
 
-DROP VIEW IF EXISTS io_global_by_wait_by_bytes_raw;
-
-CREATE SQL SECURITY INVOKER VIEW io_global_by_wait_by_bytes_raw AS
+CREATE OR REPLACE
+  ALGORITHM = MERGE
+  DEFINER = 'root'@'localhost'
+  SQL SECURITY INVOKER 
+VIEW x$io_global_by_wait_by_bytes (
+  event_name,
+  count_star,
+  total_latency,
+  min_latency,
+  avg_latency,
+  max_latency,
+  count_read,
+  total_read,
+  avg_read,
+  count_write,
+  total_written,
+  avg_written,
+  total_requested
+) AS
 SELECT SUBSTRING_INDEX(event_name, '/', -2) event_name,
        count_star,
        sum_timer_wait total_latency,

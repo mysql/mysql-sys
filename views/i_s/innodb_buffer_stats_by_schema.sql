@@ -11,7 +11,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA */
 
 /* 
  * View: innodb_buffer_stats_by_schema
@@ -19,23 +19,31 @@
  * Summarizes the output of the INFORMATION_SCHEMA.INNODB_BUFFER_PAGE 
  * table, aggregating by schema
  *
- * mysql> SELECT * FROM innodb_buffer_stats_by_schema;
- * +---------------+------------+------------+-------+--------------+-----------+-------------+
- * | object_schema | allocated  | data       | pages | pages_hashed | pages_old | rows_cached |
- * +---------------+------------+------------+-------+--------------+-----------+-------------+
- * | common_schema | 1.06 MiB   | 529.29 KiB |    68 |           68 |        68 |         697 |
- * | InnoDB System | 144.00 KiB | 15.67 KiB  |     9 |            9 |         9 |          43 |
- * | mysql         | 80.00 KiB  | 9.01 KiB   |     5 |            5 |         5 |          83 |
- * +---------------+------------+------------+-------+--------------+-----------+-------------+
- * 3 rows in set (0.08 sec)
+ * 
+ * mysql> select * from innodb_buffer_stats_by_schema;
+ * +--------------------------+------------+------------+-------+--------------+-----------+-------------+
+ * | object_schema            | allocated  | data       | pages | pages_hashed | pages_old | rows_cached |
+ * +--------------------------+------------+------------+-------+--------------+-----------+-------------+
+ * | mem30_trunk__instruments | 1.69 MiB   | 510.03 KiB |   108 |          108 |       108 |        3885 |
+ * | InnoDB System            | 688.00 KiB | 351.62 KiB |    43 |           43 |        43 |         862 |
+ * | mem30_trunk__events      | 80.00 KiB  | 21.61 KiB  |     5 |            5 |         5 |         229 |
+ * +--------------------------+------------+------------+-------+--------------+-----------+-------------+
  *
- * Versions: 5.5.28+
  */
 
-/*!50528 DROP VIEW IF EXISTS innodb_buffer_stats_by_schema */;
-
-/*!50528 
-CREATE SQL SECURITY INVOKER VIEW innodb_buffer_stats_by_schema AS
+CREATE OR REPLACE
+  ALGORITHM = TEMPTABLE
+  DEFINER = 'root'@'localhost'
+  SQL SECURITY INVOKER 
+VIEW innodb_buffer_stats_by_schema (
+  object_schema,
+  allocated,
+  data,
+  pages,
+  pages_hashed,
+  pages_old,
+  rows_cached
+) AS
 SELECT IF(LOCATE('.', ibp.table_name) = 0, 'InnoDB System', REPLACE(SUBSTRING_INDEX(ibp.table_name, '.', 1), '`', '')) AS object_schema,
        sys.format_bytes(SUM(IF(ibp.compressed_size = 0, 16384, compressed_size))) AS allocated,
        sys.format_bytes(SUM(ibp.data_size)) AS data,
@@ -46,31 +54,38 @@ SELECT IF(LOCATE('.', ibp.table_name) = 0, 'InnoDB System', REPLACE(SUBSTRING_IN
   FROM information_schema.innodb_buffer_page ibp 
  WHERE table_name IS NOT NULL
  GROUP BY object_schema
- ORDER BY SUM(IF(ibp.compressed_size = 0, 16384, compressed_size)) DESC */;
+ ORDER BY SUM(IF(ibp.compressed_size = 0, 16384, compressed_size)) DESC;
 
 /* 
- * View: innodb_buffer_stats_by_schema_raw
+ * View: x$innodb_buffer_stats_by_schema
  * 
  * Summarizes the output of the INFORMATION_SCHEMA.INNODB_BUFFER_PAGE 
  * table, aggregating by schema
  *
- * mysql> SELECT * FROM innodb_buffer_stats_by_schema_raw;
- * +---------------+-----------+--------+-------+--------------+-----------+-------------+
- * | object_schema | allocated | data   | pages | pages_hashed | pages_old | rows_cached |
- * +---------------+-----------+--------+-------+--------------+-----------+-------------+
- * | common_schema |   1114112 | 541996 |    68 |           68 |        68 |         697 |
- * | InnoDB System |    147456 |  16047 |     9 |            9 |         9 |          43 |
- * | mysql         |     81920 |   9224 |     5 |            5 |         5 |          83 |
- * +---------------+-----------+--------+-------+--------------+-----------+-------------+
- * 3 rows in set (0.10 sec)
+ * mysql> select * from x$innodb_buffer_stats_by_schema;
+ * +--------------------------+-----------+--------+-------+--------------+-----------+-------------+
+ * | object_schema            | allocated | data   | pages | pages_hashed | pages_old | rows_cached |
+ * +--------------------------+-----------+--------+-------+--------------+-----------+-------------+
+ * | mem30_trunk__instruments |   1769472 | 522272 |   108 |          108 |       108 |        3885 |
+ * | InnoDB System            |    704512 | 360054 |    43 |           43 |        43 |         862 |
+ * | mem30_trunk__events      |     81920 |  22125 |     5 |            5 |         5 |         229 |
+ * +--------------------------+-----------+--------+-------+--------------+-----------+-------------+
  *
- * Versions: 5.5.28+
  */
 
-/*!50528 DROP VIEW IF EXISTS innodb_buffer_stats_by_schema_raw */;
-
-/*!50528 
-CREATE SQL SECURITY INVOKER VIEW innodb_buffer_stats_by_schema_raw AS
+CREATE OR REPLACE
+  ALGORITHM = TEMPTABLE
+  DEFINER = 'root'@'localhost'
+  SQL SECURITY INVOKER 
+VIEW x$innodb_buffer_stats_by_schema (
+  object_schema,
+  allocated,
+  data,
+  pages,
+  pages_hashed,
+  pages_old,
+  rows_cached
+) AS
 SELECT IF(LOCATE('.', ibp.table_name) = 0, 'InnoDB System', REPLACE(SUBSTRING_INDEX(ibp.table_name, '.', 1), '`', '')) AS object_schema,
        SUM(IF(ibp.compressed_size = 0, 16384, compressed_size)) AS allocated,
        SUM(ibp.data_size) AS data,
@@ -81,4 +96,4 @@ SELECT IF(LOCATE('.', ibp.table_name) = 0, 'InnoDB System', REPLACE(SUBSTRING_IN
   FROM information_schema.innodb_buffer_page ibp 
  WHERE table_name IS NOT NULL
  GROUP BY object_schema
- ORDER BY SUM(IF(ibp.compressed_size = 0, 16384, compressed_size)) DESC */;
+ ORDER BY SUM(IF(ibp.compressed_size = 0, 16384, compressed_size)) DESC;

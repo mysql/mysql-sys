@@ -11,27 +11,29 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA */
 
 /* 
  * View: memory_global_total
  * 
- * Shows the total memory usage within the server globally
+ * Shows the total memory usage within the server globally.
  *
  * mysql> select * from memory_global_total;
  * +-----------------+
  * | total_allocated |
  * +-----------------+
- * | 1.35 MiB        |
+ * | 123.35 MiB      |
  * +-----------------+
- * 1 row in set (0.18 sec)
  *
- * Versions: 5.7.2+
  */
 
-DROP VIEW IF EXISTS memory_global_total;
-
-CREATE SQL SECURITY INVOKER VIEW memory_global_total AS
+CREATE OR REPLACE
+  ALGORITHM = TEMPTABLE
+  DEFINER = 'root'@'localhost'
+  SQL SECURITY INVOKER 
+VIEW memory_global_total (
+  total_allocated
+) AS
 SELECT sys.format_bytes(SUM(CURRENT_NUMBER_OF_BYTES_USED)) total_allocated
   FROM performance_schema.memory_summary_global_by_event_name;
 
@@ -40,20 +42,21 @@ SELECT sys.format_bytes(SUM(CURRENT_NUMBER_OF_BYTES_USED)) total_allocated
  * 
  * Shows the total memory usage within the server globally
  *
- * mysql> select * from memory_global_total_raw;
+ * mysql> select * from x$memory_global_total;
  * +-----------------+
  * | total_allocated |
  * +-----------------+
  * |         1420023 |
  * +-----------------+
- * 1 row in set (0.01 sec)
  *
- * Versions: 5.7.2+
  */
 
-DROP VIEW IF EXISTS memory_global_total_raw;
-
-CREATE SQL SECURITY INVOKER VIEW memory_global_total_raw AS
+CREATE OR REPLACE
+  ALGORITHM = TEMPTABLE
+  DEFINER = 'root'@'localhost'
+  SQL SECURITY INVOKER 
+VIEW x$memory_global_total (
+  total_allocated
+) AS
 SELECT SUM(CURRENT_NUMBER_OF_BYTES_USED) total_allocated
   FROM performance_schema.memory_summary_global_by_event_name;
-

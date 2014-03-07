@@ -11,13 +11,13 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA */
 
 /* 
  * View: schema_tables_with_full_table_scans
  *
  * Find tables that are being accessed by full table scans
- * ordering by the number of rows scanned descending
+ * ordering by the number of rows scanned descending.
  *
  * mysql> select * from schema_tables_with_full_table_scans limit 5;
  * +------------------+-------------------+-------------------+
@@ -30,13 +30,17 @@
  * | mem30__inventory | mysqlserver       |               294 |
  * +------------------+-------------------+-------------------+
  *
- * Versions: 5.6.2+
- *
  */
 
-DROP VIEW IF EXISTS schema_tables_with_full_table_scans;
-
-CREATE SQL SECURITY INVOKER VIEW schema_tables_with_full_table_scans AS
+CREATE OR REPLACE
+  ALGORITHM = MERGE
+  DEFINER = 'root'@'localhost'
+  SQL SECURITY INVOKER 
+VIEW schema_tables_with_full_table_scans (
+  object_schema,
+  object_name,
+  rows_full_scanned
+) AS
 SELECT object_schema, 
        object_name,
        count_read AS rows_full_scanned
