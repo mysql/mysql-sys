@@ -168,6 +168,7 @@ Shows the top global IO consumer classes by bytes usage.
 
 ##### Example
 
+```SQL
 mysql> select * from io_global_by_wait_by_bytes;
 +--------------------+------------+---------------+-------------+-------------+-------------+------------+------------+-----------+-------------+---------------+-------------+-----------------+
 | event_name         | count_star | total_latency | min_latency | avg_latency | max_latency | count_read | total_read | avg_read  | count_write | total_written | avg_written | total_requested |
