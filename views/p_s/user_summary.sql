@@ -54,8 +54,8 @@ SELECT accounts.user,
        SUM(accounts.total_connections) AS total_connections,
        COUNT(DISTINCT host) AS unique_hosts
   FROM performance_schema.accounts
-  JOIN sys.x$user_summary_by_statement_latency AS stmt ON accounts.user = stmt.user
-  JOIN sys.x$user_summary_by_file_io AS io ON accounts.user = io.user
+  LEFT JOIN sys.x$user_summary_by_statement_latency AS stmt ON accounts.user = stmt.user
+  LEFT JOIN sys.x$user_summary_by_file_io AS io ON accounts.user = io.user
  WHERE accounts.user IS NOT NULL
  GROUP BY accounts.user;
 
@@ -100,7 +100,7 @@ SELECT accounts.user,
        SUM(accounts.total_connections) AS total_connections,
        COUNT(DISTINCT host) AS unique_hosts
   FROM performance_schema.accounts
-  JOIN sys.x$user_summary_by_statement_latency AS stmt ON accounts.user = stmt.user
-  JOIN sys.x$user_summary_by_file_io AS io ON accounts.user = io.user
+  LEFT JOIN sys.x$user_summary_by_statement_latency AS stmt ON accounts.user = stmt.user
+  LEFT JOIN sys.x$user_summary_by_file_io AS io ON accounts.user = io.user
  WHERE accounts.user IS NOT NULL
  GROUP BY accounts.user;
