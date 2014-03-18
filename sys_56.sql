@@ -79,6 +79,14 @@ SOURCE ./views/p_s/user_summary_by_statement_latency.sql
 SOURCE ./views/p_s/user_summary_by_stages.sql
 SOURCE ./views/p_s/user_summary.sql
 
+SOURCE ./views/p_s/host_summary_by_file_io_type.sql
+SOURCE ./views/p_s/host_summary_by_file_io.sql
+SOURCE ./views/p_s/host_summary_by_statement_type.sql
+SOURCE ./views/p_s/host_summary_by_statement_latency.sql
+SOURCE ./views/p_s/host_summary_by_stages.sql
+SOURCE ./views/p_s/host_summary.sql
+
+
 SOURCE ./views/p_s/wait_classes_global_by_avg_latency.sql
 SOURCE ./views/p_s/wait_classes_global_by_latency.sql
 SOURCE ./views/p_s/waits_by_user_by_latency.sql
