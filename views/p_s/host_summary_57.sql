@@ -20,7 +20,7 @@
  *
  * mysql> select * from host_summary;
  * +------+------------+---------------+-------------+---------------------+-------------------+--------------+----------------+------------------------+
- * | host | statements | total_latency | avg_latency | current_connections | total_connections | unique_hosts | current_memory | total_memory_allocated |
+ * | host | statements | total_latency | avg_latency | current_connections | total_connections | unique_users | current_memory | total_memory_allocated |
  * +------+------------+---------------+-------------+---------------------+-------------------+--------------+----------------+------------------------+
  * | hal1 |       5663 | 00:01:47.14   | 18.92 ms    |                   1 |                 1 |            1 | 1.41 MiB       | 543.55 MiB             |
  * | hal2 |        225 | 14.49 s       | 64.40 ms    |                   1 |                 1 |            1 | 707.60 KiB     | 81.02 MiB              |
@@ -72,7 +72,7 @@ SELECT accounts.host,
  *
  * mysql> select * from x$host_summary;
  * +------+------------+-----------------+------------------+---------------------+-------------------+--------------+----------------+------------------------+
- * | host | statements | total_latency   | avg_latency      | current_connections | total_connections | unique_hosts | current_memory | total_memory_allocated |
+ * | host | statements | total_latency   | avg_latency      | current_connections | total_connections | unique_users | current_memory | total_memory_allocated |
  * +------+------------+-----------------+------------------+---------------------+-------------------+--------------+----------------+------------------------+
  * | hal1 |       5685 | 107175100271000 | 18852260381.8821 |                   1 |                 1 |            1 |        1459022 |              572855680 |
  * | hal2 |        225 |  14489223428000 | 64396548568.8889 |                   1 |                 1 |            1 |         724578 |               84958286 |
@@ -94,7 +94,7 @@ VIEW x$host_summary (
   file_io_latency,
   current_connections,
   total_connections,
-  unique_hosts,
+  unique_users,
   current_memory,
   total_memory_allocated
 ) AS
@@ -107,7 +107,7 @@ SELECT accounts.host,
        SUM(io.io_latency) AS file_io_latency,
        SUM(accounts.current_connections) AS current_connections,
        SUM(accounts.total_connections) AS total_connections,
-       COUNT(DISTINCT accounts.host) AS unique_hosts,
+       COUNT(DISTINCT accounts.user) AS unique_users,
        mem.current_allocated AS current_memory,
        mem.total_allocated AS total_memory_allocated
   FROM performance_schema.accounts
