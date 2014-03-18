@@ -68,7 +68,7 @@ SELECT accounts.host,
  * +------+------------+-------------------+-----------------------+-------------+----------+-----------------+---------------------+-------------------+--------------+
  * | host | statements | statement_latency | statement_avg_latency | table_scans | file_ios | file_io_latency | current_connections | total_connections | unique_hosts |
  * +------+------------+-------------------+-----------------------+-------------+----------+-----------------+---------------------+-------------------+--------------+
- * | root |       2925 |   239577283481000 |      81906763583.2479 |          83 |    54709 |  55605611965150 |                   1 |                 1 |            1 |
+ * | hal |       2925 |   239577283481000 |      81906763583.2479 |          83 |    54709 |  55605611965150 |                   1 |                 1 |            1 |
  * +------+------------+-------------------+-----------------------+-------------+----------+-----------------+---------------------+-------------------+--------------+
  *
  */
@@ -98,7 +98,7 @@ SELECT accounts.host,
        SUM(io.io_latency) AS file_io_latency,
        SUM(accounts.current_connections) AS current_connections,
        SUM(accounts.total_connections) AS total_connections,
-       COUNT(DISTINCT host) AS unique_hosts
+       COUNT(DISTINCT accounts.host) AS unique_hosts
   FROM performance_schema.accounts
   LEFT JOIN sys.x$host_summary_by_statement_latency AS stmt ON accounts.host = stmt.host
   LEFT JOIN sys.x$host_summary_by_file_io AS io ON accounts.host = io.host
