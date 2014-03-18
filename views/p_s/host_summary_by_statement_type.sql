@@ -48,7 +48,7 @@ VIEW host_summary_by_statement_type (
   rows_affected,
   full_scans
 ) AS
-SELECT user,
+SELECT host,
        SUBSTRING_INDEX(event_name, '/', -1) AS statement,
        count_star AS total,
        sys.format_time(sum_timer_wait) AS total_latency,
@@ -59,7 +59,7 @@ SELECT user,
        sum_rows_affected AS rows_affected,
        sum_no_index_used + sum_no_good_index_used AS full_scans
   FROM performance_schema.events_statements_summary_by_host_by_event_name
- WHERE user IS NOT NULL
+ WHERE host IS NOT NULL
    AND sum_timer_wait != 0
  ORDER BY host, sum_timer_wait DESC;
 
@@ -68,7 +68,7 @@ SELECT user,
  *
  * Summarizes the types of statements executed by each host.
  *
- * mysql> select * from x$user_summary_by_statement_type;
+ * mysql> select * from x$host_summary_by_statement_type;
  * +------+----------------------+--------+-----------------+----------------+----------------+-----------+---------------+---------------+------------+
  * | host | statement            | total  | total_latency   | max_latency    | lock_latency   | rows_sent | rows_examined | rows_affected | full_scans |
  * +------+----------------------+--------+-----------------+----------------+----------------+-----------+---------------+---------------+------------+
@@ -109,6 +109,6 @@ SELECT host,
        sum_rows_affected AS rows_affected,
        sum_no_index_used + sum_no_good_index_used AS full_scans
   FROM performance_schema.events_statements_summary_by_host_by_event_name
- WHERE user IS NOT NULL
+ WHERE host IS NOT NULL
    AND sum_timer_wait != 0
  ORDER BY host, sum_timer_wait DESC;
