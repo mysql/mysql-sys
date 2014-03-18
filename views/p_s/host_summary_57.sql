@@ -16,7 +16,7 @@
 /*
  * View: host_summary
  *
- * Summarizes statement activity and connections by user
+ * Summarizes statement activity and connections by host
  *
  * mysql> select * from host_summary;
  * +------+------------+---------------+-------------+---------------------+-------------------+--------------+----------------+------------------------+
@@ -66,16 +66,16 @@ SELECT accounts.host,
  GROUP BY accounts.host;
 
 /*
- * View: x$user_summary
+ * View: x$host_summary
  *
- * Summarizes statement activity and connections by user
+ * Summarizes statement activity and connections by host
  *
- * mysql> select * from x$user_summary;
+ * mysql> select * from x$host_summary;
  * +------+------------+-----------------+------------------+---------------------+-------------------+--------------+----------------+------------------------+
- * | user | statements | total_latency   | avg_latency      | current_connections | total_connections | unique_hosts | current_memory | total_memory_allocated |
+ * | host | statements | total_latency   | avg_latency      | current_connections | total_connections | unique_hosts | current_memory | total_memory_allocated |
  * +------+------------+-----------------+------------------+---------------------+-------------------+--------------+----------------+------------------------+
- * | root |       5685 | 107175100271000 | 18852260381.8821 |                   1 |                 1 |            1 |        1459022 |              572855680 |
- * | mark |        225 |  14489223428000 | 64396548568.8889 |                   1 |                 1 |            1 |         724578 |               84958286 |
+ * | hal1 |       5685 | 107175100271000 | 18852260381.8821 |                   1 |                 1 |            1 |        1459022 |              572855680 |
+ * | hal2 |        225 |  14489223428000 | 64396548568.8889 |                   1 |                 1 |            1 |         724578 |               84958286 |
  * +------+------------+-----------------+------------------+---------------------+-------------------+--------------+----------------+------------------------+
  * 
  */
@@ -84,8 +84,8 @@ CREATE OR REPLACE
   ALGORITHM = TEMPTABLE
   DEFINER = 'root'@'localhost'
   SQL SECURITY INVOKER 
-VIEW x$user_summary (
-  user,
+VIEW x$host_summary (
+  host,
   statements,
   statement_latency,
   statement_avg_latency,
@@ -98,7 +98,7 @@ VIEW x$user_summary (
   current_memory,
   total_memory_allocated
 ) AS
-SELECT accounts.user,
+SELECT accounts.host,
        SUM(stmt.total) AS statements,
        SUM(stmt.total_latency) AS statement_latency,
        SUM(stmt.total_latency) / SUM(stmt.total) AS statement_avg_latency,
@@ -111,8 +111,8 @@ SELECT accounts.user,
        mem.current_allocated AS current_memory,
        mem.total_allocated AS total_memory_allocated
   FROM performance_schema.accounts
-  JOIN sys.x$user_summary_by_statement_latency AS stmt ON accounts.user = stmt.user
-  JOIN sys.x$user_summary_by_file_io AS io ON accounts.user = io.user
-  JOIN sys.x$memory_by_user_by_current_bytes mem ON accounts.user = mem.user
- WHERE accounts.user IS NOT NULL
- GROUP BY accounts.user;
+  JOIN sys.x$host_summary_by_statement_latency AS stmt ON accounts.host = stmt.host
+  JOIN sys.x$host_summary_by_file_io AS io ON accounts.host = io.host
+  JOIN sys.x$memory_by_host_by_current_bytes mem ON accounts.host = mem.host
+ WHERE accounts.host IS NOT NULL
+ GROUP BY accounts.host;
