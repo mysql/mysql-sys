@@ -58,7 +58,7 @@ SELECT host,
 /*
  * View: x$host_summary_by_statement_latency
  *
- * Summarizes overall statement statistics by user.
+ * Summarizes overall statement statistics by host.
  *
  * mysql> select * from x$host_summary_by_statement_latency;
  * +------+-------+-----------------+---------------+---------------+-----------+---------------+---------------+------------+
