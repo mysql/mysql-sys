@@ -1,3 +1,5 @@
+**Table of Contents**  *generated with [DocToc](http://doctoc.herokuapp.com/)*
+
 # The MySQL sys schema
 
 A collection of views, functions and procedures to help MySQL administrators get insight in to MySQL Database usage.
