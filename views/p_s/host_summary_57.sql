@@ -107,7 +107,7 @@ SELECT accounts.host,
        SUM(io.io_latency) AS file_io_latency,
        SUM(accounts.current_connections) AS current_connections,
        SUM(accounts.total_connections) AS total_connections,
-       COUNT(DISTINCT host) AS unique_hosts,
+       COUNT(DISTINCT accounts.host) AS unique_hosts,
        mem.current_allocated AS current_memory,
        mem.total_allocated AS total_memory_allocated
   FROM performance_schema.accounts
