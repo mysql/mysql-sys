@@ -23,23 +23,23 @@
  * +------------+--------------------------------------+-------+-----------+-------------+
  * | host       | event_name                           | total | latency   | max_latency |
  * +------------+--------------------------------------+-------+-----------+-------------+
- * | background | wait/io/file/sql/FRM                 |   871 | 168.15 ms | 18.48 ms    |
- * | background | wait/io/file/innodb/innodb_data_file |   173 | 129.56 ms | 34.09 ms    |
- * | background | wait/io/file/innodb/innodb_log_file  |    20 | 77.53 ms  | 60.66 ms    |
- * | background | wait/io/file/myisam/dfile            |    40 | 6.54 ms   | 4.58 ms     |
- * | background | wait/io/file/mysys/charset           |     3 | 4.79 ms   | 4.71 ms     |
- * | background | wait/io/file/myisam/kfile            |    67 | 4.38 ms   | 300.04 us   |
- * | background | wait/io/file/sql/ERRMSG              |     5 | 2.72 ms   | 1.69 ms     |
- * | background | wait/io/file/sql/pid                 |     3 | 266.30 us | 185.47 us   |
- * | background | wait/io/file/sql/casetest            |     5 | 246.81 us | 150.19 us   |
- * | background | wait/io/file/sql/global_ddl_log      |     2 | 21.24 us  | 18.59 us    |
- * | root       | wait/io/file/sql/file_parser         |  1422 | 4.80 s    | 135.14 ms   |
- * | root       | wait/io/file/sql/FRM                 |   865 | 85.82 ms  | 9.81 ms     |
- * | root       | wait/io/file/myisam/kfile            |  1073 | 37.14 ms  | 15.79 ms    |
- * | root       | wait/io/file/myisam/dfile            |  2991 | 25.53 ms  | 5.25 ms     |
- * | root       | wait/io/file/sql/dbopt               |    20 | 1.07 ms   | 153.07 us   |
- * | root       | wait/io/file/sql/misc                |     4 | 59.71 us  | 33.75 us    |
- * | root       | wait/io/file/archive/data            |     1 | 13.91 us  | 13.91 us    |
+ * | hal1       | wait/io/file/sql/FRM                 |   871 | 168.15 ms | 18.48 ms    |
+ * | hal1       | wait/io/file/innodb/innodb_data_file |   173 | 129.56 ms | 34.09 ms    |
+ * | hal1       | wait/io/file/innodb/innodb_log_file  |    20 | 77.53 ms  | 60.66 ms    |
+ * | hal1       | wait/io/file/myisam/dfile            |    40 | 6.54 ms   | 4.58 ms     |
+ * | hal1       | wait/io/file/mysys/charset           |     3 | 4.79 ms   | 4.71 ms     |
+ * | hal1       | wait/io/file/myisam/kfile            |    67 | 4.38 ms   | 300.04 us   |
+ * | hal1       | wait/io/file/sql/ERRMSG              |     5 | 2.72 ms   | 1.69 ms     |
+ * | hal1       | wait/io/file/sql/pid                 |     3 | 266.30 us | 185.47 us   |
+ * | hal1       | wait/io/file/sql/casetest            |     5 | 246.81 us | 150.19 us   |
+ * | hal1       | wait/io/file/sql/global_ddl_log      |     2 | 21.24 us  | 18.59 us    |
+ * | hal2       | wait/io/file/sql/file_parser         |  1422 | 4.80 s    | 135.14 ms   |
+ * | hal2       | wait/io/file/sql/FRM                 |   865 | 85.82 ms  | 9.81 ms     |
+ * | hal2       | wait/io/file/myisam/kfile            |  1073 | 37.14 ms  | 15.79 ms    |
+ * | hal2       | wait/io/file/myisam/dfile            |  2991 | 25.53 ms  | 5.25 ms     |
+ * | hal2       | wait/io/file/sql/dbopt               |    20 | 1.07 ms   | 153.07 us   |
+ * | hal2       | wait/io/file/sql/misc                |     4 | 59.71 us  | 33.75 us    |
+ * | hal2       | wait/io/file/archive/data            |     1 | 13.91 us  | 13.91 us    |
  * +------------+--------------------------------------+-------+-----------+-------------+
  *
  */
