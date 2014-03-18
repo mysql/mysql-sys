@@ -90,6 +90,7 @@ SOURCE ./views/p_s/host_summary.sql
 SOURCE ./views/p_s/wait_classes_global_by_avg_latency.sql
 SOURCE ./views/p_s/wait_classes_global_by_latency.sql
 SOURCE ./views/p_s/waits_by_user_by_latency.sql
+SOURCE ./views/p_s/waits_by_host_by_latency.sql
 SOURCE ./views/p_s/waits_global_by_latency.sql
 
 SOURCE ./after_setup.sql
