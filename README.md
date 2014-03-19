@@ -941,7 +941,6 @@ Summarizes file IO totals per host.
 
 Summarizes file IO by event type per host.
 
-
 ##### Example
 
 ```SQL
@@ -1147,7 +1146,6 @@ Lists the top wait events by their total latency, ignoring idle (this may be ver
   | hal1 | wait/synch/mutex/innodb/trx_mutex                   |     81 | 5.93 us       | 73.14 ns    | 252.59 ns   |
   +------+-----------------------------------------------------+--------+---------------+-------------+-------------+
 ```
-
 
 #### waits_global_by_latency / x$waits_global_by_latency
 
