@@ -272,7 +272,7 @@ Summarizes memory use by host using the 5.7 Performance Schema instrumentation.
 ##### Example
 
 ```SQL
-mysql> select  from memory_by_host_by_current_bytes WHERE host IS NOT NULL;
+mysql> select * from memory_by_host_by_current_bytes WHERE host IS NOT NULL;
   +------+--------------------+-------------------+-------------------+-------------------+-----------------+
   | host | current_count_used | current_allocated | current_avg_alloc | current_max_alloc | total_allocated |
   +------+--------------------+-------------------+-------------------+-------------------+-----------------+
@@ -908,7 +908,7 @@ Summarizes statement activity, file IO and connections by host.
 ##### Example
 
 ```SQL 
- mysql> select  from host_summary;
+ mysql> select * from host_summary;
   +------+------------+-------------------+-----------------------+-------------+----------+-----------------+---------------------+-------------------+--------------+
   | host | statements | statement_latency | statement_avg_latency | table_scans | file_ios | file_io_latency | current_connections | total_connections | unique_users |
   +------+------------+-------------------+-----------------------+-------------+----------+-----------------+---------------------+-------------------+--------------+
@@ -926,7 +926,7 @@ Summarizes file IO totals per host.
 ##### Example
 
 ```SQL
- mysql> select  from host_summary_by_file_io;
+ mysql> select * from host_summary_by_file_io;
   +------------+-------+------------+
   | host       | ios   | io_latency |
   +------------+-------+------------+
@@ -945,7 +945,7 @@ Summarizes file IO by event type per host.
 ##### Example
 
 ```SQL
-  mysql> select  from host_summary_by_file_io_type;
+  mysql> select * from host_summary_by_file_io_type;
   +------------+--------------------------------------+-------+-----------+-------------+
   | host       | event_name                           | total | latency   | max_latency |
   +------------+--------------------------------------+-------+-----------+-------------+
@@ -978,7 +978,7 @@ Summarizes stages by host, ordered by host and total latency per stage.
 ##### Example
 
 ```SQL
-  mysql> select  from host_summary_by_stages;
+  mysql> select *  from host_summary_by_stages;
   +------+--------------------------------+-------+-----------+-----------+
   | host | event_name                     | total | wait_sum  | wait_avg  |
   +------+--------------------------------+-------+-----------+-----------+
@@ -1010,7 +1010,7 @@ Summarizes overall statement statistics by host.
 ##### Example
 
 ```SQL
-mysql> select  from host_summary_by_statement_latency;
+mysql> select * from host_summary_by_statement_latency;
   +------+-------+---------------+-------------+--------------+-----------+---------------+---------------+------------+
   | host | total | total_latency | max_latency | lock_latency | rows_sent | rows_examined | rows_affected | full_scans |
   +------+-------+---------------+-------------+--------------+-----------+---------------+---------------+------------+
@@ -1027,7 +1027,7 @@ Summarizes the types of statements executed by each host.
 ##### Example
 
 ```SQL
-  mysql> select  from host_summary_by_statement_type;
+  mysql> select * from host_summary_by_statement_type;
   +------+----------------------+--------+---------------+-------------+--------------+-----------+---------------+---------------+------------+
   | host | statement            | total  | total_latency | max_latency | lock_latency | rows_sent | rows_examined | rows_affected | full_scans |
   +------+----------------------+--------+---------------+-------------+--------------+-----------+---------------+---------------+------------+
@@ -1126,7 +1126,7 @@ Lists the top wait events by their total latency, ignoring idle (this may be ver
 ##### Example
 
 ```SQL
- mysql> select  from waits_by_host_by_latency;
+ mysql> select * from waits_by_host_by_latency;
   +------+-----------------------------------------------------+--------+---------------+-------------+-------------+
   | host | event                                               | total  | total_latency | avg_latency | max_latency |
   +------+-----------------------------------------------------+--------+---------------+-------------+-------------+
