@@ -1426,6 +1426,42 @@ mysql> CALL sys.ps_setup_disable_instrument('');
 1 row in set (0.01 sec)
 ```
 
+#### ps_setup_disable_consumers
+
+##### Description
+
+Disables consumers within Performance Schema matching the input pattern.
+
+Requires the SUPER privilege for "SET sql_log_bin = 0;".
+
+##### Parameters
+
+* consumer (VARCHAR(128)): A LIKE pattern match (using "%consumer%") of consumers to disable
+
+##### Example
+
+To disable all consumers:
+```SQL
+mysql> CALL sys.ps_setup_disable_comsumers(\'\');
++--------------------------+
+| summary                  |
++--------------------------+
+| Disabled 15 consumers    |
++--------------------------+
+1 row in set (0.02 sec)
+```
+
+To disable just the event_stage consumers:
+```SQL
+mysql> CALL sys.ps_setup_disable_comsumers(\'stage\');
++------------------------+
+| summary                |
++------------------------+
+| Disabled 3 consumers   |
++------------------------+
+1 row in set (0.00 sec)
+```
+
 #### ps_setup_disable_thread
 
 ##### Description
@@ -1479,6 +1515,42 @@ mysql> CALL sys.ps_setup_enable_background_threads();
 +-------------------------------+
 | Enabled 18 background threads |
 +-------------------------------+
+1 row in set (0.00 sec)
+```
+
+#### ps_setup_enable_consumers
+
+##### Description
+
+Enables consumers within Performance Schema matching the input pattern.
+
+Requires the SUPER privilege for "SET sql_log_bin = 0;".
+
+##### Parameters
+
+* consumer (VARCHAR(128)): A LIKE pattern match (using "%consumer%") of consumers to enable
+
+##### Example
+
+To enable all consumers:
+```SQL
+mysql> CALL sys.ps_setup_enable_consumers(\'\');
++-------------------------+
+| summary                 |
++-------------------------+
+| Enabled 10 consumers    |
++-------------------------+
+1 row in set (0.02 sec)
+```
+
+To enable just "waits" consumers:
+```SQL
+mysql> CALL sys.ps_setup_enable_consumers(\'waits\');
++-----------------------+
+| summary               |
++-----------------------+
+| Enabled 3 consumers   |
++-----------------------+
 1 row in set (0.00 sec)
 ```
 
