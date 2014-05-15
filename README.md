@@ -1807,6 +1807,48 @@ Empty set (0.00 sec)
 Query OK, 0 rows affected (0.01 sec)
 ```
 
+#### ps_setup_show_disabled_consumers
+
+##### Description
+
+Shows all currently disabled consumers.
+
+##### Parameters
+
+None
+ 
+##### Example
+
+```SQL
+mysql> CALL sys.ps_setup_show_disabled_consumers();
+
++---------------------------+
+| disabled_consumers        |
++---------------------------+
+| events_statements_current |
+| global_instrumentation    |
+| thread_instrumentation    |
+| statements_digest         |
++---------------------------+
+4 rows in set (0.05 sec)
+```
+
+#### ps_setup_show_disabled_instruments
+
+##### Description
+
+Shows all currently disabled instruments.
+
+##### Parameters
+
+None
+			 
+##### Example
+
+```SQL
+mysql> CALL sys.ps_setup_show_disabled_instruments();
+```
+
 #### ps_setup_show_enabled
 
 ##### Description
@@ -1879,6 +1921,48 @@ mysql> CALL sys.ps_setup_show_enabled(TRUE, TRUE);
 210 rows in set (0.08 sec)
 
 Query OK, 0 rows affected (0.89 sec)
+```
+
+#### ps_setup_show_enabled_consumers
+
+##### Description
+
+Shows all currently enabled consumers.
+
+##### Parameters
+
+None
+
+##### Example
+
+```SQL
+mysql> CALL sys.ps_setup_show_enabled_consumers();
+
++---------------------------+
+| enabled_consumers         |
++---------------------------+
+| events_statements_current |
+| global_instrumentation    |
+| thread_instrumentation    |
+| statements_digest         |
++---------------------------+
+4 rows in set (0.05 sec)
+```
+
+#### ps_setup_show_enabled_instruments
+
+##### Description
+
+Shows all currently enabled instruments.
+
+##### Parameters
+
+None
+
+##### Example
+
+```SQL
+mysql> CALL sys.ps_setup_show_enabled_instruments();
 ```
 
 #### ps_statement_avg_latency_histogram

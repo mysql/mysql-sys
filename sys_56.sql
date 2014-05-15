@@ -44,7 +44,11 @@ SOURCE ./procedures/ps_setup_reload_saved.sql
 SOURCE ./procedures/ps_setup_reset_to_default.sql
 SOURCE ./procedures/ps_setup_save.sql
 SOURCE ./procedures/ps_setup_show_disabled.sql
+SOURCE ./procedures/ps_setup_show_disabled_consumers.sql
+SOURCE ./procedures/ps_setup_show_disabled_instruments.sql
 SOURCE ./procedures/ps_setup_show_enabled.sql
+SOURCE ./procedures/ps_setup_show_enabled_consumers.sql
+SOURCE ./procedures/ps_setup_show_enabled_instruments.sql
 SOURCE ./procedures/ps_truncate_all_tables.sql
 
 SOURCE ./views/i_s/innodb_buffer_stats_by_schema.sql
