@@ -5,14 +5,14 @@
 ### Improvements
 
 * Added procedures to enable / disable Performance Schema consumers. (Contributed by the MySQL QA Team)
-** `ps_setup_disable_consumers(<LIKE string>)` allows disabling any consumers matching the LIKE string.
-** `ps_setup_enable_consumers(<LIKE string>)` allows enabling any consumers matching the LIKE string.
+   * `ps_setup_disable_consumers(<LIKE string>)` allows disabling any consumers matching the LIKE string.
+   * `ps_setup_enable_consumers(<LIKE string>)` allows enabling any consumers matching the LIKE string.
 
 * Added procedures to show both enabled and disbled consumers or instruments individually, these are more useful for tooling than the `ps_setup_show_enabled`/`ps_setup_show_disabled` procedures which show all configuration in multiple result sets.  (Contributed by the MySQL QA Team)
-** `ps_setup_show_disabled_consumers` shows only disabled consumers.
-** `ps_setup_show_disabled_instruments` shows only disabled instruments.
-** `ps_setup_show_enabled_consumers` shows only enabled consumers.
-** `ps_setup_show_enabled_instruments` shows only enabled instruments.
+   * `ps_setup_show_disabled_consumers` shows only disabled consumers.
+   * `ps_setup_show_disabled_instruments` shows only disabled instruments.
+   * `ps_setup_show_enabled_consumers` shows only enabled consumers.
+   * `ps_setup_show_enabled_instruments` shows only enabled instruments.
 
 ### Bug Fixes
 
