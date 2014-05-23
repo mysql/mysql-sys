@@ -1442,7 +1442,7 @@ Requires the SUPER privilege for "SET sql_log_bin = 0;".
 
 To disable all consumers:
 ```SQL
-mysql> CALL sys.ps_setup_disable_comsumers('');
+mysql> CALL sys.ps_setup_disable_consumers('');
 +--------------------------+
 | summary                  |
 +--------------------------+
@@ -1453,7 +1453,7 @@ mysql> CALL sys.ps_setup_disable_comsumers('');
 
 To disable just the event_stage consumers:
 ```SQL
-mysql> CALL sys.ps_setup_disable_comsumers('stage');
+mysql> CALL sys.ps_setup_disable_consumers('stage');
 +------------------------+
 | summary                |
 +------------------------+
