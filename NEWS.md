@@ -1,6 +1,14 @@
 # Change history for the MySQL sys schema
 
-## 1.0.1 (23/05/2004)
+## 1.1.0
+
+### Improvements
+
+### Bug Fixes
+
+* Removed unintentially committed sys_56_rds.sql file (See Issue #5, which is still outstanding)
+
+## 1.0.1 (23/05/2014)
 
 ### Improvements
 
