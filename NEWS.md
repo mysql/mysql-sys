@@ -1,6 +1,6 @@
 # Change history for the MySQL sys schema
 
-## 1.0.1
+## 1.0.1 (23/05/2004)
 
 ### Improvements
 
