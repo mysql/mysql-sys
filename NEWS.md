@@ -4,6 +4,14 @@
 
 ### Improvements
 
+* Added host summary views, which have the same structure as the user summary views, but aggregated by host instead
+   * `host_summary`
+   * `host_summary_by_file_io_type`
+   * `host_summary_by_file_io`
+   * `host_summary_by_statement_type`
+   * `host_summary_by_statement_latency`
+   * `host_summary_by_stages`
+
 ### Bug Fixes
 
 * Removed unintentially committed sys_56_rds.sql file (See Issue #5, which is still outstanding)
