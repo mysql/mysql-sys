@@ -36,4 +36,4 @@
 * Some views did not work with the ERROR_FOR_DIVISION_BY_ZERO SQL mode. (#6) (Contributed by Joe Grasse)
 * On Windows the `ps_thread_stack()` stored function failed to escape file path backslashes correctly within the JSON output.
 
-## 1.0.0 (11/04/2004)
+## 1.0.0 (11/04/2014)
