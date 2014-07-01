@@ -34,6 +34,8 @@ CREATE DEFINER='root'@'localhost' PROCEDURE ps_trace_thread (
 
              Each resultset returned from the procedure should be used for a complete graph
 
+             Requires the SUPER privilege for "SET sql_log_bin = 0;".
+
              Parameters
              -----------
 
@@ -108,6 +110,7 @@ BEGIN
     DECLARE v_done bool DEFAULT FALSE;
     DECLARE v_start, v_runtime DECIMAL(20,2) DEFAULT 0.0;
     DECLARE v_min_event_id bigint unsigned DEFAULT 0;
+    DECLARE v_this_thread_enabed ENUM('YES', 'NO');
     DECLARE v_event longtext;
     DECLARE c_stack CURSOR FOR
         SELECT CONCAT(IF(nesting_event_id IS NOT NULL, CONCAT(nesting_event_id, ' -> '), ''), 
@@ -216,7 +219,11 @@ BEGIN
        ORDER BY event_id;
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET v_done = TRUE;
 
+    SET @log_bin := @@sql_log_bin;
+    SET sql_log_bin = 0;
+
     /* Do not track the current thread, it will kill the stack */
+    SELECT INSTRUMENTED INTO v_this_thread_enabed FROM performance_schema.threads WHERE PROCESSLIST_ID = CONNECTION_ID();
     CALL sys.ps_setup_disable_thread(CONNECTION_ID());
 
     IF (in_auto_setup) THEN
@@ -302,8 +309,13 @@ BEGIN
     /* Reset the settings for the performance schema */
     IF (in_auto_setup) THEN
         CALL sys.ps_setup_reload_saved();
+    END IF;
+    /* Restore INSTRUMENTED for this thread */
+    IF (v_this_thread_enabed = 'YES') THEN
         CALL sys.ps_setup_enable_thread(CONNECTION_ID());
     END IF;
+
+    SET sql_log_bin = @log_bin;
 END$$
 
 DELIMITER ;
