@@ -278,7 +278,7 @@ BEGIN
     DROP TEMPORARY TABLE stmt_trace;
     DROP TEMPORARY TABLE stmt_stages;
 
-    SET @stmt := CONCAT("EXPLAIN FORMAT=JSON", @sql);
+    SET @stmt := CONCAT("EXPLAIN FORMAT=JSON ", @sql);
     PREPARE explain_stmt FROM @stmt;
     EXECUTE explain_stmt;
     DEALLOCATE PREPARE explain_stmt;
