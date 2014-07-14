@@ -1520,8 +1520,6 @@ mysql> SHOW FULL TABLES FROM ps;
 
 Disable all background thread instrumentation within Performance Schema.
 
-Requires the SUPER privilege for "SET sql_log_bin = 0;".
-
 ##### Parameters
 
 None.
@@ -1542,8 +1540,6 @@ mysql> CALL sys.ps_setup_disable_background_threads();
 ##### Description
 
 Disables instruments within Performance Schema  matching the input pattern.
-
-Requires the SUPER privilege for "SET sql_log_bin = 0;".
 
 ##### Parameters
 
@@ -1588,8 +1584,6 @@ mysql> CALL sys.ps_setup_disable_instrument('');
 
 Disables consumers within Performance Schema matching the input pattern.
 
-Requires the SUPER privilege for "SET sql_log_bin = 0;".
-
 ##### Parameters
 
 * consumer (VARCHAR(128)): A LIKE pattern match (using "%consumer%") of consumers to disable
@@ -1624,8 +1618,6 @@ mysql> CALL sys.ps_setup_disable_consumers('stage');
 
 Disable the given connection/thread in Performance Schema.
 
-Requires the SUPER privilege for "SET sql_log_bin = 0;".
-
 ##### Parameters
 
 * in_connection_id (BIGINT): The connection ID (PROCESSLIST_ID from performance_schema.threads or the ID shown within SHOW PROCESSLIST)
@@ -1657,8 +1649,6 @@ mysql> CALL sys.ps_setup_disable_thread(CONNECTION_ID());
 
 Enable all background thread instrumentation within Performance Schema.
 
-Requires the SUPER privilege for "SET sql_log_bin = 0;".
-
 ##### Parameters
 
 None.
@@ -1679,8 +1669,6 @@ mysql> CALL sys.ps_setup_enable_background_threads();
 ##### Description
 
 Enables consumers within Performance Schema matching the input pattern.
-
-Requires the SUPER privilege for "SET sql_log_bin = 0;".
 
 ##### Parameters
 
@@ -1715,8 +1703,6 @@ mysql> CALL sys.ps_setup_enable_consumers('waits');
 ##### Description
 
 Enables instruments within Performance Schema matching the input pattern.
-
-Requires the SUPER privilege for "SET sql_log_bin = 0;".
 
 ##### Parameters
 
@@ -1761,8 +1747,6 @@ mysql> CALL sys.ps_setup_enable_instrument('');
 ##### Description
 
 Enable the given connection/thread in Performance Schema.
-
-Requires the SUPER privilege for "SET sql_log_bin = 0;".
 
 ##### Parameters
 
@@ -2175,6 +2159,8 @@ It will also attempt to generate an EXPLAIN for the longest running example of t
 
 Note this may fail, as Performance Schema truncates long SQL_TEXT values (and hence the EXPLAIN will fail due to parse errors).
 
+Requires the SUPER privilege for "SET sql_log_bin = 0;".
+
 ##### Parameters
 
 * in_digest VARCHAR(32): The statement digest identifier you would like to analyze
@@ -2266,6 +2252,8 @@ Dumps all data within Performance Schema for an instrumented thread, to create a
 
 Each resultset returned from the procedure should be used for a complete graph
 
+Requires the SUPER privilege for "SET sql_log_bin = 0;".
+
 ##### Parameters
 
 * in_thread_id (INT): The thread that you would like a stack trace for
@@ -2327,8 +2315,6 @@ mysql> CALL sys.ps_dump_thread_stack(25, CONCAT('/tmp/stack-', REPLACE(NOW(), ' 
 ##### Description
 
 Truncates all summary tables within Performance Schema, resetting all aggregated instrumentation as a snapshot.
-
-Requires the SUPER privilege for "SET sql_log_bin = 0;".
 
 ##### Parameters
 
