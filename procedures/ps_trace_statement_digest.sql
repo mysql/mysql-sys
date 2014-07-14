@@ -64,7 +64,7 @@ CREATE DEFINER='root'@'localhost' PROCEDURE ps_trace_statement_digest (
              Example
              -----------
 
-             mysql> call ps_analyze_statement_digest(\'891ec6860f98ba46d89dd20b0c03652c\', 10, 0.1, true, true);
+             mysql> call ps_trace_statement_digest(\'891ec6860f98ba46d89dd20b0c03652c\', 10, 0.1, true, true);
              +--------------------+
              | SUMMARY STATISTICS |
              +--------------------+
@@ -278,7 +278,7 @@ BEGIN
     DROP TEMPORARY TABLE stmt_trace;
     DROP TEMPORARY TABLE stmt_stages;
 
-    SET @stmt := CONCAT("EXPLAIN FORMAT=JSON", @sql);
+    SET @stmt := CONCAT("EXPLAIN FORMAT=JSON ", @sql);
     PREPARE explain_stmt FROM @stmt;
     EXECUTE explain_stmt;
     DEALLOCATE PREPARE explain_stmt;
