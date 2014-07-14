@@ -57,9 +57,6 @@ CREATE DEFINER='root'@'localhost' PROCEDURE ps_setup_reset_to_default (
     NOT DETERMINISTIC
     MODIFIES SQL DATA
 BEGIN
-    SET @log_bin := @@sql_log_bin;
-    SET sql_log_bin = 0;
-
     SET @query = 'DELETE
                     FROM performance_schema.setup_actors
                    WHERE NOT (HOST = ''%'' AND USER = ''%'' AND ROLE = ''%'')';
@@ -149,8 +146,6 @@ BEGIN
     PREPARE reset_stmt FROM @query;
     EXECUTE reset_stmt;
     DEALLOCATE PREPARE reset_stmt;
-
-    SET sql_log_bin = @log_bin; 
 END$$
 
 DELIMITER ;
