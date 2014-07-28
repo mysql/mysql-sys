@@ -81,11 +81,8 @@ BEGIN
     DEALLOCATE PREPARE reset_stmt;
 
     SET @query = 'UPDATE performance_schema.setup_instruments
-                     SET ENABLED = ''NO'', TIMED = ''NO''
-                   WHERE NAME NOT LIKE ''wait/io/file/%''
-                     AND NAME NOT LIKE ''wait/io/table/%''
-                     AND NAME NOT LIKE ''statement/%''
-                     AND NAME NOT IN (''wait/lock/table/sql/handler'', ''idle'')';
+                     SET ENABLED = sys.ps_is_instrument_default_enabled(NAME),
+                         TIMED   = sys.ps_is_instrument_default_timed(NAME)';
 
     IF (in_verbose) THEN
         SELECT CONCAT('Resetting: setup_instruments\n', REPLACE(@query, '  ', '')) AS status;
