@@ -20,7 +20,7 @@
  * 
  * When the user found is NULL, it is assumed to be a "background" thread.  
  *
- * mysql> select * from memory_by_user_by_current_bytes WHERE user IS NOT NULL;
+ * mysql> select * from memory_by_user_by_current_bytes;
  * +------+--------------------+-------------------+-------------------+-------------------+-----------------+
  * | user | current_count_used | current_allocated | current_avg_alloc | current_max_alloc | total_allocated |
  * +------+--------------------+-------------------+-------------------+-------------------+-----------------+
@@ -59,7 +59,7 @@ SELECT IF(user IS NULL, 'background', user) AS user,
  * 
  * When the user found is NULL, it is assumed to be a "background" thread.  
  *
- * mysql> select * from x$memory_by_user_by_current_bytes WHERE user IS NOT NULL;
+ * mysql> select * from x$memory_by_user_by_current_bytes;
  * +------+--------------------+-------------------+-------------------+-------------------+-----------------+
  * | user | current_count_used | current_allocated | current_avg_alloc | current_max_alloc | total_allocated |
  * +------+--------------------+-------------------+-------------------+-------------------+-----------------+

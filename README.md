@@ -251,10 +251,12 @@ mysql> select * from latest_file_io limit 5;
 
 Summarizes memory use by user using the 5.7 Performance Schema instrumentation.
 
+When the user found is NULL, it is assumed to be a "background" thread.
+
 ##### Example
 
 ```SQL
-mysql> select * from memory_by_user_by_current_bytes WHERE user IS NOT NULL;
+mysql> select * from memory_by_user_by_current_bytes;
 +------+--------------------+-------------------+-------------------+-------------------+-----------------+
 | user | current_count_used | current_allocated | current_avg_alloc | current_max_alloc | total_allocated |
 +------+--------------------+-------------------+-------------------+-------------------+-----------------+
@@ -742,6 +744,8 @@ avg_tmp_tables_per_query: 189
 
 Summarizes statement activity, file IO and connections by user.
 
+When the user found is NULL, it is assumed to be a "background" thread.
+
 ##### Example
 
 ```SQL
@@ -823,6 +827,8 @@ mysql> select * from user_summary_by_file_io_type;
 
 Summarizes stages by user, ordered by user and total latency per stage.
 
+When the user found is NULL, it is assumed to be a "background" thread.
+
 ##### Example
 
 ```SQL
@@ -855,6 +861,8 @@ mysql> select * from user_summary_by_stages;
 
 Summarizes overall statement statistics by user.
 
+When the user found is NULL, it is assumed to be a "background" thread.
+
 ##### Example
 
 ```SQL
@@ -871,6 +879,8 @@ mysql> select * from user_summary_by_statement_latency;
 ##### Description
 
 Summarizes the types of statements executed by each user.
+
+When the user found is NULL, it is assumed to be a "background" thread.
 
 ##### Example
 
