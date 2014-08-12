@@ -251,10 +251,12 @@ mysql> select * from latest_file_io limit 5;
 
 Summarizes memory use by user using the 5.7 Performance Schema instrumentation.
 
+When the user found is NULL, it is assumed to be a "background" thread.
+
 ##### Example
 
 ```SQL
-mysql> select * from memory_by_user_by_current_bytes WHERE user IS NOT NULL;
+mysql> select * from memory_by_user_by_current_bytes;
 +------+--------------------+-------------------+-------------------+-------------------+-----------------+
 | user | current_count_used | current_allocated | current_avg_alloc | current_max_alloc | total_allocated |
 +------+--------------------+-------------------+-------------------+-------------------+-----------------+
@@ -724,6 +726,8 @@ avg_tmp_tables_per_query: 189
 
 Summarizes statement activity, file IO and connections by user.
 
+When the user found is NULL, it is assumed to be a "background" thread.
+
 ##### Example
 
 ```SQL
@@ -734,41 +738,6 @@ mysql> select * from user_summary;
 | root |       2924 | 00:03:59.53       | 81.92 ms              |          82 |    54702 | 55.61 s         |                   1 |                 1 |            1 |
 +------+------------+-------------------+-----------------------+-------------+----------+-----------------+---------------------+-------------------+--------------+
 ```
-
-#### user_summary_by_file_io_type / x$user_summary_by_file_io_type
-
-##### Description
-
-Summarizes file IO by event type per user.
-
-When the user found is NULL, it is assumed to be a "background" thread.
-
-##### Example
-
-```SQL
-mysql> select * from user_summary_by_file_io_type;
-+------------+--------------------------------------+-------+-----------+-------------+
-| user       | event_name                           | total | latency   | max_latency |
-+------------+--------------------------------------+-------+-----------+-------------+
-| background | wait/io/file/sql/FRM                 |   871 | 168.15 ms | 18.48 ms    |
-| background | wait/io/file/innodb/innodb_data_file |   173 | 129.56 ms | 34.09 ms    |
-| background | wait/io/file/innodb/innodb_log_file  |    20 | 77.53 ms  | 60.66 ms    |
-| background | wait/io/file/myisam/dfile            |    40 | 6.54 ms   | 4.58 ms     |
-| background | wait/io/file/mysys/charset           |     3 | 4.79 ms   | 4.71 ms     |
-| background | wait/io/file/myisam/kfile            |    67 | 4.38 ms   | 300.04 us   |
-| background | wait/io/file/sql/ERRMSG              |     5 | 2.72 ms   | 1.69 ms     |
-| background | wait/io/file/sql/pid                 |     3 | 266.30 us | 185.47 us   |
-| background | wait/io/file/sql/casetest            |     5 | 246.81 us | 150.19 us   |
-| background | wait/io/file/sql/global_ddl_log      |     2 | 21.24 us  | 18.59 us    |
-| root       | wait/io/file/sql/file_parser         |  1422 | 4.80 s    | 135.14 ms   |
-| root       | wait/io/file/sql/FRM                 |   865 | 85.82 ms  | 9.81 ms     |
-| root       | wait/io/file/myisam/kfile            |  1073 | 37.14 ms  | 15.79 ms    |
-| root       | wait/io/file/myisam/dfile            |  2991 | 25.53 ms  | 5.25 ms     |
-| root       | wait/io/file/sql/dbopt               |    20 | 1.07 ms   | 153.07 us   |
-| root       | wait/io/file/sql/misc                |     4 | 59.71 us  | 33.75 us    |
-| root       | wait/io/file/archive/data            |     1 | 13.91 us  | 13.91 us    |
-+------------+--------------------------------------+-------+-----------+-------------+
- ```
 
 #### user_summary_by_file_io / x$user_summary_by_file_io
 
@@ -840,6 +809,8 @@ mysql> select * from user_summary_by_file_io_type;
 
 Summarizes stages by user, ordered by user and total latency per stage.
 
+When the user found is NULL, it is assumed to be a "background" thread.
+
 ##### Example
 
 ```SQL
@@ -872,6 +843,8 @@ mysql> select * from user_summary_by_stages;
 
 Summarizes overall statement statistics by user.
 
+When the user found is NULL, it is assumed to be a "background" thread.
+
 ##### Example
 
 ```SQL
@@ -888,6 +861,8 @@ mysql> select * from user_summary_by_statement_latency;
 ##### Description
 
 Summarizes the types of statements executed by each user.
+
+When the user found is NULL, it is assumed to be a "background" thread.
 
 ##### Example
 
