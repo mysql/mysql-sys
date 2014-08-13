@@ -1424,6 +1424,39 @@ mysql> SELECT sys.ps_is_account_enabled('localhost', 'root');
 1 row in set (0.01 sec)
 ```
 
+#### ps_thread_id
+
+##### Description
+
+Return the Performance Schema THREAD_ID for the specified connection ID.
+
+##### Parameters
+
+* in_connection_id (BIGINT UNSIGNED): The id of the connection to return the thread id for.
+
+##### Returns
+
+BIGINT UNSIGNED
+
+##### Example
+```SQL
+mysql> SELECT sys.ps_thread_id(79);
++----------------------+
+| sys.ps_thread_id(79) |
++----------------------+
+|                   98 |
++----------------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT sys.ps_thread_id(CONNECTION_ID());
++-----------------------------------+
+| sys.ps_thread_id(CONNECTION_ID()) |
++-----------------------------------+
+|                                98 |
++-----------------------------------+
+1 row in set (0.00 sec)
+```
+
 #### ps_thread_stack
 
 ##### Description
