@@ -17,7 +17,7 @@ DROP PROCEDURE IF EXISTS ps_trace_thread;
 
 DELIMITER $$
 CREATE DEFINER='root'@'localhost' PROCEDURE ps_trace_thread (
-        IN in_thread_id INT,
+        IN in_thread_id BIGINT UNSIGNED,
         IN in_outfile VARCHAR(255),
         IN in_max_runtime DECIMAL(20,2),
         IN in_interval DECIMAL(20,2),
@@ -39,7 +39,7 @@ CREATE DEFINER='root'@'localhost' PROCEDURE ps_trace_thread (
              Parameters
              -----------
 
-             in_thread_id (INT): 
+             in_thread_id (BIGINT UNSIGNED):
                The thread that you would like a stack trace for
              in_outfile  (VARCHAR(255)):
                The filename the dot file will be written to
