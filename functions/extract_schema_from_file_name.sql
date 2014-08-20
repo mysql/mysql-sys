@@ -20,7 +20,7 @@ DELIMITER $$
 CREATE DEFINER='root'@'localhost' FUNCTION extract_schema_from_file_name (
         path VARCHAR(512)
     )
-    RETURNS VARCHAR(512) 
+    RETURNS VARCHAR(64) 
     COMMENT '
              Description
              -----------
@@ -43,7 +43,7 @@ CREATE DEFINER='root'@'localhost' FUNCTION extract_schema_from_file_name (
              Returns
              -----------
 
-             VARCHAR(512)
+             VARCHAR(64)
 
              Example
              -----------
