@@ -59,7 +59,7 @@ CREATE DEFINER='root'@'localhost' FUNCTION extract_schema_from_file_name (
     SQL SECURITY INVOKER
     DETERMINISTIC
     NO SQL
-    RETURN SUBSTRING_INDEX(SUBSTRING_INDEX(REPLACE(path, '\\', '/'), '/', -2), '/', 1)
+    RETURN LEFT(SUBSTRING_INDEX(SUBSTRING_INDEX(REPLACE(path, '\\', '/'), '/', -2), '/', 1), 64);
 $$
 
 DELIMITER ;
