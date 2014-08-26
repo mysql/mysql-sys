@@ -55,7 +55,7 @@ CREATE DEFINER='root'@'localhost' FUNCTION extract_table_from_file_name (
     SQL SECURITY INVOKER
     DETERMINISTIC
     NO SQL
-    RETURN SUBSTRING_INDEX(REPLACE(SUBSTRING_INDEX(REPLACE(path, '\\', '/'), '/', -1), '@0024', '$'), '.', 1);
+    RETURN LEFT(SUBSTRING_INDEX(REPLACE(SUBSTRING_INDEX(REPLACE(path, '\\', '/'), '/', -1), '@0024', '$'), '.', 1), 64);
 $$
 
 DELIMITER ;
