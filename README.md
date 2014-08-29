@@ -1206,7 +1206,7 @@ Currently relies on the fact that a table data file will be within a specified d
 
 ##### Returns
 
-VARCHAR(512)
+VARCHAR(64)
 
 ##### Example
 ```SQL
@@ -1233,7 +1233,7 @@ Useful for when interacting with Performance Schema data concerning IO statistic
 
 ##### Returns
 
-VARCHAR(512)
+VARCHAR(64)
 
 ##### Example
 ```SQL
