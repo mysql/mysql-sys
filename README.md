@@ -251,10 +251,12 @@ mysql> select * from latest_file_io limit 5;
 
 Summarizes memory use by user using the 5.7 Performance Schema instrumentation.
 
+When the user found is NULL, it is assumed to be a "background" thread.
+
 ##### Example
 
 ```SQL
-mysql> select * from memory_by_user_by_current_bytes WHERE user IS NOT NULL;
+mysql> select * from memory_by_user_by_current_bytes;
 +------+--------------------+-------------------+-------------------+-------------------+-----------------+
 | user | current_count_used | current_allocated | current_avg_alloc | current_max_alloc | total_allocated |
 +------+--------------------+-------------------+-------------------+-------------------+-----------------+
@@ -742,6 +744,8 @@ avg_tmp_tables_per_query: 189
 
 Summarizes statement activity, file IO and connections by user.
 
+When the user found is NULL, it is assumed to be a "background" thread.
+
 ##### Example
 
 ```SQL
@@ -823,6 +827,8 @@ mysql> select * from user_summary_by_file_io_type;
 
 Summarizes stages by user, ordered by user and total latency per stage.
 
+When the user found is NULL, it is assumed to be a "background" thread.
+
 ##### Example
 
 ```SQL
@@ -855,6 +861,8 @@ mysql> select * from user_summary_by_stages;
 
 Summarizes overall statement statistics by user.
 
+When the user found is NULL, it is assumed to be a "background" thread.
+
 ##### Example
 
 ```SQL
@@ -871,6 +879,8 @@ mysql> select * from user_summary_by_statement_latency;
 ##### Description
 
 Summarizes the types of statements executed by each user.
+
+When the user found is NULL, it is assumed to be a "background" thread.
 
 ##### Example
 
@@ -1206,7 +1216,7 @@ Currently relies on the fact that a table data file will be within a specified d
 
 ##### Returns
 
-VARCHAR(512)
+VARCHAR(64)
 
 ##### Example
 ```SQL
@@ -1233,7 +1243,7 @@ Useful for when interacting with Performance Schema data concerning IO statistic
 
 ##### Returns
 
-VARCHAR(512)
+VARCHAR(64)
 
 ##### Example
 ```SQL
@@ -1471,6 +1481,39 @@ mysql> SELECT sys.ps_is_instrument_default_timed('statement/sql/select');
 +------------------------------------------------------------+
 | YES                                                        |
 +------------------------------------------------------------+
+1 row in set (0.00 sec)
+```
+
+#### ps_thread_id
+
+##### Description
+
+Return the Performance Schema THREAD_ID for the specified connection ID.
+
+##### Parameters
+
+* in_connection_id (BIGINT UNSIGNED): The id of the connection to return the thread id for.
+
+##### Returns
+
+BIGINT UNSIGNED
+
+##### Example
+```SQL
+mysql> SELECT sys.ps_thread_id(79);
++----------------------+
+| sys.ps_thread_id(79) |
++----------------------+
+|                   98 |
++----------------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT sys.ps_thread_id(CONNECTION_ID());
++-----------------------------------+
+| sys.ps_thread_id(CONNECTION_ID()) |
++-----------------------------------+
+|                                98 |
++-----------------------------------+
 1 row in set (0.00 sec)
 ```
 

@@ -157,29 +157,29 @@ BEGIN
 
     DROP TEMPORARY TABLE IF EXISTS stmt_trace;
     CREATE TEMPORARY TABLE stmt_trace (
-        thread_id BIGINT,
-        timer_start BIGINT,
-        event_id BIGINT,
+        thread_id BIGINT UNSIGNED,
+        timer_start BIGINT UNSIGNED,
+        event_id BIGINT UNSIGNED,
         sql_text longtext,
-        timer_wait BIGINT,
-        lock_time BIGINT,
-        errors BIGINT,
-        mysql_errno BIGINT,
-        rows_sent BIGINT,
-        rows_affected BIGINT,
-        rows_examined BIGINT,
-        created_tmp_tables BIGINT,
-        created_tmp_disk_tables BIGINT,
-        no_index_used BIGINT,
+        timer_wait BIGINT UNSIGNED,
+        lock_time BIGINT UNSIGNED,
+        errors BIGINT UNSIGNED,
+        mysql_errno INT,
+        rows_sent BIGINT UNSIGNED,
+        rows_affected BIGINT UNSIGNED,
+        rows_examined BIGINT UNSIGNED,
+        created_tmp_tables BIGINT UNSIGNED,
+        created_tmp_disk_tables BIGINT UNSIGNED,
+        no_index_used BIGINT UNSIGNED,
         PRIMARY KEY (thread_id, timer_start)
     );
 
     DROP TEMPORARY TABLE IF EXISTS stmt_stages;
     CREATE TEMPORARY TABLE stmt_stages (
-       event_id BIGINT,
-       stmt_id BIGINT,
+       event_id BIGINT UNSIGNED,
+       stmt_id BIGINT UNSIGNED,
        event_name VARCHAR(128),
-       timer_wait BIGINT,
+       timer_wait BIGINT UNSIGNED,
        PRIMARY KEY (event_id)
     );
 
