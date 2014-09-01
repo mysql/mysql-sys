@@ -455,6 +455,10 @@ Statistics around tables.
 
 Ordered by the total wait time descending - top tables are most contended.
 
+Also includes the helper view (used by schema_table_statistics_with_buffer as well):
+
+* x$ps_schema_table_statistics_io
+
 ##### Example
 
 ```SQL
@@ -489,6 +493,8 @@ Statistics around tables.
 Ordered by the total wait time descending - top tables are most contended.
 
 More statistics such as caching stats for the InnoDB buffer pool with InnoDB tables
+
+Uses the x$ps_schema_table_statistics_io helper view from schema_table_statistics.
 
 ##### Example
 
