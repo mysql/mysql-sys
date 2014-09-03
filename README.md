@@ -1105,7 +1105,7 @@ mysql> select * from wait_classes_global_by_latency;
 
 ##### Description
 
-Lists the top wait events by their total latency, ignoring idle (this may be very large) per user.
+Lists the top wait events per user by their total latency, ignoring idle (this may be very large) per user.
 
 ##### Example
 
@@ -1136,7 +1136,7 @@ mysql> select * from waits_by_user_by_latency;
 
 ##### Description
 
-Lists the top wait events by their total latency, ignoring idle (this may be very large) per host.
+Lists the top wait events per host by their total latency, ignoring idle (this may be very large) per host.
 
 ##### Example
 
