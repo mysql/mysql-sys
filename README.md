@@ -271,16 +271,18 @@ mysql> select * from memory_by_user_by_current_bytes;
 
 Summarizes memory use by host using the 5.7 Performance Schema instrumentation.
 
+When the host found is NULL, it is assumed to be a local "background" thread.
+
 ##### Example
 
 ```SQL
 mysql> select * from memory_by_host_by_current_bytes WHERE host IS NOT NULL;
-  +------+--------------------+-------------------+-------------------+-------------------+-----------------+
-  | host | current_count_used | current_allocated | current_avg_alloc | current_max_alloc | total_allocated |
-  +------+--------------------+-------------------+-------------------+-------------------+-----------------+
-  | hal1 |               1401 | 1.09 MiB          | 815 bytes         | 334.97 KiB        | 42.73 MiB       |
-  | hal2 |                201 | 496.08 KiB        | 2.47 KiB          | 334.97 KiB        | 5.50 MiB        |
-  +------+--------------------+-------------------+-------------------+-------------------+-----------------+
+   +------------+--------------------+-------------------+-------------------+-------------------+-----------------+
+   | host       | current_count_used | current_allocated | current_avg_alloc | current_max_alloc | total_allocated |
+   +------------+--------------------+-------------------+-------------------+-------------------+-----------------+
+   | background |               2773 | 10.84 MiB         | 4.00 KiB          | 8.00 MiB          | 30.69 MiB       |
+   | localhost  |               1509 | 809.30 KiB        | 549 bytes         | 176.38 KiB        | 83.59 MiB       |
+   +------------+--------------------+-------------------+-------------------+-------------------+-----------------+
 ```
 
 #### memory_global_by_current_allocated / x$memory_global_by_current_allocated
