@@ -52,7 +52,7 @@ Note, when functions check for configuration options, they first check whether a
 
 | Variable               | Default Value | Description                                                                    |
 | ---------------------- | ------------- | ------------------------------------------------------------------------------ |
-| statement_truncate_len | 128           | Sets the size to truncate statements to, for the `format_statement()` function |
+| statement_truncate_len | 64            | Sets the size to truncate statements to, for the `format_statement()` function |
 
 ### Views
 
