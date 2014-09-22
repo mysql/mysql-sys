@@ -62,9 +62,16 @@ CREATE DEFINER='root'@'localhost' FUNCTION format_statement (
     DETERMINISTIC
     NO SQL
 BEGIN
+  /* Check if we have the configured length, if not, init it */
   IF @statement_truncate_len IS NULL THEN
       SELECT value INTO @statement_truncate_len FROM sys.sys_config WHERE variable = 'statement_truncate_len';
   END IF;
+  
+  /* Protection against the variable being removed from sys_config */
+  IF @statement_truncate_len IS NULL THEN
+      SET @statement_truncate_len := 64;
+  END IF;
+
   IF CHAR_LENGTH(statement) > @statement_truncate_len THEN
       RETURN REPLACE(CONCAT(LEFT(statement, (@statement_truncate_len/2)-2), ' ... ', RIGHT(statement, (@statement_truncate_len/2)-2)), '\n', ' ');
   ELSE 
