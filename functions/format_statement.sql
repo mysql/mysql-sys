@@ -20,7 +20,7 @@ DELIMITER $$
 CREATE DEFINER='root'@'localhost' FUNCTION format_statement (
         statement LONGTEXT
     )
-    RETURNS VARCHAR(65)
+    RETURNS LONGTEXT
     COMMENT '
              Description
              -----------
@@ -62,8 +62,11 @@ CREATE DEFINER='root'@'localhost' FUNCTION format_statement (
     DETERMINISTIC
     NO SQL
 BEGIN
-  IF LENGTH(statement) > 64 THEN 
-      RETURN REPLACE(CONCAT(LEFT(statement, 30), ' ... ', RIGHT(statement, 30)), '\n', ' ');
+  IF @statement_truncate_len IS NULL THEN
+      SELECT value INTO @statement_truncate_len FROM sys.sys_config WHERE variable = 'statement_truncate_len';
+  END IF;
+  IF CHAR_LENGTH(statement) > @statement_truncate_len THEN
+      RETURN REPLACE(CONCAT(LEFT(statement, (@statement_truncate_len/2)-2), ' ... ', RIGHT(statement, (@statement_truncate_len/2)-2)), '\n', ' ');
   ELSE 
       RETURN REPLACE(statement, '\n', ' ');
   END IF;

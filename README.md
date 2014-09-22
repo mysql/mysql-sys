@@ -23,6 +23,37 @@ Alternatively, you could just choose to load individual files based on your need
 
 ## Overview of objects
 
+### Tables
+
+#### sys_config
+
+##### Description
+
+Holds configuration options for the sys schema. This is a persistent table (using the `InnoDB` storage engine), with the configuration persisting across upgrades (new options are added with `INSERT IGNORE`). 
+
+The table also has two related triggers, which maintain the user that `INSERTs` or `UPDATEs` the configuration - `sys_config_insert_set_user` and `sys_config_update_set_user` respectively.
+
+Its structure is as follows:
+
+```SQL
++----------+--------------+------+-----+-------------------+-----------------------------+
+| Field    | Type         | Null | Key | Default           | Extra                       |
++----------+--------------+------+-----+-------------------+-----------------------------+
+| variable | varchar(128) | NO   | PRI | NULL              |                             |
+| value    | varchar(128) | YES  |     | NULL              |                             |
+| set_time | timestamp    | NO   |     | CURRENT_TIMESTAMP | on update CURRENT_TIMESTAMP |
+| set_by   | varchar(128) | YES  |     | NULL              |                             |
++----------+--------------+------+-----+-------------------+-----------------------------+
+```
+
+Note, when functions check for configuration options, they first check whether a similar named user variable exists with a value, and if this is not set then pull the configuration option from this table in to that named user variable. This is done for performance reasons (to not continually `SELECT` from the table), however this comes with the side effect that once inited, the values last with the session, somewhat like how session variables are inited from global variables. If the values within this table are changed, they will not take effect until the user logs in again.
+
+##### Options included
+
+| Variable               | Default Value | Description                                                                    |
+| ---------------------- | ------------- | ------------------------------------------------------------------------------ |
+| statement_truncate_len | 128           | Sets the size to truncate statements to, for the `format_statement()` function |
+
 ### Views
 
 Many of the views in the sys schema have both a command line user friendly format output, as well as tooling friendly versions of any view that contains formatted output duplicated as an x$ table.
