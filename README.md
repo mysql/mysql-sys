@@ -560,7 +560,7 @@ innodb_buffer_bytes_allocated: 311296
     innodb_buffer_rows_cached: 2
 ```
 
-#### schema_tables_with_full_table_scans
+#### schema_tables_with_full_table_scans / x$schema_tables_with_full_table_scans
 
 ##### Description
 
@@ -570,15 +570,15 @@ Finds tables that are being accessed by full table scans ordering by the number 
 
 ```SQL
 mysql> select * from schema_tables_with_full_table_scans limit 5;
-+------------------+-------------------+-------------------+
-| object_schema    | object_name       | rows_full_scanned |
-+------------------+-------------------+-------------------+
-| mem              | rule_alarms       |              1210 |
-| mem30__advisors  | advisor_schedules |              1021 |
-| mem30__inventory | agent             |               498 |
-| mem              | dc_p_string       |               449 |
-| mem30__inventory | mysqlserver       |               294 |
-+------------------+-------------------+-------------------+
++--------------------+--------------------------------+-------------------+-----------+
+| object_schema      | object_name                    | rows_full_scanned | latency   |
++--------------------+--------------------------------+-------------------+-----------+
+| mem30__instruments | fsstatistics                   |          10207042 | 13.10 s   |
+| mem30__instruments | preparedstatementapidata       |            436428 | 973.27 ms |
+| mem30__instruments | mysqlprocessactivity           |            411702 | 282.07 ms |
+| mem30__instruments | querycachequeriesincachedata   |            374011 | 767.15 ms |
+| mem30__instruments | rowaccessesdata                |            322321 | 1.55 s    |
++--------------------+--------------------------------+-------------------+-----------+
 ```
 
 #### schema_unused_indexes
