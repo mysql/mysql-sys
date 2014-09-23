@@ -589,6 +589,8 @@ Finds indexes that have had no events against them (and hence, no usage).
 
 To trust whether the data from this view is representative of your workload, you should ensure that the server has been up for a representative amount of time before using it.
 
+PRIMARY (key) indexes are ignored.
+
 ##### Example
 
 ```SQL

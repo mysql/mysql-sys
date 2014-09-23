@@ -22,6 +22,8 @@
  * you should ensure that the server has been up for a representative amount of
  * time before using it.
  *
+ * PRIMARY (key) indexes are ignored.
+ *
  * mysql> select * from schema_unused_indexes limit 5;
  * +-------------------------+----------------------------------------+------------+
  * | object_schema           | object_name                            | index_name |
@@ -51,4 +53,5 @@ SELECT object_schema,
  WHERE index_name IS NOT NULL
    AND count_star = 0
    AND object_schema != 'mysql'
+   AND index_name != 'PRIMARY'
  ORDER BY object_schema, object_name;
