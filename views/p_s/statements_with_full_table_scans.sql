@@ -20,6 +20,9 @@
  * ordered by number the percentage of times a full scan was done,
  * then by the statement latency.
  *
+ * This view ignores SHOW statements, as these always cause a full table scan,
+ * and there is nothing that can be done about this.
+ *
  * mysql> select * from statements_with_full_table_scans limit 1\G
  * *************************** 1. row ***************************
  *                    query: SELECT * FROM `schema_tables_w ... ex_usage` . `COUNT_READ` DESC
@@ -74,8 +77,9 @@ SELECT sys.format_statement(DIGEST_TEXT) AS query,
        LAST_SEEN as last_seen,
        DIGEST AS digest
   FROM performance_schema.events_statements_summary_by_digest
- WHERE SUM_NO_INDEX_USED > 0
-    OR SUM_NO_GOOD_INDEX_USED > 0
+ WHERE (SUM_NO_INDEX_USED > 0
+    OR SUM_NO_GOOD_INDEX_USED > 0)
+   AND DIGEST_TEXT NOT LIKE 'SHOW%'
  ORDER BY no_index_used_pct DESC, total_latency DESC;
 
 /*
@@ -84,6 +88,9 @@ SELECT sys.format_statement(DIGEST_TEXT) AS query,
  * Lists all normalized statements that use have done a full table scan
  * ordered by number the percentage of times a full scan was done,
  * then by the statement latency.
+ *
+ * This view ignores SHOW statements, as these always cause a full table scan,
+ * and there is nothing that can be done about this.
  *
  * mysql> select * from x$statements_with_full_table_scans limit 1\G
  * *************************** 1. row ***************************
@@ -139,6 +146,7 @@ SELECT DIGEST_TEXT AS query,
        LAST_SEEN as last_seen,
        DIGEST AS digest
   FROM performance_schema.events_statements_summary_by_digest
- WHERE SUM_NO_INDEX_USED > 0
-    OR SUM_NO_GOOD_INDEX_USED > 0
+ WHERE (SUM_NO_INDEX_USED > 0
+    OR SUM_NO_GOOD_INDEX_USED > 0)
+   AND DIGEST_TEXT NOT LIKE 'SHOW%'
  ORDER BY no_index_used_pct DESC, total_latency DESC;

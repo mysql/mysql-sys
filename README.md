@@ -671,6 +671,8 @@ warning_pct: 0.0000
 
 Lists all normalized statements that use have done a full table scan ordered by number the percentage of times a full scan was done, then by the statement latency.
 
+This view ignores SHOW statements, as these always cause a full table scan, and there is nothing that can be done about this.
+
 ##### Example
 
 ```SQL
