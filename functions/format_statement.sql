@@ -25,7 +25,11 @@ CREATE DEFINER='root'@'localhost' FUNCTION format_statement (
              Description
              -----------
 
-             Formats a normalized statement, truncating it if it\'s > 64 characters long.
+             Formats a normalized statement, truncating it if it\'s > 64 characters long by default.
+
+             To configure the length to truncate the statement to by default, update the `statement_truncate_len`
+             variable with `sys_config` table to a different value. Alternatively, to change it just for just 
+             your particular session, use `SET @statement_truncate_len := <some new value>`.
 
              Useful for printing statement related data from Performance Schema from 
              the command line.
