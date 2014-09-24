@@ -35,6 +35,8 @@
  *         rows_sent: 84
  *     rows_sent_avg: 42
  *     rows_examined: 20012
+ *     rows_affected: 0
+ * rows_affected_avg: 0
  * rows_examined_avg: 10006
  *        tmp_tables: 378
  *   tmp_disk_tables: 66
@@ -42,7 +44,7 @@
  * sort_merge_passes: 0
  *            digest: 54f9bd520f0bbf15db0c2ed93386bec9
  *        first_seen: 2014-03-07 13:13:41
- *         last_seen: 2014-03-07 13:13:48 *
+ *         last_seen: 2014-03-07 13:13:48
  * 
  */
 
@@ -65,6 +67,8 @@ VIEW statement_analysis (
   rows_sent_avg,
   rows_examined,
   rows_examined_avg,
+  rows_affected,
+  rows_affected_avg,
   tmp_tables,
   tmp_disk_tables,
   rows_sorted,
@@ -87,6 +91,8 @@ SELECT sys.format_statement(DIGEST_TEXT) AS query,
        ROUND(IFNULL(SUM_ROWS_SENT / NULLIF(COUNT_STAR, 0), 0)) AS rows_sent_avg,
        SUM_ROWS_EXAMINED AS rows_examined,
        ROUND(IFNULL(SUM_ROWS_EXAMINED / NULLIF(COUNT_STAR, 0), 0))  AS rows_examined_avg,
+       SUM_ROWS_AFFECTED AS rows_affected,
+       ROUND(IFNULL(SUM_ROWS_AFFECTED / NULLIF(COUNT_STAR, 0), 0))  AS rows_affected_avg,
        SUM_CREATED_TMP_TABLES AS tmp_tables,
        SUM_CREATED_TMP_DISK_TABLES AS tmp_disk_tables,
        SUM_SORT_ROWS AS rows_sorted,
@@ -120,6 +126,8 @@ ORDER BY SUM_TIMER_WAIT DESC;
  *     rows_sent_avg: 42
  *     rows_examined: 20012
  * rows_examined_avg: 10006
+ *     rows_affected: 0
+ * rows_affected_avg: 0
  *        tmp_tables: 378
  *   tmp_disk_tables: 66
  *       rows_sorted: 168
@@ -149,6 +157,8 @@ VIEW x$statement_analysis (
   rows_sent_avg,
   rows_examined,
   rows_examined_avg,
+  rows_affected,
+  rows_affected_avg,
   tmp_tables,
   tmp_disk_tables,
   rows_sorted,
@@ -171,6 +181,8 @@ SELECT DIGEST_TEXT AS query,
        ROUND(IFNULL(SUM_ROWS_SENT / NULLIF(COUNT_STAR, 0), 0)) AS rows_sent_avg,
        SUM_ROWS_EXAMINED AS rows_examined,
        ROUND(IFNULL(SUM_ROWS_EXAMINED / NULLIF(COUNT_STAR, 0), 0))  AS rows_examined_avg,
+       SUM_ROWS_AFFECTED AS rows_affected,
+       ROUND(IFNULL(SUM_ROWS_AFFECTED / NULLIF(COUNT_STAR, 0), 0))  AS rows_affected_avg,
        SUM_CREATED_TMP_TABLES AS tmp_tables,
        SUM_CREATED_TMP_DISK_TABLES AS tmp_disk_tables,
        SUM_SORT_ROWS AS rows_sorted,

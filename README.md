@@ -636,6 +636,8 @@ mysql> select * from statement_analysis limit 1\G
     rows_sent_avg: 42
     rows_examined: 20012
 rows_examined_avg: 10006
+    rows_affected: 0
+rows_affected_avg: 0
        tmp_tables: 378
   tmp_disk_tables: 66
       rows_sorted: 168
