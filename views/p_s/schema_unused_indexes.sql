@@ -25,15 +25,15 @@
  * PRIMARY (key) indexes are ignored.
  *
  * mysql> select * from schema_unused_indexes limit 5;
- * +-------------------------+----------------------------------------+------------+
- * | object_schema           | object_name                            | index_name |
- * +-------------------------+----------------------------------------+------------+
- * | mem30_test__instruments | mysqlavailabilityadvisor$observedstate | PRIMARY    |
- * | mem30_test__test        | compressme                             | PRIMARY    |
- * | mem30_test__test        | compressmekeyblocksize                 | PRIMARY    |
- * | mem30_test__test        | dontcompressme                         | PRIMARY    |
- * | mem30_test__test        | round_robin_test                       | PRIMARY    |
- * +-------------------------+----------------------------------------+------------+
+ * +--------------------+---------------------+--------------------+
+ * | object_schema      | object_name         | index_name         |
+ * +--------------------+---------------------+--------------------+
+ * | mem30__bean_config | plists              | path               |
+ * | mem30__config      | group_selections    | name               |
+ * | mem30__config      | notification_groups | name               |
+ * | mem30__config      | user_form_defaults  | FKC1AEF1F9E7EE2CFB |
+ * | mem30__enterprise  | whats_new_entries   | entryId            |
+ * +--------------------+---------------------+--------------------+
  *
  */
 
