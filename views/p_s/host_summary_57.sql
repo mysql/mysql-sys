@@ -63,7 +63,7 @@ SELECT accounts.host,
   JOIN sys.x$host_summary_by_file_io AS io ON accounts.host = io.host
   JOIN sys.x$memory_by_host_by_current_bytes mem ON accounts.host = mem.host
  WHERE accounts.host IS NOT NULL
- GROUP BY accounts.host;
+ GROUP BY accounts.host, mem.current_allocated, mem.total_allocated;
 
 /*
  * View: x$host_summary
@@ -115,4 +115,4 @@ SELECT accounts.host,
   JOIN sys.x$host_summary_by_file_io AS io ON accounts.host = io.host
   JOIN sys.x$memory_by_host_by_current_bytes mem ON accounts.host = mem.host
  WHERE accounts.host IS NOT NULL
- GROUP BY accounts.host;
+ GROUP BY accounts.host, mem.current_allocated, mem.total_allocated;

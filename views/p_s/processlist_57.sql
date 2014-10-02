@@ -109,7 +109,9 @@ SELECT pps.thread_id AS thd_id,
   LEFT JOIN performance_schema.events_waits_current AS ewc USING (thread_id)
   LEFT JOIN performance_schema.events_statements_current as esc USING (thread_id)
   LEFT JOIN performance_schema.memory_summary_by_thread_by_event_name as mem USING (thread_id)
- GROUP BY thread_id
+ GROUP BY thread_id, conn_id, user, db, command, state, time, current_statement, lock_latency,
+          rows_examined, rows_sent, rows_affected, tmp_tables, tmp_disk_tables, full_scan, last_statement,
+          last_statement_latency, last_wait, last_wait_latency, source
  ORDER BY pps.processlist_time DESC, last_wait_latency DESC;
 
 /*
@@ -207,5 +209,7 @@ SELECT pps.thread_id AS thd_id,
   LEFT JOIN performance_schema.events_waits_current AS ewc USING (thread_id)
   LEFT JOIN performance_schema.events_statements_current as esc USING (thread_id)
   LEFT JOIN performance_schema.memory_summary_by_thread_by_event_name as mem USING (thread_id)
- GROUP BY thread_id
+ GROUP BY thread_id, conn_id, user, db, command, state, time, current_statement, lock_latency,
+          rows_examined, rows_sent, rows_affected, tmp_tables, tmp_disk_tables, full_scan, last_statement,
+          last_statement_latency, last_wait, last_wait_latency, source
  ORDER BY pps.processlist_time DESC, last_wait_latency DESC;

@@ -124,7 +124,9 @@ SELECT pst.object_schema AS table_schema,
   LEFT JOIN x$ps_schema_table_statistics_io AS fsbi
     ON pst.object_schema = fsbi.table_schema
    AND pst.object_name = fsbi.table_name
- GROUP BY pst.object_schema, pst.object_name
+ GROUP BY pst.object_schema, pst.object_name, pst.sum_timer_wait, pst.count_fetch,
+          pst.sum_timer_fetch, pst.count_insert, pst.sum_timer_insert, pst.count_update,
+          pst.sum_timer_update, pst.count_delete, pst.sum_timer_delete
  ORDER BY pst.sum_timer_wait DESC;
 
 /* 
@@ -205,5 +207,7 @@ SELECT pst.object_schema AS table_schema,
   LEFT JOIN x$ps_schema_table_statistics_io AS fsbi
     ON pst.object_schema = fsbi.table_schema
    AND pst.object_name = fsbi.table_name
- GROUP BY pst.object_schema, pst.object_name
+ GROUP BY pst.object_schema, pst.object_name, pst.sum_timer_wait, pst.count_fetch,
+          pst.sum_timer_fetch, pst.count_insert, pst.sum_timer_insert, pst.count_update,
+          pst.sum_timer_update, pst.count_delete, pst.sum_timer_delete
  ORDER BY pst.sum_timer_wait DESC;
