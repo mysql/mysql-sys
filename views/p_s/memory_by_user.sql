@@ -49,7 +49,7 @@ SELECT IF(user IS NULL, 'background', user) AS user,
        sys.format_bytes(MAX(current_number_of_bytes_used)) AS current_max_alloc,
        sys.format_bytes(SUM(sum_number_of_bytes_alloc)) AS total_allocated
   FROM performance_schema.memory_summary_by_user_by_event_name
- GROUP BY user
+ GROUP BY IF(user IS NULL, 'background', user)
  ORDER BY SUM(current_number_of_bytes_used) DESC;
 
 /*
@@ -88,5 +88,5 @@ SELECT IF(user IS NULL, 'background', user) AS user,
        MAX(current_number_of_bytes_used) AS current_max_alloc,
        SUM(sum_number_of_bytes_alloc) AS total_allocated
   FROM performance_schema.memory_summary_by_user_by_event_name
- GROUP BY user
+ GROUP BY IF(user IS NULL, 'background', user)
  ORDER BY SUM(current_number_of_bytes_used) DESC;
