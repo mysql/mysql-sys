@@ -49,7 +49,7 @@ SELECT IF(host IS NULL, 'background', host) AS host,
        sys.format_bytes(MAX(current_number_of_bytes_used)) AS current_max_alloc,
        sys.format_bytes(SUM(sum_number_of_bytes_alloc)) AS total_allocated
   FROM performance_schema.memory_summary_by_host_by_event_name
- GROUP BY host
+ GROUP BY IF(host IS NULL, 'background', host)
  ORDER BY SUM(current_number_of_bytes_used) DESC;
 
 /*
@@ -88,5 +88,5 @@ SELECT IF(host IS NULL, 'background', host) AS host,
        MAX(current_number_of_bytes_used) AS current_max_alloc,
        SUM(sum_number_of_bytes_alloc) AS total_allocated
   FROM performance_schema.memory_summary_by_host_by_event_name
- GROUP BY host
+ GROUP BY IF(host IS NULL, 'background', host)
  ORDER BY SUM(current_number_of_bytes_used) DESC;
