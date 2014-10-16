@@ -37,7 +37,7 @@ Examples:
 
 Generate a MySQL 5.7 SQL file that uses the 'mark'@'localhost' user:
 
-    $0 -v 57 -u "'mark'@'localhost'"
+    $0 -v 57 -u \"'mark'@'localhost'\"
 
 Generate a MySQL 5.6 SQL file for RDS:
 
