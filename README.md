@@ -21,6 +21,30 @@ Or if you would like to log in to the client, and install the 5.7 version:
 
 Alternatively, you could just choose to load individual files based on your needs, but beware, certain objects have dependencies on other objects. You will need to ensure that these are also loaded.
 
+### Generating a single SQL file
+
+There is bash script within the root of the branch directory, called `generate_sql_file.sh`, that allows you to create a single SQL file from the branch.
+
+This includes substitution parameters for the MySQL user to use, and whether to include or exclude `SET sql_log_bin` commands from the scripts. This is particularly useful for installations such as Amazon RDS, which do not have the root@localhost user, or disallow setting sql_log_bin.
+
+When run, this outputs a file named such as `sys_<sys_version>_<mysql_version_identifier>_inline.sql`, i.e. `sys_1.2.0_56_inline.sql` is sys version 1.2.0, built for MySQL 5.6.
+
+#### Options
+
+* v: The version of MySQL to build the sys schema for, either '56' or '57'
+* b: Whether to omit any lines that deal with sql_log_bin (useful for RDS)
+* u: The user to set as the owner of the objects (useful for RDS)
+
+#### Examples
+
+Generate a MySQL 5.7 SQL file that uses the 'mark'@'localhost' user:
+
+    ./generate_sql_file.sh -v 57 -u "'mark'@'localhost'"
+
+Generate a MySQL 5.6 SQL file for RDS:
+
+    ./generate_sql_file.sh -v 56 -b -u CURRENT_USER
+
 ## Overview of objects
 
 ### Tables
