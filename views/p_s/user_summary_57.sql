@@ -64,7 +64,7 @@ SELECT IF(accounts.user IS NULL, 'background', accounts.user) AS user,
   LEFT JOIN sys.x$user_summary_by_statement_latency AS stmt ON IF(accounts.user IS NULL, 'background', accounts.user) = stmt.user
   LEFT JOIN sys.x$user_summary_by_file_io AS io ON IF(accounts.user IS NULL, 'background', accounts.user) = io.user
   LEFT JOIN sys.x$memory_by_user_by_current_bytes mem ON IF(accounts.user IS NULL, 'background', accounts.user) = mem.user
- GROUP BY IF(accounts.user IS NULL, 'background', accounts.user);
+ GROUP BY IF(accounts.user IS NULL, 'background', accounts.user), mem.current_allocated, mem.total_allocated;
 
 /*
  * View: x$user_summary
@@ -117,4 +117,4 @@ SELECT IF(accounts.user IS NULL, 'background', accounts.user) AS user,
   LEFT JOIN sys.x$user_summary_by_statement_latency AS stmt ON IF(accounts.user IS NULL, 'background', accounts.user) = stmt.user
   LEFT JOIN sys.x$user_summary_by_file_io AS io ON IF(accounts.user IS NULL, 'background', accounts.user) = io.user
   LEFT JOIN sys.x$memory_by_user_by_current_bytes mem ON IF(accounts.user IS NULL, 'background', accounts.user) = mem.user
- GROUP BY IF(accounts.user IS NULL, 'background', accounts.user);
+ GROUP BY IF(accounts.user IS NULL, 'background', accounts.user), mem.current_allocated, mem.total_allocated;
