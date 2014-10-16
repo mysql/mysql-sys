@@ -50,7 +50,7 @@ while getopts ":v:hbu:" opt; do
     b)
       SKIPBINLOG=true
       ;;
-  	h)
+    h)
       echo $"$USAGE"
       exit 0
       ;;
