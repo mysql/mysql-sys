@@ -29,33 +29,6 @@ SOURCE ./functions/ps_is_instrument_default_timed.sql
 SOURCE ./functions/ps_thread_id.sql
 SOURCE ./functions/ps_thread_stack.sql
 
-SOURCE ./procedures/create_synonym_db.sql
-
-SOURCE ./procedures/ps_statement_avg_latency_histogram.sql
-SOURCE ./procedures/ps_trace_statement_digest.sql
-SOURCE ./procedures/ps_trace_thread.sql
-
-SOURCE ./procedures/ps_setup_disable_background_threads.sql
-SOURCE ./procedures/ps_setup_disable_consumers.sql
-SOURCE ./procedures/ps_setup_disable_instrument.sql
-SOURCE ./procedures/ps_setup_disable_thread.sql
-
-SOURCE ./procedures/ps_setup_enable_background_threads.sql
-SOURCE ./procedures/ps_setup_enable_consumers.sql
-SOURCE ./procedures/ps_setup_enable_instrument.sql
-SOURCE ./procedures/ps_setup_enable_thread.sql
-
-SOURCE ./procedures/ps_setup_reload_saved.sql
-SOURCE ./procedures/ps_setup_reset_to_default_57.sql
-SOURCE ./procedures/ps_setup_save.sql
-SOURCE ./procedures/ps_setup_show_disabled.sql
-SOURCE ./procedures/ps_setup_show_disabled_consumers.sql
-SOURCE ./procedures/ps_setup_show_disabled_instruments.sql
-SOURCE ./procedures/ps_setup_show_enabled.sql
-SOURCE ./procedures/ps_setup_show_enabled_consumers.sql
-SOURCE ./procedures/ps_setup_show_enabled_instruments.sql
-SOURCE ./procedures/ps_truncate_all_tables.sql
-
 SOURCE ./views/i_s/innodb_buffer_stats_by_schema.sql
 SOURCE ./views/i_s/innodb_buffer_stats_by_table.sql
 SOURCE ./views/i_s/schema_object_overview.sql
@@ -107,5 +80,32 @@ SOURCE ./views/p_s/wait_classes_global_by_latency.sql
 SOURCE ./views/p_s/waits_by_user_by_latency.sql
 SOURCE ./views/p_s/waits_by_host_by_latency.sql
 SOURCE ./views/p_s/waits_global_by_latency.sql
+
+SOURCE ./procedures/create_synonym_db.sql
+
+SOURCE ./procedures/ps_statement_avg_latency_histogram.sql
+SOURCE ./procedures/ps_trace_statement_digest.sql
+SOURCE ./procedures/ps_trace_thread.sql
+
+SOURCE ./procedures/ps_setup_disable_background_threads.sql
+SOURCE ./procedures/ps_setup_disable_consumers.sql
+SOURCE ./procedures/ps_setup_disable_instrument.sql
+SOURCE ./procedures/ps_setup_disable_thread.sql
+
+SOURCE ./procedures/ps_setup_enable_background_threads.sql
+SOURCE ./procedures/ps_setup_enable_consumers.sql
+SOURCE ./procedures/ps_setup_enable_instrument.sql
+SOURCE ./procedures/ps_setup_enable_thread.sql
+
+SOURCE ./procedures/ps_setup_reload_saved.sql
+SOURCE ./procedures/ps_setup_reset_to_default_57.sql
+SOURCE ./procedures/ps_setup_save.sql
+SOURCE ./procedures/ps_setup_show_disabled.sql
+SOURCE ./procedures/ps_setup_show_disabled_consumers.sql
+SOURCE ./procedures/ps_setup_show_disabled_instruments.sql
+SOURCE ./procedures/ps_setup_show_enabled.sql
+SOURCE ./procedures/ps_setup_show_enabled_consumers.sql
+SOURCE ./procedures/ps_setup_show_enabled_instruments.sql
+SOURCE ./procedures/ps_truncate_all_tables.sql
 
 SOURCE ./after_setup.sql
