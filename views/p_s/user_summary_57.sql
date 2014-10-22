@@ -58,13 +58,14 @@ SELECT IF(accounts.user IS NULL, 'background', accounts.user) AS user,
        SUM(accounts.current_connections) AS current_connections,
        SUM(accounts.total_connections) AS total_connections,
        COUNT(DISTINCT host) AS unique_hosts,
-       sys.format_bytes(mem.current_allocated) AS current_memory,
-       sys.format_bytes(mem.total_allocated) AS total_memory_allocated
+       sys.format_bytes(SUM(mem.current_allocated)) AS current_memory,
+       sys.format_bytes(SUM(mem.total_allocated)) AS total_memory_allocated
   FROM performance_schema.accounts
   LEFT JOIN sys.x$user_summary_by_statement_latency AS stmt ON IF(accounts.user IS NULL, 'background', accounts.user) = stmt.user
   LEFT JOIN sys.x$user_summary_by_file_io AS io ON IF(accounts.user IS NULL, 'background', accounts.user) = io.user
   LEFT JOIN sys.x$memory_by_user_by_current_bytes mem ON IF(accounts.user IS NULL, 'background', accounts.user) = mem.user
- GROUP BY IF(accounts.user IS NULL, 'background', accounts.user);
+ GROUP BY IF(accounts.user IS NULL, 'background', accounts.user)
+ ORDER BY SUM(stmt.total_latency) DESC;
 
 /*
  * View: x$user_summary
@@ -111,10 +112,12 @@ SELECT IF(accounts.user IS NULL, 'background', accounts.user) AS user,
        SUM(accounts.current_connections) AS current_connections,
        SUM(accounts.total_connections) AS total_connections,
        COUNT(DISTINCT host) AS unique_hosts,
-       mem.current_allocated AS current_memory,
-       mem.total_allocated AS total_memory_allocated
+       SUM(mem.current_allocated) AS current_memory,
+       SUM(mem.total_allocated) AS total_memory_allocated
   FROM performance_schema.accounts
   LEFT JOIN sys.x$user_summary_by_statement_latency AS stmt ON IF(accounts.user IS NULL, 'background', accounts.user) = stmt.user
   LEFT JOIN sys.x$user_summary_by_file_io AS io ON IF(accounts.user IS NULL, 'background', accounts.user) = io.user
   LEFT JOIN sys.x$memory_by_user_by_current_bytes mem ON IF(accounts.user IS NULL, 'background', accounts.user) = mem.user
- GROUP BY IF(accounts.user IS NULL, 'background', accounts.user);
+ GROUP BY IF(accounts.user IS NULL, 'background', accounts.user)
+ ORDER BY SUM(stmt.total_latency) DESC;
+

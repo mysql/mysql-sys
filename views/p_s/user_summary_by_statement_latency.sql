@@ -44,18 +44,18 @@ VIEW user_summary_by_statement_latency (
   rows_affected,
   full_scans
 ) AS
-SELECT user,
-       SUM(total) AS total,
-       sys.format_time(SUM(total_latency)) AS total_latency,
-       sys.format_time(SUM(max_latency)) AS max_latency,
-       sys.format_time(SUM(lock_latency)) AS lock_latency,
-       SUM(rows_sent) AS rows_sent,
-       SUM(rows_examined) AS rows_examined,
-       SUM(rows_affected) AS rows_affected,
-       SUM(full_scans) AS full_scans
-  FROM sys.x$user_summary_by_statement_type
- GROUP BY user
- ORDER BY SUM(total_latency) DESC;
+SELECT IF(user IS NULL, 'background', user) AS user,
+       SUM(count_star) AS total,
+       sys.format_time(SUM(sum_timer_wait)) AS total_latency,
+       sys.format_time(SUM(max_timer_wait)) AS max_latency,
+       sys.format_time(SUM(sum_lock_time)) AS lock_latency,
+       SUM(sum_rows_sent) AS rows_sent,
+       SUM(sum_rows_examined) AS rows_examined,
+       SUM(sum_rows_affected) AS rows_affected,
+       SUM(sum_no_index_used) + SUM(sum_no_good_index_used) AS full_scans
+  FROM performance_schema.events_statements_summary_by_user_by_event_name
+ GROUP BY IF(user IS NULL, 'background', user)
+ ORDER BY SUM(sum_timer_wait) DESC;
 
 /*
  * View: x$user_summary_by_statement_latency
@@ -88,15 +88,15 @@ VIEW x$user_summary_by_statement_latency (
   rows_affected,
   full_scans
 ) AS
-SELECT user,
-       SUM(total) AS total,
-       SUM(total_latency) AS total_latency,
-       SUM(max_latency) AS max_latency,
-       SUM(lock_latency) AS lock_latency,
-       SUM(rows_sent) AS rows_sent,
-       SUM(rows_examined) AS rows_examined,
-       SUM(rows_affected) AS rows_affected,
-       SUM(full_scans) AS full_scans
-  FROM sys.x$user_summary_by_statement_type
- GROUP BY user
- ORDER BY SUM(total_latency) DESC;
+SELECT IF(user IS NULL, 'background', user) AS user,
+       SUM(count_star) AS total,
+       SUM(sum_timer_wait) AS total_latency,
+       SUM(max_timer_wait) AS max_latency,
+       SUM(sum_lock_time) AS lock_latency,
+       SUM(sum_rows_sent) AS rows_sent,
+       SUM(sum_rows_examined) AS rows_examined,
+       SUM(sum_rows_affected) AS rows_affected,
+       SUM(sum_no_index_used) + SUM(sum_no_good_index_used) AS full_scans
+  FROM performance_schema.events_statements_summary_by_user_by_event_name
+ GROUP BY IF(user IS NULL, 'background', user)
+ ORDER BY SUM(sum_timer_wait) DESC;

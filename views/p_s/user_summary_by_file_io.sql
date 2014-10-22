@@ -39,12 +39,12 @@ VIEW user_summary_by_file_io (
   ios,
   io_latency
 ) AS
-SELECT user, 
-       SUM(total) AS ios,
-       sys.format_time(SUM(latency)) AS io_latency 
-  FROM x$user_summary_by_file_io_type
- GROUP BY user
- ORDER BY SUM(latency) DESC;
+SELECT IF(user IS NULL, 'background', user) AS user,
+       SUM(count_star) AS ios,
+       sys.format_time(SUM(sum_timer_wait)) AS io_latency 
+  FROM performance_schema.events_waits_summary_by_user_by_event_name
+ GROUP BY IF(user IS NULL, 'background', user)
+ ORDER BY SUM(sum_timer_wait) DESC;
 
 /*
  * View: x$user_summary_by_file_io
@@ -72,9 +72,9 @@ VIEW x$user_summary_by_file_io (
   ios,
   io_latency
 ) AS
-SELECT user, 
-       SUM(total) AS ios,
-       SUM(latency) AS io_latency 
-  FROM x$user_summary_by_file_io_type
- GROUP BY user
- ORDER BY SUM(latency) DESC;
+SELECT IF(user IS NULL, 'background', user) AS user,
+       SUM(count_star) AS ios,
+       SUM(sum_timer_wait) AS io_latency 
+  FROM performance_schema.events_waits_summary_by_user_by_event_name
+ GROUP BY IF(user IS NULL, 'background', user)
+ ORDER BY SUM(sum_timer_wait) DESC;
