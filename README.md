@@ -897,26 +897,26 @@ When the user found is NULL, it is assumed to be a "background" thread.
 
 ```SQL
 mysql> select * from user_summary_by_stages;
-+------+--------------------------------+-------+-----------+-----------+
-| user | event_name                     | total | wait_sum  | wait_avg  |
-+------+--------------------------------+-------+-----------+-----------+
-| root | stage/sql/Opening tables       |   889 | 1.97 ms   | 2.22 us   |
-| root | stage/sql/Creating sort index  |     4 | 1.79 ms   | 446.30 us |
-| root | stage/sql/init                 |    10 | 312.27 us | 31.23 us  |
-| root | stage/sql/checking permissions |    10 | 300.62 us | 30.06 us  |
-| root | stage/sql/freeing items        |     5 | 85.89 us  | 17.18 us  |
-| root | stage/sql/statistics           |     5 | 79.15 us  | 15.83 us  |
-| root | stage/sql/preparing            |     5 | 69.12 us  | 13.82 us  |
-| root | stage/sql/optimizing           |     5 | 53.11 us  | 10.62 us  |
-| root | stage/sql/Sending data         |     5 | 44.66 us  | 8.93 us   |
-| root | stage/sql/closing tables       |     5 | 37.54 us  | 7.51 us   |
-| root | stage/sql/System lock          |     5 | 34.28 us  | 6.86 us   |
-| root | stage/sql/query end            |     5 | 24.37 us  | 4.87 us   |
-| root | stage/sql/end                  |     5 | 8.60 us   | 1.72 us   |
-| root | stage/sql/Sorting result       |     5 | 8.33 us   | 1.67 us   |
-| root | stage/sql/executing            |     5 | 5.37 us   | 1.07 us   |
-| root | stage/sql/cleaning up          |     5 | 4.60 us   | 919.00 ns |
-+------+--------------------------------+-------+-----------+-----------+
++------+--------------------------------+-------+---------------+-------------+
+| user | event_name                     | total | total_latency | avg_latency |
++------+--------------------------------+-------+---------------+-------------+
+| root | stage/sql/Opening tables       |   889 | 1.97 ms       | 2.22 us     |
+| root | stage/sql/Creating sort index  |     4 | 1.79 ms       | 446.30 us   |
+| root | stage/sql/init                 |    10 | 312.27 us     | 31.23 us    |
+| root | stage/sql/checking permissions |    10 | 300.62 us     | 30.06 us    |
+| root | stage/sql/freeing items        |     5 | 85.89 us      | 17.18 us    |
+| root | stage/sql/statistics           |     5 | 79.15 us      | 15.83 us    |
+| root | stage/sql/preparing            |     5 | 69.12 us      | 13.82 us    |
+| root | stage/sql/optimizing           |     5 | 53.11 us      | 10.62 us    |
+| root | stage/sql/Sending data         |     5 | 44.66 us      | 8.93 us     |
+| root | stage/sql/closing tables       |     5 | 37.54 us      | 7.51 us     |
+| root | stage/sql/System lock          |     5 | 34.28 us      | 6.86 us     |
+| root | stage/sql/query end            |     5 | 24.37 us      | 4.87 us     |
+| root | stage/sql/end                  |     5 | 8.60 us       | 1.72 us     |
+| root | stage/sql/Sorting result       |     5 | 8.33 us       | 1.67 us     |
+| root | stage/sql/executing            |     5 | 5.37 us       | 1.07 us     |
+| root | stage/sql/cleaning up          |     5 | 4.60 us       | 919.00 ns   |
++------+--------------------------------+-------+---------------+-------------+
 ```
 
 #### user_summary_by_statement_latency / x$user_summary_by_statement_latency
@@ -979,6 +979,8 @@ mysql> select * from user_summary_by_statement_type;
 
 Summarizes statement activity, file IO and connections by host.
 
+When the host found is NULL, it is assumed to be a "background" thread.
+
 ##### Example
 
 ```SQL 
@@ -996,6 +998,8 @@ Summarizes statement activity, file IO and connections by host.
 ##### Description
 
 Summarizes file IO totals per host.
+
+When the host found is NULL, it is assumed to be a "background" thread.
 
 ##### Example
 
@@ -1015,31 +1019,33 @@ Summarizes file IO totals per host.
 
 Summarizes file IO by event type per host.
 
+When the host found is NULL, it is assumed to be a "background" thread.
+
 ##### Example
 
 ```SQL
   mysql> select * from host_summary_by_file_io_type;
-  +------------+--------------------------------------+-------+-----------+-------------+
-  | host       | event_name                           | total | latency   | max_latency |
-  +------------+--------------------------------------+-------+-----------+-------------+
-  | hal1       | wait/io/file/sql/FRM                 |   871 | 168.15 ms | 18.48 ms    |
-  | hal1       | wait/io/file/innodb/innodb_data_file |   173 | 129.56 ms | 34.09 ms    |
-  | hal1       | wait/io/file/innodb/innodb_log_file  |    20 | 77.53 ms  | 60.66 ms    |
-  | hal1       | wait/io/file/myisam/dfile            |    40 | 6.54 ms   | 4.58 ms     |
-  | hal1       | wait/io/file/mysys/charset           |     3 | 4.79 ms   | 4.71 ms     |
-  | hal1       | wait/io/file/myisam/kfile            |    67 | 4.38 ms   | 300.04 us   |
-  | hal1       | wait/io/file/sql/ERRMSG              |     5 | 2.72 ms   | 1.69 ms     |
-  | hal1       | wait/io/file/sql/pid                 |     3 | 266.30 us | 185.47 us   |
-  | hal1       | wait/io/file/sql/casetest            |     5 | 246.81 us | 150.19 us   |
-  | hal1       | wait/io/file/sql/global_ddl_log      |     2 | 21.24 us  | 18.59 us    |
-  | hal2       | wait/io/file/sql/file_parser         |  1422 | 4.80 s    | 135.14 ms   |
-  | hal2       | wait/io/file/sql/FRM                 |   865 | 85.82 ms  | 9.81 ms     |
-  | hal2       | wait/io/file/myisam/kfile            |  1073 | 37.14 ms  | 15.79 ms    |
-  | hal2       | wait/io/file/myisam/dfile            |  2991 | 25.53 ms  | 5.25 ms     |
-  | hal2       | wait/io/file/sql/dbopt               |    20 | 1.07 ms   | 153.07 us   |
-  | hal2       | wait/io/file/sql/misc                |     4 | 59.71 us  | 33.75 us    |
-  | hal2       | wait/io/file/archive/data            |     1 | 13.91 us  | 13.91 us    |
-  +------------+--------------------------------------+-------+-----------+-------------+
+  +------------+--------------------------------------+-------+---------------+-------------+
+  | host       | event_name                           | total | total_latency | max_latency |
+  +------------+--------------------------------------+-------+---------------+-------------+
+  | hal1       | wait/io/file/sql/FRM                 |   871 | 168.15 ms     | 18.48 ms    |
+  | hal1       | wait/io/file/innodb/innodb_data_file |   173 | 129.56 ms     | 34.09 ms    |
+  | hal1       | wait/io/file/innodb/innodb_log_file  |    20 | 77.53 ms      | 60.66 ms    |
+  | hal1       | wait/io/file/myisam/dfile            |    40 | 6.54 ms       | 4.58 ms     |
+  | hal1       | wait/io/file/mysys/charset           |     3 | 4.79 ms       | 4.71 ms     |
+  | hal1       | wait/io/file/myisam/kfile            |    67 | 4.38 ms       | 300.04 us   |
+  | hal1       | wait/io/file/sql/ERRMSG              |     5 | 2.72 ms       | 1.69 ms     |
+  | hal1       | wait/io/file/sql/pid                 |     3 | 266.30 us     | 185.47 us   |
+  | hal1       | wait/io/file/sql/casetest            |     5 | 246.81 us     | 150.19 us   |
+  | hal1       | wait/io/file/sql/global_ddl_log      |     2 | 21.24 us      | 18.59 us    |
+  | hal2       | wait/io/file/sql/file_parser         |  1422 | 4.80 s        | 135.14 ms   |
+  | hal2       | wait/io/file/sql/FRM                 |   865 | 85.82 ms      | 9.81 ms     |
+  | hal2       | wait/io/file/myisam/kfile            |  1073 | 37.14 ms      | 15.79 ms    |
+  | hal2       | wait/io/file/myisam/dfile            |  2991 | 25.53 ms      | 5.25 ms     |
+  | hal2       | wait/io/file/sql/dbopt               |    20 | 1.07 ms       | 153.07 us   |
+  | hal2       | wait/io/file/sql/misc                |     4 | 59.71 us      | 33.75 us    |
+  | hal2       | wait/io/file/archive/data            |     1 | 13.91 us      | 13.91 us    |
+  +------------+--------------------------------------+-------+---------------+-------------+
  ```
 
 #### host_summary_by_stages / x$host_summary_by_stages
@@ -1048,30 +1054,32 @@ Summarizes file IO by event type per host.
 
 Summarizes stages by host, ordered by host and total latency per stage.
 
+When the host found is NULL, it is assumed to be a "background" thread.
+
 ##### Example
 
 ```SQL
   mysql> select *  from host_summary_by_stages;
-  +------+--------------------------------+-------+-----------+-----------+
-  | host | event_name                     | total | wait_sum  | wait_avg  |
-  +------+--------------------------------+-------+-----------+-----------+
-  | hal  | stage/sql/Opening tables       |   889 | 1.97 ms   | 2.22 us   |
-  | hal  | stage/sql/Creating sort index  |     4 | 1.79 ms   | 446.30 us |
-  | hal  | stage/sql/init                 |    10 | 312.27 us | 31.23 us  |
-  | hal  | stage/sql/checking permissions |    10 | 300.62 us | 30.06 us  |
-  | hal  | stage/sql/freeing items        |     5 | 85.89 us  | 17.18 us  |
-  | hal  | stage/sql/statistics           |     5 | 79.15 us  | 15.83 us  |
-  | hal  | stage/sql/preparing            |     5 | 69.12 us  | 13.82 us  |
-  | hal  | stage/sql/optimizing           |     5 | 53.11 us  | 10.62 us  |
-  | hal  | stage/sql/Sending data         |     5 | 44.66 us  | 8.93 us   |
-  | hal  | stage/sql/closing tables       |     5 | 37.54 us  | 7.51 us   |
-  | hal  | stage/sql/System lock          |     5 | 34.28 us  | 6.86 us   |
-  | hal  | stage/sql/query end            |     5 | 24.37 us  | 4.87 us   |
-  | hal  | stage/sql/end                  |     5 | 8.60 us   | 1.72 us   |
-  | hal  | stage/sql/Sorting result       |     5 | 8.33 us   | 1.67 us   |
-  | hal  | stage/sql/executing            |     5 | 5.37 us   | 1.07 us   |
-  | hal  | stage/sql/cleaning up          |     5 | 4.60 us   | 919.00 ns |
-  +------+--------------------------------+-------+-----------+-----------+
+  +------+--------------------------------+-------+---------------+-------------+
+  | host | event_name                     | total | total_latency | avg_latency |
+  +------+--------------------------------+-------+---------------+-------------+
+  | hal  | stage/sql/Opening tables       |   889 | 1.97 ms       | 2.22 us     |
+  | hal  | stage/sql/Creating sort index  |     4 | 1.79 ms       | 446.30 us   |
+  | hal  | stage/sql/init                 |    10 | 312.27 us     | 31.23 us    |
+  | hal  | stage/sql/checking permissions |    10 | 300.62 us     | 30.06 us    |
+  | hal  | stage/sql/freeing items        |     5 | 85.89 us      | 17.18 us    |
+  | hal  | stage/sql/statistics           |     5 | 79.15 us      | 15.83 us    |
+  | hal  | stage/sql/preparing            |     5 | 69.12 us      | 13.82 us    |
+  | hal  | stage/sql/optimizing           |     5 | 53.11 us      | 10.62 us    |
+  | hal  | stage/sql/Sending data         |     5 | 44.66 us      | 8.93 us     |
+  | hal  | stage/sql/closing tables       |     5 | 37.54 us      | 7.51 us     |
+  | hal  | stage/sql/System lock          |     5 | 34.28 us      | 6.86 us     |
+  | hal  | stage/sql/query end            |     5 | 24.37 us      | 4.87 us     |
+  | hal  | stage/sql/end                  |     5 | 8.60 us       | 1.72 us     |
+  | hal  | stage/sql/Sorting result       |     5 | 8.33 us       | 1.67 us     |
+  | hal  | stage/sql/executing            |     5 | 5.37 us       | 1.07 us     |
+  | hal  | stage/sql/cleaning up          |     5 | 4.60 us       | 919.00 ns   |
+  +------+--------------------------------+-------+---------------+-------------+
 ```
 
 #### host_summary_by_statement_latency / x$host_summary_by_statement_latency
@@ -1079,6 +1087,8 @@ Summarizes stages by host, ordered by host and total latency per stage.
 ##### Description
 
 Summarizes overall statement statistics by host.
+
+When the host found is NULL, it is assumed to be a "background" thread.
 
 ##### Example
 
@@ -1097,6 +1107,8 @@ mysql> select * from host_summary_by_statement_latency;
 
 Summarizes the types of statements executed by each host.
 
+When the host found is NULL, it is assumed to be a "background" thread.
+
 ##### Example
 
 ```SQL
@@ -1111,9 +1123,7 @@ Summarizes the types of statements executed by each host.
   | hal  | create_table         |     19 | 3.04 s        | 431.71 ms   | 0 ps         |         0 |             0 |             0 |          0 |
   ...
   +------+----------------------+--------+---------------+-------------+--------------+-----------+---------------+---------------+------------+
-  
 ```
-
 
 #### wait_classes_global_by_avg_latency / x$wait_classes_global_by_avg_latency
 
