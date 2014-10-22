@@ -93,13 +93,13 @@ SELECT pps.thread_id AS thd_id,
        esc.created_tmp_disk_tables AS tmp_disk_tables,
        IF(esc.no_good_index_used > 0 OR esc.no_index_used > 0, 
           'YES', 'NO') AS full_scan,
-       sys.format_bytes(SUM(mem.current_number_of_bytes_used)) AS current_memory,
+       sys.format_bytes(mem.current_allocated) AS current_memory,
        IF(esc.timer_wait IS NOT NULL,
           sys.format_statement(esc.sql_text),
           NULL) AS last_statement,
        IF(esc.timer_wait IS NOT NULL,
           sys.format_time(esc.timer_wait),
-          NULL) as last_statement_latency,
+          NULL) AS last_statement_latency,
        ewc.event_name AS last_wait,
        IF(ewc.timer_wait IS NULL AND ewc.event_name IS NOT NULL, 
           'Still Waiting', 
@@ -107,9 +107,8 @@ SELECT pps.thread_id AS thd_id,
        ewc.source
   FROM performance_schema.threads AS pps
   LEFT JOIN performance_schema.events_waits_current AS ewc USING (thread_id)
-  LEFT JOIN performance_schema.events_statements_current as esc USING (thread_id)
-  LEFT JOIN performance_schema.memory_summary_by_thread_by_event_name as mem USING (thread_id)
- GROUP BY thread_id
+  LEFT JOIN performance_schema.events_statements_current AS esc USING (thread_id)
+  LEFT JOIN sys.x$memory_by_thread_by_current_bytes AS mem USING (thread_id)
  ORDER BY pps.processlist_time DESC, last_wait_latency DESC;
 
 /*
@@ -191,13 +190,13 @@ SELECT pps.thread_id AS thd_id,
        esc.created_tmp_disk_tables AS tmp_disk_tables,
        IF(esc.no_good_index_used > 0 OR esc.no_index_used > 0, 
           'YES', 'NO') AS full_scan,
-       SUM(mem.current_number_of_bytes_used) AS current_memory,
+       mem.current_allocated AS current_memory,
        IF(esc.timer_wait IS NOT NULL,
           esc.sql_text,
           NULL) AS last_statement,
        IF(esc.timer_wait IS NOT NULL,
           esc.timer_wait,
-          NULL) as last_statement_latency,
+          NULL) AS last_statement_latency,
        ewc.event_name AS last_wait,
        IF(ewc.timer_wait IS NULL AND ewc.event_name IS NOT NULL, 
           'Still Waiting', 
@@ -205,7 +204,6 @@ SELECT pps.thread_id AS thd_id,
        ewc.source
   FROM performance_schema.threads AS pps
   LEFT JOIN performance_schema.events_waits_current AS ewc USING (thread_id)
-  LEFT JOIN performance_schema.events_statements_current as esc USING (thread_id)
-  LEFT JOIN performance_schema.memory_summary_by_thread_by_event_name as mem USING (thread_id)
- GROUP BY thread_id
+  LEFT JOIN performance_schema.events_statements_current AS esc USING (thread_id)
+  LEFT JOIN sys.x$memory_by_thread_by_current_bytes AS mem USING (thread_id)
  ORDER BY pps.processlist_time DESC, last_wait_latency DESC;
