@@ -34,7 +34,6 @@ SOURCE ./views/i_s/innodb_buffer_stats_by_table.sql
 SOURCE ./views/i_s/schema_object_overview.sql
 
 SOURCE ./views/p_s/ps_check_lost_instrumentation.sql
-SOURCE ./views/p_s/processlist_57.sql
 
 SOURCE ./views/p_s/latest_file_io.sql
 SOURCE ./views/p_s/io_by_thread_by_latency.sql
@@ -45,6 +44,7 @@ SOURCE ./views/p_s/io_global_by_wait_by_latency.sql
 
 SOURCE ./views/p_s/memory_by_user.sql
 SOURCE ./views/p_s/memory_by_host.sql
+SOURCE ./views/p_s/memory_by_thread.sql
 SOURCE ./views/p_s/memory_global_by_current_allocated.sql
 SOURCE ./views/p_s/memory_global_total.sql
 
@@ -80,6 +80,8 @@ SOURCE ./views/p_s/wait_classes_global_by_latency.sql
 SOURCE ./views/p_s/waits_by_user_by_latency.sql
 SOURCE ./views/p_s/waits_by_host_by_latency.sql
 SOURCE ./views/p_s/waits_global_by_latency.sql
+
+SOURCE ./views/p_s/processlist_57.sql
 
 SOURCE ./procedures/create_synonym_db.sql
 
