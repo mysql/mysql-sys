@@ -67,7 +67,7 @@ SELECT IF(processlist_id IS NULL,
   LEFT JOIN performance_schema.threads USING (thread_id)
  WHERE event_name LIKE 'wait/io/file/%'
    AND sum_timer_wait > 0
- GROUP BY thread_id
+ GROUP BY thread_id, processlist_id, user
  ORDER BY SUM(sum_timer_wait) DESC;
 
 /*
@@ -124,5 +124,5 @@ SELECT IF(processlist_id IS NULL,
   LEFT JOIN performance_schema.threads USING (thread_id)
  WHERE event_name LIKE 'wait/io/file/%'
    AND sum_timer_wait > 0
- GROUP BY thread_id
+ GROUP BY thread_id, processlist_id, user
  ORDER BY SUM(sum_timer_wait) DESC;
