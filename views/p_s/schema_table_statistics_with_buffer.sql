@@ -76,6 +76,7 @@ VIEW schema_table_statistics_with_buffer (
   io_misc_latency,
   innodb_buffer_allocated,
   innodb_buffer_data,
+  innodb_buffer_free,
   innodb_buffer_pages,
   innodb_buffer_pages_hashed,
   innodb_buffer_pages_old,
@@ -83,28 +84,29 @@ VIEW schema_table_statistics_with_buffer (
 ) AS
 SELECT pst.object_schema AS table_schema,
        pst.object_name AS table_name,
-       SUM(pst.count_fetch) AS rows_fetched,
-       sys.format_time(SUM(pst.sum_timer_fetch)) AS fetch_latency,
-       SUM(pst.count_fetch) AS rows_fetched,
-       sys.format_time(SUM(pst.sum_timer_insert)) AS insert_latency,
-       SUM(pst.count_update) AS rows_updated,
-       sys.format_time(SUM(pst.sum_timer_update)) AS update_latency,
-       SUM(pst.count_delete) AS rows_deleted,
-       sys.format_time(SUM(pst.sum_timer_delete)) AS delete_latency,
-       SUM(fsbi.count_read) AS io_read_requests,
-       sys.format_bytes(SUM(fsbi.sum_number_of_bytes_read)) AS io_read,
-       sys.format_time(SUM(fsbi.sum_timer_read)) AS io_read_latency,
-       SUM(fsbi.count_write) AS io_write_requests,
-       sys.format_bytes(SUM(fsbi.sum_number_of_bytes_write)) AS io_write,
-       sys.format_time(SUM(fsbi.sum_timer_write)) AS io_write_latency,
-       SUM(fsbi.count_misc) AS io_misc_requests,
-       sys.format_time(SUM(fsbi.sum_timer_misc)) AS io_misc_latency,
-       SUM(ibp.allocated) AS innodb_buffer_allocated,
-       SUM(ibp.data) AS innodb_buffer_data,
-       SUM(ibp.pages) AS innodb_buffer_pages,
-       SUM(ibp.pages_hashed) AS innodb_buffer_pages_hashed,
-       SUM(ibp.pages_old) AS innodb_buffer_pages_old,
-       SUM(ibp.rows_cached) AS innodb_buffer_rows_cached
+       pst.count_fetch AS rows_fetched,
+       sys.format_time(pst.sum_timer_fetch) AS fetch_latency,
+       pst.count_insert AS rows_inserted,
+       sys.format_time(pst.sum_timer_insert) AS insert_latency,
+       pst.count_update AS rows_updated,
+       sys.format_time(pst.sum_timer_update) AS update_latency,
+       pst.count_delete AS rows_deleted,
+       sys.format_time(pst.sum_timer_delete) AS delete_latency,
+       fsbi.count_read AS io_read_requests,
+       sys.format_bytes(fsbi.sum_number_of_bytes_read) AS io_read,
+       sys.format_time(fsbi.sum_timer_read) AS io_read_latency,
+       fsbi.count_write AS io_write_requests,
+       sys.format_bytes(fsbi.sum_number_of_bytes_write) AS io_write,
+       sys.format_time(fsbi.sum_timer_write) AS io_write_latency,
+       fsbi.count_misc AS io_misc_requests,
+       sys.format_time(fsbi.sum_timer_misc) AS io_misc_latency,
+       sys.format_bytes(ibp.allocated) AS innodb_buffer_allocated,
+       sys.format_bytes(ibp.data) AS innodb_buffer_data,
+       sys.format_bytes(ibp.allocated - ibp.data) AS innodb_buffer_free,
+       ibp.pages AS innodb_buffer_pages,
+       ibp.pages_hashed AS innodb_buffer_pages_hashed,
+       ibp.pages_old AS innodb_buffer_pages_old,
+       ibp.rows_cached AS innodb_buffer_rows_cached
   FROM performance_schema.table_io_waits_summary_by_table AS pst
   LEFT JOIN x$ps_schema_table_statistics_io AS fsbi
     ON pst.object_schema = fsbi.table_schema
@@ -112,8 +114,7 @@ SELECT pst.object_schema AS table_schema,
   LEFT JOIN sys.x$innodb_buffer_stats_by_table AS ibp
     ON pst.object_schema = ibp.object_schema
    AND pst.object_name = ibp.object_name
- GROUP BY pst.object_schema, pst.object_name
- ORDER BY SUM(pst.sum_timer_wait) DESC;
+ ORDER BY pst.sum_timer_wait DESC;
 
 /* 
  * View: x$schema_table_statistics_with_buffer
@@ -178,6 +179,7 @@ VIEW x$schema_table_statistics_with_buffer (
   io_misc_latency,
   innodb_buffer_allocated,
   innodb_buffer_data,
+  innodb_buffer_free,
   innodb_buffer_pages,
   innodb_buffer_pages_hashed,
   innodb_buffer_pages_old,
@@ -185,28 +187,29 @@ VIEW x$schema_table_statistics_with_buffer (
 ) AS
 SELECT pst.object_schema AS table_schema,
        pst.object_name AS table_name,
-       SUM(pst.count_fetch) AS rows_fetched,
-       SUM(pst.sum_timer_fetch) AS fetch_latency,
-       SUM(pst.count_insert) AS rows_inserted,
-       SUM(pst.sum_timer_insert) AS insert_latency,
-       SUM(pst.count_update) AS rows_updated,
-       SUM(pst.sum_timer_update) AS update_latency,
-       SUM(pst.count_delete) AS rows_deleted,
-       SUM(pst.sum_timer_delete) AS delete_latency,
-       SUM(fsbi.count_read) AS io_read_requests,
-       SUM(fsbi.sum_number_of_bytes_read) AS io_read,
-       SUM(fsbi.sum_timer_read) AS io_read_latency,
-       SUM(fsbi.count_write) AS io_write_requests,
-       SUM(fsbi.sum_number_of_bytes_write) AS io_write,
-       SUM(fsbi.sum_timer_write) AS io_write_latency,
-       SUM(fsbi.count_misc) AS io_misc_requests,
-       SUM(fsbi.sum_timer_misc) AS io_misc_latency,
-       SUM(ibp.allocated) AS innodb_buffer_allocated,
-       SUM(ibp.data) AS innodb_buffer_data,
-       SUM(ibp.pages) AS innodb_buffer_pages,
-       SUM(ibp.pages_hashed) AS innodb_buffer_pages_hashed,
-       SUM(ibp.pages_old) AS innodb_buffer_pages_old,
-       SUM(ibp.rows_cached) AS innodb_buffer_rows_cached
+       pst.count_fetch AS rows_fetched,
+       pst.sum_timer_fetch AS fetch_latency,
+       pst.count_insert AS rows_inserted,
+       pst.sum_timer_insert AS insert_latency,
+       pst.count_update AS rows_updated,
+       pst.sum_timer_update AS update_latency,
+       pst.count_delete AS rows_deleted,
+       pst.sum_timer_delete AS delete_latency,
+       fsbi.count_read AS io_read_requests,
+       fsbi.sum_number_of_bytes_read AS io_read,
+       fsbi.sum_timer_read AS io_read_latency,
+       fsbi.count_write AS io_write_requests,
+       fsbi.sum_number_of_bytes_write AS io_write,
+       fsbi.sum_timer_write AS io_write_latency,
+       fsbi.count_misc AS io_misc_requests,
+       fsbi.sum_timer_misc AS io_misc_latency,
+       ibp.allocated AS innodb_buffer_allocated,
+       ibp.data AS innodb_buffer_data,
+       (ibp.allocated - ibp.data) AS innodb_buffer_free,
+       ibp.pages AS innodb_buffer_pages,
+       ibp.pages_hashed AS innodb_buffer_pages_hashed,
+       ibp.pages_old AS innodb_buffer_pages_old,
+       ibp.rows_cached AS innodb_buffer_rows_cached
   FROM performance_schema.table_io_waits_summary_by_table AS pst
   LEFT JOIN x$ps_schema_table_statistics_io AS fsbi
     ON pst.object_schema = fsbi.table_schema
@@ -214,5 +217,4 @@ SELECT pst.object_schema AS table_schema,
   LEFT JOIN sys.x$innodb_buffer_stats_by_table AS ibp
     ON pst.object_schema = ibp.object_schema
    AND pst.object_name = ibp.object_name
- GROUP BY pst.object_schema, pst.object_name
- ORDER BY SUM(pst.sum_timer_wait) DESC;
+ ORDER BY pst.sum_timer_wait DESC;

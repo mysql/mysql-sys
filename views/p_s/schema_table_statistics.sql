@@ -40,10 +40,16 @@ VIEW x$ps_schema_table_statistics_io (
 ) AS
 SELECT extract_schema_from_file_name(file_name) AS table_schema,
        extract_table_from_file_name(file_name) AS table_name,
-       count_read, sum_number_of_bytes_read, sum_timer_read,
-       count_write, sum_number_of_bytes_write, sum_timer_write,
-       count_misc, sum_timer_misc
-  FROM performance_schema.file_summary_by_instance;
+       SUM(count_read) AS count_read,
+       SUM(sum_number_of_bytes_read) AS sum_number_of_bytes_read,
+       SUM(sum_timer_read) AS sum_timer_read,
+       SUM(count_write) AS count_write,
+       SUM(sum_number_of_bytes_write) AS sum_number_of_bytes_write,
+       SUM(sum_timer_write) AS sum_timer_write,
+       SUM(count_misc) AS count_misc,
+       SUM(sum_timer_misc) AS sum_timer_misc
+  FROM performance_schema.file_summary_by_instance
+ GROUP BY table_schema, table_name;
 
 /* 
  * View: schema_table_statistics
@@ -112,19 +118,18 @@ SELECT pst.object_schema AS table_schema,
        sys.format_time(pst.sum_timer_update) AS update_latency,
        pst.count_delete AS rows_deleted,
        sys.format_time(pst.sum_timer_delete) AS delete_latency,
-       SUM(fsbi.count_read) AS io_read_requests,
-       sys.format_bytes(SUM(fsbi.sum_number_of_bytes_read)) AS io_read,
-       sys.format_time(SUM(fsbi.sum_timer_read)) AS io_read_latency,
-       SUM(fsbi.count_write) AS io_write_requests,
-       sys.format_bytes(SUM(fsbi.sum_number_of_bytes_write)) AS io_write,
-       sys.format_time(SUM(fsbi.sum_timer_write)) AS io_write_latency,
-       SUM(fsbi.count_misc) AS io_misc_requests,
-       sys.format_time(SUM(fsbi.sum_timer_misc)) AS io_misc_latency
+       fsbi.count_read AS io_read_requests,
+       sys.format_bytes(fsbi.sum_number_of_bytes_read) AS io_read,
+       sys.format_time(fsbi.sum_timer_read) AS io_read_latency,
+       fsbi.count_write AS io_write_requests,
+       sys.format_bytes(fsbi.sum_number_of_bytes_write) AS io_write,
+       sys.format_time(fsbi.sum_timer_write) AS io_write_latency,
+       fsbi.count_misc AS io_misc_requests,
+       sys.format_time(fsbi.sum_timer_misc) AS io_misc_latency
   FROM performance_schema.table_io_waits_summary_by_table AS pst
   LEFT JOIN x$ps_schema_table_statistics_io AS fsbi
     ON pst.object_schema = fsbi.table_schema
    AND pst.object_name = fsbi.table_name
- GROUP BY pst.object_schema, pst.object_name
  ORDER BY pst.sum_timer_wait DESC;
 
 /* 
@@ -193,17 +198,16 @@ SELECT pst.object_schema AS table_schema,
        pst.sum_timer_update AS update_latency,
        pst.count_delete AS rows_deleted,
        pst.sum_timer_delete AS delete_latency,
-       SUM(fsbi.count_read) AS io_read_requests,
-       SUM(fsbi.sum_number_of_bytes_read) AS io_read,
-       SUM(fsbi.sum_timer_read) AS io_read_latency,
-       SUM(fsbi.count_write) AS io_write_requests,
-       SUM(fsbi.sum_number_of_bytes_write) AS io_write,
-       SUM(fsbi.sum_timer_write) AS io_write_latency,
-       SUM(fsbi.count_misc) AS io_misc_requests,
-       SUM(fsbi.sum_timer_misc) AS io_misc_latency
+       fsbi.count_read AS io_read_requests,
+       fsbi.sum_number_of_bytes_read AS io_read,
+       fsbi.sum_timer_read AS io_read_latency,
+       fsbi.count_write AS io_write_requests,
+       fsbi.sum_number_of_bytes_write AS io_write,
+       fsbi.sum_timer_write AS io_write_latency,
+       fsbi.count_misc AS io_misc_requests,
+       fsbi.sum_timer_misc AS io_misc_latency
   FROM performance_schema.table_io_waits_summary_by_table AS pst
   LEFT JOIN x$ps_schema_table_statistics_io AS fsbi
     ON pst.object_schema = fsbi.table_schema
    AND pst.object_name = fsbi.table_name
- GROUP BY pst.object_schema, pst.object_name
  ORDER BY pst.sum_timer_wait DESC;
