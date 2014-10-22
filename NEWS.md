@@ -1,5 +1,32 @@
 # Change history for the MySQL sys schema
 
+## 1.2.0 (22/10/2014)
+
+### Backwards Incompatible Changes
+
+* The `host_summary_by_stages` and `user_summary_by_stages` `wait_sum` and `wait_avg` columns were renamed to `total_latency` and `avg_latency` respectively, for consistency.
+* The `host_summary_by_file_io_type` and `user_summary_by_file_io_type `latency` column was renamed to `total_latency`, for consistency.
+
+### Improvements
+
+* Made the truncation length for the `format_statement` view configurable
+  * This includes adding a new persistent `sys_config` table to store the new variable - `statement_truncate_len` - see the README for usage
+* Added `total_latency` to the `schema_tables_with_full_table_scans` view, and added an x$ counterpart
+* Added `innodb_buffer_free` to the `schema_table_statistics_with_buffer` view, to summarize how much free space is allocated per table in the buffer pool
+* The `schema_unused_indexes` view now ignores indexes named `PRIMARY` (primary keys)
+* Added `rows_affected` and `rows_affected_avg` stats to the `statement_analysis` views
+* The `statements_with_full_table_scans` view now ignores any SQL that starts with `SHOW`
+* Added a script, `generate_sql_file.sh`, that can be used to generate a single SQL file, also allowing substitution of the MySQL user to use, and/or whether the `SET sql_log_bin ...` statements should be omitted.
+** This is useful for those using RDS, where the root@localhost user is not accessible, and sql_log_bin is disabled (Issue #5)
+* Added a set `memory_by_thread_by_current_bytes` views, that summarize memory usage per thread with MySQL 5.7's memory instrumentation
+* Improved each of the host specific views to return aggregate values for `background` threads, instead of ignoring them, in the same way as the user summary views
+
+### Bug Fixes
+
+* Added the missing `memory_by_host` view for MySQL 5.7
+* Added missing space for hour notation within the `format_time` function
+* Fixed views affected by MySQL 5.7 ONLY_FULL_GROUP_BY and functional dependency changes
+
 ## 1.1.0 (04/09/2014)
 
 ### Improvements
