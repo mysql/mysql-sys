@@ -18,6 +18,8 @@
  *
  * Summarizes statement activity, file IO and connections by host.
  *
+ * When the host found is NULL, it is assumed to be a "background" thread.
+ *
  * mysql> select * from host_summary;
  * +------+------------+-------------------+-----------------------+-------------+----------+-----------------+---------------------+-------------------+--------------+
  * | host | statements | statement_latency | statement_avg_latency | table_scans | file_ios | file_io_latency | current_connections | total_connections | unique_users |
@@ -43,7 +45,7 @@ VIEW host_summary (
   total_connections,
   unique_hosts
 ) AS
-SELECT accounts.host,
+SELECT IF(accounts.host IS NULL, 'background', accounts.host) AS host,
        SUM(stmt.total) AS statements,
        sys.format_time(SUM(stmt.total_latency)) AS statement_latency,
        sys.format_time(SUM(stmt.total_latency) / SUM(stmt.total)) AS statement_avg_latency,
@@ -56,13 +58,14 @@ SELECT accounts.host,
   FROM performance_schema.accounts
   LEFT JOIN sys.x$host_summary_by_statement_latency AS stmt ON accounts.host = stmt.host
   LEFT JOIN sys.x$host_summary_by_file_io AS io ON accounts.host = io.host
- WHERE accounts.host IS NOT NULL
- GROUP BY accounts.host;
+ GROUP BY IF(accounts.host IS NULL, 'background', accounts.host);
 
 /*
  * View: x$host_summary
  *
  * Summarizes statement activity, file IO and connections by host.
+ *
+ * When the host found is NULL, it is assumed to be a "background" thread.
  *
  * mysql> select * from x$host_summary;
  * +------+------------+-------------------+-----------------------+-------------+----------+-----------------+---------------------+-------------------+--------------+
@@ -89,7 +92,7 @@ VIEW x$host_summary (
   total_connections,
   unique_hosts
 ) AS
-SELECT accounts.host,
+SELECT IF(accounts.host IS NULL, 'background', accounts.host) AS host,
        SUM(stmt.total) AS statements,
        SUM(stmt.total_latency) AS statement_latency,
        SUM(stmt.total_latency) / SUM(stmt.total) AS statement_avg_latency,
@@ -102,5 +105,4 @@ SELECT accounts.host,
   FROM performance_schema.accounts
   LEFT JOIN sys.x$host_summary_by_statement_latency AS stmt ON accounts.host = stmt.host
   LEFT JOIN sys.x$host_summary_by_file_io AS io ON accounts.host = io.host
- WHERE accounts.host IS NOT NULL
- GROUP BY accounts.host;
+ GROUP BY IF(accounts.host IS NULL, 'background', accounts.host);

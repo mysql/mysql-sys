@@ -18,6 +18,8 @@
  *
  * Summarizes file IO totals per host.
  *
+ * When the host found is NULL, it is assumed to be a "background" thread.
+ *
  * mysql> select * from host_summary_by_file_io;
  * +------------+-------+------------+
  * | host       | ios   | io_latency |
@@ -37,18 +39,19 @@ VIEW host_summary_by_file_io (
   ios,
   io_latency
 ) AS
-SELECT host, 
-       SUM(total) AS ios,
-       sys.format_time(SUM(latency)) AS io_latency 
-  FROM x$host_summary_by_file_io_type
- GROUP BY host
- ORDER BY SUM(latency) DESC;
+SELECT IF(host IS NULL, 'background', host) AS host,
+       SUM(count_star) AS ios,
+       sys.format_time(SUM(sum_timer_wait)) AS io_latency 
+  FROM performance_schema.events_waits_summary_by_host_by_event_name
+ GROUP BY IF(host IS NULL, 'background', host)
+ ORDER BY SUM(sum_timer_wait) DESC;
 
 /*
  * View: x$host_summary_by_file_io
  *
  * Summarizes file IO totals per host.
  *
+ * When the host found is NULL, it is assumed to be a "background" thread.
  *
  * mysql> select * from x$host_summary_by_file_io;
  * +------------+-------+----------------+
@@ -69,9 +72,9 @@ VIEW x$host_summary_by_file_io (
   ios,
   io_latency
 ) AS
-SELECT host, 
-       SUM(total) AS ios,
-       SUM(latency) AS io_latency 
-  FROM x$host_summary_by_file_io_type
- GROUP BY host
- ORDER BY SUM(latency) DESC;
+SELECT IF(host IS NULL, 'background', host) AS host,
+       SUM(count_star) AS ios,
+       SUM(sum_timer_wait) AS io_latency 
+  FROM performance_schema.events_waits_summary_by_host_by_event_name
+ GROUP BY IF(host IS NULL, 'background', host)
+ ORDER BY SUM(sum_timer_wait) DESC;

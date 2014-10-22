@@ -18,6 +18,8 @@
  *
  * Summarizes statement activity and connections by host
  *
+ * When the host found is NULL, it is assumed to be a "background" thread.
+ *
  * mysql> select * from host_summary;
  * +------+------------+---------------+-------------+---------------------+-------------------+--------------+----------------+------------------------+
  * | host | statements | total_latency | avg_latency | current_connections | total_connections | unique_users | current_memory | total_memory_allocated |
@@ -46,7 +48,7 @@ VIEW host_summary (
   current_memory,
   total_memory_allocated
 ) AS
-SELECT accounts.host,
+SELECT IF(accounts.host IS NULL, 'background', accounts.host) AS host,
        SUM(stmt.total) AS statements,
        sys.format_time(SUM(stmt.total_latency)) AS statement_latency,
        sys.format_time(SUM(stmt.total_latency) / SUM(stmt.total)) AS statement_avg_latency,
@@ -56,19 +58,20 @@ SELECT accounts.host,
        SUM(accounts.current_connections) AS current_connections,
        SUM(accounts.total_connections) AS total_connections,
        COUNT(DISTINCT user) AS unique_users,
-       sys.format_bytes(mem.current_allocated) AS current_memory,
-       sys.format_bytes(mem.total_allocated) AS total_memory_allocated
+       sys.format_bytes(SUM(mem.current_allocated)) AS current_memory,
+       sys.format_bytes(SUM(mem.total_allocated)) AS total_memory_allocated
   FROM performance_schema.accounts
   JOIN sys.x$host_summary_by_statement_latency AS stmt ON accounts.host = stmt.host
   JOIN sys.x$host_summary_by_file_io AS io ON accounts.host = io.host
   JOIN sys.x$memory_by_host_by_current_bytes mem ON accounts.host = mem.host
- WHERE accounts.host IS NOT NULL
- GROUP BY accounts.host;
+ GROUP BY IF(accounts.host IS NULL, 'background', accounts.host);
 
 /*
  * View: x$host_summary
  *
  * Summarizes statement activity and connections by host
+ *
+ * When the host found is NULL, it is assumed to be a "background" thread.
  *
  * mysql> select * from x$host_summary;
  * +------+------------+-----------------+------------------+---------------------+-------------------+--------------+----------------+------------------------+
@@ -98,7 +101,7 @@ VIEW x$host_summary (
   current_memory,
   total_memory_allocated
 ) AS
-SELECT accounts.host,
+SELECT IF(accounts.host IS NULL, 'background', accounts.host) AS host,
        SUM(stmt.total) AS statements,
        SUM(stmt.total_latency) AS statement_latency,
        SUM(stmt.total_latency) / SUM(stmt.total) AS statement_avg_latency,
@@ -108,11 +111,10 @@ SELECT accounts.host,
        SUM(accounts.current_connections) AS current_connections,
        SUM(accounts.total_connections) AS total_connections,
        COUNT(DISTINCT accounts.user) AS unique_users,
-       mem.current_allocated AS current_memory,
-       mem.total_allocated AS total_memory_allocated
+       SUM(mem.current_allocated) AS current_memory,
+       SUM(mem.total_allocated) AS total_memory_allocated
   FROM performance_schema.accounts
   JOIN sys.x$host_summary_by_statement_latency AS stmt ON accounts.host = stmt.host
   JOIN sys.x$host_summary_by_file_io AS io ON accounts.host = io.host
   JOIN sys.x$memory_by_host_by_current_bytes mem ON accounts.host = mem.host
- WHERE accounts.host IS NOT NULL
- GROUP BY accounts.host;
+ GROUP BY IF(accounts.host IS NULL, 'background', accounts.host);

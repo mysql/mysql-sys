@@ -18,6 +18,8 @@
  *
  * Summarizes the types of statements executed by each host.
  *
+ * When the host found is NULL, it is assumed to be a "background" thread.
+ *
  * mysql> select * from host_summary_by_statement_type;
  * +------+----------------------+--------+---------------+-------------+--------------+-----------+---------------+---------------+------------+
  * | host | statement            | total  | total_latency | max_latency | lock_latency | rows_sent | rows_examined | rows_affected | full_scans |
@@ -48,7 +50,7 @@ VIEW host_summary_by_statement_type (
   rows_affected,
   full_scans
 ) AS
-SELECT host,
+SELECT IF(host IS NULL, 'background', host) AS host,
        SUBSTRING_INDEX(event_name, '/', -1) AS statement,
        count_star AS total,
        sys.format_time(sum_timer_wait) AS total_latency,
@@ -59,14 +61,15 @@ SELECT host,
        sum_rows_affected AS rows_affected,
        sum_no_index_used + sum_no_good_index_used AS full_scans
   FROM performance_schema.events_statements_summary_by_host_by_event_name
- WHERE host IS NOT NULL
-   AND sum_timer_wait != 0
- ORDER BY host, sum_timer_wait DESC;
+ WHERE sum_timer_wait != 0
+ ORDER BY IF(host IS NULL, 'background', host), sum_timer_wait DESC;
 
 /*
  * View: x$host_summary_by_statement_type
  *
  * Summarizes the types of statements executed by each host.
+ *
+ * When the host found is NULL, it is assumed to be a "background" thread.
  *
  * mysql> select * from x$host_summary_by_statement_type;
  * +------+----------------------+--------+-----------------+----------------+----------------+-----------+---------------+---------------+------------+
@@ -98,7 +101,7 @@ VIEW x$host_summary_by_statement_type (
   rows_affected,
   full_scans
 ) AS
-SELECT host,
+SELECT IF(host IS NULL, 'background', host) AS host,
        SUBSTRING_INDEX(event_name, '/', -1) AS statement,
        count_star AS total,
        sum_timer_wait AS total_latency,
@@ -109,6 +112,5 @@ SELECT host,
        sum_rows_affected AS rows_affected,
        sum_no_index_used + sum_no_good_index_used AS full_scans
   FROM performance_schema.events_statements_summary_by_host_by_event_name
- WHERE host IS NOT NULL
-   AND sum_timer_wait != 0
- ORDER BY host, sum_timer_wait DESC;
+ WHERE sum_timer_wait != 0
+ ORDER BY IF(host IS NULL, 'background', host), sum_timer_wait DESC;
