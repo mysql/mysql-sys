@@ -31,6 +31,7 @@ SOURCE ./functions/ps_thread_stack.sql
 
 SOURCE ./views/i_s/innodb_buffer_stats_by_schema.sql
 SOURCE ./views/i_s/innodb_buffer_stats_by_table.sql
+SOURCE ./views/i_s/innodb_lock_waits.sql
 SOURCE ./views/i_s/schema_object_overview.sql
 
 SOURCE ./views/p_s/ps_check_lost_instrumentation.sql
