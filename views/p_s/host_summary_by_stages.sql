@@ -61,7 +61,7 @@ SELECT IF(host IS NULL, 'background', host) AS host,
        sys.format_time(sum_timer_wait) AS total_latency, 
        sys.format_time(avg_timer_wait) AS avg_latency 
   FROM performance_schema.events_stages_summary_by_host_by_event_name
-   AND sum_timer_wait != 0 
+ WHERE sum_timer_wait != 0
  ORDER BY IF(host IS NULL, 'background', host), sum_timer_wait DESC;
 
 /*
@@ -111,5 +111,5 @@ SELECT IF(host IS NULL, 'background', host) AS host,
        sum_timer_wait AS total_latency, 
        avg_timer_wait AS avg_latency 
   FROM performance_schema.events_stages_summary_by_host_by_event_name
-   AND sum_timer_wait != 0 
+ WHERE sum_timer_wait != 0
  ORDER BY IF(host IS NULL, 'background', host), sum_timer_wait DESC;
