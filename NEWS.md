@@ -1,5 +1,15 @@
 # Change history for the MySQL sys schema
 
+## 1.3.0 (23/10/2014)
+
+### Improvements
+
+* Added an `innodb_lock_waits` set of views, showing each thread that is waiting on a lock within InnoDB, and the blocking thread lock information (Contributed by Jesper Wisborg Krogh)
+
+### Bug Fixes
+
+* Fixed broken `host_summary_by_stages` views, broken with a last minute change before the 1.2.0 release that went unnoticed (facepalm)
+
 ## 1.2.0 (22/10/2014)
 
 ### Backwards Incompatible Changes
@@ -18,7 +28,7 @@
 * The `statements_with_full_table_scans` view now ignores any SQL that starts with `SHOW`
 * Added a script, `generate_sql_file.sh`, that can be used to generate a single SQL file, also allowing substitution of the MySQL user to use, and/or whether the `SET sql_log_bin ...` statements should be omitted.
 ** This is useful for those using RDS, where the root@localhost user is not accessible, and sql_log_bin is disabled (Issue #5)
-* Added a set `memory_by_thread_by_current_bytes` views, that summarize memory usage per thread with MySQL 5.7's memory instrumentation
+* Added a set of `memory_by_thread_by_current_bytes` views, that summarize memory usage per thread with MySQL 5.7's memory instrumentation
 * Improved each of the host specific views to return aggregate values for `background` threads, instead of ignoring them, in the same way as the user summary views
 
 ### Bug Fixes
