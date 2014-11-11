@@ -151,28 +151,30 @@ mysql> select * from innodb_buffer_stats_by_table;
 ##### Description
 
 Gives a snapshot of which InnoDB locks transactions are waiting for.
+The lock waits are order by the age of the lock descending.
 
 ##### Example
 
 ```SQL
 mysql> SELECT * FROM innodb_lock_waits\G
 *************************** 1. row ***************************
-     waiting_trx_id: 805505
-     waiting_thread: 78
-      waiting_query: UPDATE t1 SET val = 'c2' WHERE id = 3
-    waiting_lock_id: 805505:132:3:28
-  waiting_lock_mode: X
-  waiting_lock_type: RECORD
- waiting_lock_table: `db1`.`t1`
- waiting_lock_index: PRIMARY
-    blocking_trx_id: 805504
-    blocking_thread: 77
-     blocking_query: UPDATE t1 SET val = CONCAT('c1', SLEEP(10)) WHERE id = 3
-   blocking_lock_id: 805504:132:3:28
- blocking_lock_mode: X
- blocking_lock_type: RECORD
-blocking_lock_table: `db1`.`t1`
-blocking_lock_index: PRIMARY
+      wait_started: 2014-11-11 12:44:58
+          wait_age: 00:00:22
+      locked_table: `db1`.`t1`
+      locked_index: GEN_CLUST_INDEX
+    waiting_trx_id: 867105
+       waiting_pid: 3
+     waiting_query: insert into t1 values(4)
+   waiting_lock_id: 867105:2356:3:1
+ waiting_lock_mode: X
+ waiting_lock_type: RECORD
+   blocking_trx_id: 867104
+      blocking_pid: 4
+    blocking_query: NULL
+  blocking_lock_id: 867104:2356:3:1
+blocking_lock_mode: S
+blocking_lock_type: RECORD
+1 row in set (0.00 sec)
 ```
 
 #### io_by_thread_by_latency / x$io_by_thread_by_latency
