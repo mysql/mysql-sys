@@ -158,23 +158,22 @@ The lock waits are order by the age of the lock descending.
 ```SQL
 mysql> SELECT * FROM innodb_lock_waits\G
 *************************** 1. row ***************************
-      wait_started: 2014-11-11 12:44:58
-          wait_age: 00:00:22
+      wait_started: 2014-11-11 13:39:20
+          wait_age: 00:00:07
       locked_table: `db1`.`t1`
-      locked_index: GEN_CLUST_INDEX
-    waiting_trx_id: 867105
+      locked_index: PRIMARY
+       locked_type: RECORD
+    waiting_trx_id: 867158
        waiting_pid: 3
-     waiting_query: insert into t1 values(4)
-   waiting_lock_id: 867105:2356:3:1
+     waiting_query: UPDATE t1 SET val = val + 1 WHERE id = 2
+   waiting_lock_id: 867158:2363:3:3
  waiting_lock_mode: X
- waiting_lock_type: RECORD
-   blocking_trx_id: 867104
+   blocking_trx_id: 867157
       blocking_pid: 4
-    blocking_query: NULL
-  blocking_lock_id: 867104:2356:3:1
-blocking_lock_mode: S
-blocking_lock_type: RECORD
-1 row in set (0.00 sec)
+    blocking_query: UPDATE t1 SET val = val + 1 + SLEEP(10) WHERE id = 2
+  blocking_lock_id: 867157:2363:3:3
+blocking_lock_mode: X
+1 row in set (0.01 sec)
 ```
 
 #### io_by_thread_by_latency / x$io_by_thread_by_latency
