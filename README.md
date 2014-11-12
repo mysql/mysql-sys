@@ -151,7 +151,7 @@ mysql> select * from innodb_buffer_stats_by_table;
 ##### Description
 
 Gives a snapshot of which InnoDB locks transactions are waiting for.
-The lock waits are order by the age of the lock descending.
+The lock waits are ordered by the age of the lock descending.
 
 ##### Example
 

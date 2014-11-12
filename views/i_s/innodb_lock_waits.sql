@@ -17,7 +17,7 @@
  * View: innodb_lock_waits
  *
  * Give a snapshot of which InnoDB locks transactions are waiting for.
- * The lock waits are order by the age of the lock descending.
+ * The lock waits are ordered by the age of the lock descending.
  *
  * Versions: 5.1+ (5.1 requires InnoDB Plugin with I_S tables)
  *
@@ -88,7 +88,7 @@ SELECT r.trx_wait_started AS wait_started, TIMEDIFF(NOW(), r.trx_wait_started) A
  * View: x$innodb_lock_waits
  *
  * Give a snapshot of which InnoDB locks transactions are waiting for.
- * The lock waits are order by the age of the lock descending.
+ * The lock waits are ordered by the age of the lock descending.
  *
  * Versions: 5.1+ (5.1 requires InnoDB Plugin with I_S tables)
  *
