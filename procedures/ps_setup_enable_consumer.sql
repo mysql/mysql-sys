@@ -13,11 +13,11 @@
    along with this program; if not, write to the Free Software
    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA */
 
-DROP PROCEDURE IF EXISTS ps_setup_enable_consumers;
+DROP PROCEDURE IF EXISTS ps_setup_enable_consumer;
 
 DELIMITER $$
 
-CREATE DEFINER='root'@'localhost' PROCEDURE ps_setup_enable_consumers (
+CREATE DEFINER='root'@'localhost' PROCEDURE ps_setup_enable_consumer (
         IN consumer VARCHAR(128)
     )
     COMMENT '
@@ -38,7 +38,7 @@ CREATE DEFINER='root'@'localhost' PROCEDURE ps_setup_enable_consumers (
 
              To enable all consumers:
 
-             mysql> CALL sys.ps_setup_enable_consumers(\'\');
+             mysql> CALL sys.ps_setup_enable_consumer(\'\');
              +-------------------------+
              | summary                 |
              +-------------------------+
@@ -50,7 +50,7 @@ CREATE DEFINER='root'@'localhost' PROCEDURE ps_setup_enable_consumers (
 
              To enable just "waits" consumers:
 
-             mysql> CALL sys.ps_setup_enable_consumers(\'waits\');
+             mysql> CALL sys.ps_setup_enable_consumer(\'waits\');
              +-----------------------+
              | summary               |
              +-----------------------+

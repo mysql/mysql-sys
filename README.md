@@ -1777,7 +1777,7 @@ mysql> CALL sys.ps_setup_disable_instrument('');
 1 row in set (0.01 sec)
 ```
 
-#### ps_setup_disable_consumers
+#### ps_setup_disable_consumer
 
 ##### Description
 
@@ -1791,7 +1791,7 @@ Disables consumers within Performance Schema matching the input pattern.
 
 To disable all consumers:
 ```SQL
-mysql> CALL sys.ps_setup_disable_consumers('');
+mysql> CALL sys.ps_setup_disable_consumer('');
 +--------------------------+
 | summary                  |
 +--------------------------+
@@ -1802,7 +1802,7 @@ mysql> CALL sys.ps_setup_disable_consumers('');
 
 To disable just the event_stage consumers:
 ```SQL
-mysql> CALL sys.ps_setup_disable_consumers('stage');
+mysql> CALL sys.ps_setup_disable_consumer('stage');
 +------------------------+
 | summary                |
 +------------------------+
@@ -1863,7 +1863,7 @@ mysql> CALL sys.ps_setup_enable_background_threads();
 1 row in set (0.00 sec)
 ```
 
-#### ps_setup_enable_consumers
+#### ps_setup_enable_consumer
 
 ##### Description
 
@@ -1877,7 +1877,7 @@ Enables consumers within Performance Schema matching the input pattern.
 
 To enable all consumers:
 ```SQL
-mysql> CALL sys.ps_setup_enable_consumers('');
+mysql> CALL sys.ps_setup_enable_consumer('');
 +-------------------------+
 | summary                 |
 +-------------------------+
@@ -1888,7 +1888,7 @@ mysql> CALL sys.ps_setup_enable_consumers('');
 
 To enable just "waits" consumers:
 ```SQL
-mysql> CALL sys.ps_setup_enable_consumers('waits');
+mysql> CALL sys.ps_setup_enable_consumer('waits');
 +-----------------------+
 | summary               |
 +-----------------------+
