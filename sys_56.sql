@@ -84,12 +84,12 @@ SOURCE ./procedures/ps_trace_statement_digest.sql
 SOURCE ./procedures/ps_trace_thread.sql
 
 SOURCE ./procedures/ps_setup_disable_background_threads.sql
-SOURCE ./procedures/ps_setup_disable_consumers.sql
+SOURCE ./procedures/ps_setup_disable_consumer.sql
 SOURCE ./procedures/ps_setup_disable_instrument.sql
 SOURCE ./procedures/ps_setup_disable_thread.sql
 
 SOURCE ./procedures/ps_setup_enable_background_threads.sql
-SOURCE ./procedures/ps_setup_enable_consumers.sql
+SOURCE ./procedures/ps_setup_enable_consumer.sql
 SOURCE ./procedures/ps_setup_enable_instrument.sql
 SOURCE ./procedures/ps_setup_enable_thread.sql
 
