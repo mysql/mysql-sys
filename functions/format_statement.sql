@@ -27,9 +27,9 @@ CREATE DEFINER='root'@'localhost' FUNCTION format_statement (
 
              Formats a normalized statement, truncating it if it\'s > 64 characters long by default.
 
-             To configure the length to truncate the statement to by default, update the `statement_truncate_len`
+             To configure the length to truncate the statement to by default, update the `sys.statement_truncate_len`
              variable with `sys_config` table to a different value. Alternatively, to change it just for just 
-             your particular session, use `SET @statement_truncate_len := <some new value>`.
+             your particular session, use `SET @sys.statement_truncate_len := <some new value>`.
 
              Useful for printing statement related data from Performance Schema from 
              the command line.
@@ -67,12 +67,12 @@ CREATE DEFINER='root'@'localhost' FUNCTION format_statement (
     NO SQL
 BEGIN
   /* Check if we have the configured length, if not, init it */
-  IF @statement_truncate_len IS NULL THEN
-      SET @statement_truncate_len = sys_get_config('statement_truncate_len', 64);
+  IF @sys.statement_truncate_len IS NULL THEN
+      SET @sys.statement_truncate_len = sys_get_config('sys.statement_truncate_len', 64);
   END IF;
 
-  IF CHAR_LENGTH(statement) > @statement_truncate_len THEN
-      RETURN REPLACE(CONCAT(LEFT(statement, (@statement_truncate_len/2)-2), ' ... ', RIGHT(statement, (@statement_truncate_len/2)-2)), '\n', ' ');
+  IF CHAR_LENGTH(statement) > @sys.statement_truncate_len THEN
+      RETURN REPLACE(CONCAT(LEFT(statement, (@sys.statement_truncate_len/2)-2), ' ... ', RIGHT(statement, (@sys.statement_truncate_len/2)-2)), '\n', ' ');
   ELSE 
       RETURN REPLACE(statement, '\n', ' ');
   END IF;

@@ -70,4 +70,4 @@ END//
 DELIMITER ;
 
 INSERT IGNORE INTO sys_config (variable, value)
-VALUES ('statement_truncate_len', 64);
+VALUES ('sys.statement_truncate_len', 64);
