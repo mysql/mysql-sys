@@ -1648,6 +1648,37 @@ thread_stack: {"rankdir": "LR","nodesep": "0.10","stack_created": "2014-02-19 13
 ```
 
 
+#### ucfirst
+
+#### Description
+
+Takes a string and returns the same string with the first character in upper case and the remaining in lower case.
+
+##### Parameters
+
+* in_string (LONGTEXT): The string to convert
+
+##### Example
+
+```SQL
+mysql> SELECT ucfirst('no');
++---------------+
+| ucfirst('no') |
++---------------+
+| No            |
++---------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT ucfirst('YES');
++----------------+
+| ucfirst('YES') |
++----------------+
+| Yes            |
++----------------+
+1 row in set (0.00 sec)
+```
+
+
 ### Procedures
 
 #### create_synonym_db
