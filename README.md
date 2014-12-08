@@ -2530,15 +2530,16 @@ mysql> CALL sys.ps_truncate_all_tables(false);
 1 row in set (0.10 sec)
 ```
 
-#### set_sys_config
+#### sys_get_config
 
 ##### Description
 
-Sets the value for the requested variable using the following logic:
+Gets the value for the requested variable using the following logic:
 
-1. If a user variable with the name exists, then return that as the value.
-2. Otherwise if the option exists in sys.sys_config return the value from there.
-3. Else fall back on the provided default value.
+1. If the option exists in sys.sys_config return the value from there.
+2. Else fall back on the provided default value.
+             
+This will overwrite any existing value already stored in the corresponding user variable.
 
 ##### Parameters
 
@@ -2547,14 +2548,14 @@ Sets the value for the requested variable using the following logic:
 
 ##### Example
 ```SQL
-mysql> CALL sys.set_sys_config(''statement_truncate_len'', 128);
+mysql> CALL sys.sys_get_config('sys.statement_truncate_len', 128);
 Query OK, 0 rows affected (0.00 sec)
 
-mysql> SELECT @statement_truncate_len;
-+-------------------------+
-| @statement_truncate_len |
-+-------------------------+
-| 64                      |
-+-------------------------+
+mysql> SELECT @sys.statement_truncate_len;
++-----------------------------+
+| @sys.statement_truncate_len |
++-----------------------------+
+| 64                          |
++-----------------------------+
 1 row in set (0.01 sec)
 ```

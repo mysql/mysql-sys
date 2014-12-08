@@ -111,6 +111,6 @@ SOURCE ./procedures/ps_setup_show_enabled_consumers.sql
 SOURCE ./procedures/ps_setup_show_enabled_instruments.sql
 SOURCE ./procedures/ps_truncate_all_tables.sql
 
-SOURCE ./procedures/set_sys_config.sql
+SOURCE ./procedures/sys_get_config.sql
 
 SOURCE ./after_setup.sql
