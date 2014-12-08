@@ -1647,6 +1647,38 @@ thread_stack: {"rankdir": "LR","nodesep": "0.10","stack_created": "2014-02-19 13
 ...
 ```
 
+#### sys_get_config
+
+##### Description
+
+Returns the value for the requested variable using the following logic:
+
+1. If the option exists in sys.sys_config return the value from there.
+2. Else fall back on the provided default value.
+
+##### Parameters
+
+* in_variable_name (VARCHAR(128)): The name of the config option to return the value for.
+* in_default_value (VARCHAR(128)): The default value to return if neither a use variable exists nor the variable exists in sys.sys_config.
+
+##### Returns
+
+VARCHAR(128)
+
+##### Example
+```SQL
+mysql> SELECT sys.sys_get_config('sys.statement_truncate_len', 128) AS Value;
++-------+
+| Value |
++-------+
+| 64    |
++-------+
+1 row in set (0.00 sec)
+
+mysql> SET @sys.statement_truncate_len = IFNULL(@sys.statement_truncate_len, sys.sys_get_config('sys.statement_truncate_len', 128));
+Query OK, 0 rows affected (0.00 sec)
+```
+
 
 ### Procedures
 
@@ -2528,34 +2560,4 @@ mysql> CALL sys.ps_truncate_all_tables(false);
 | Truncated 44 tables |
 +---------------------+
 1 row in set (0.10 sec)
-```
-
-#### sys_get_config
-
-##### Description
-
-Gets the value for the requested variable using the following logic:
-
-1. If the option exists in sys.sys_config return the value from there.
-2. Else fall back on the provided default value.
-             
-This will overwrite any existing value already stored in the corresponding user variable.
-
-##### Parameters
-
-* in_variable_name (VARCHAR(128)): The name of the config option to return the value for.
-* in_default_value (VARCHAR(128)): The default value to return if neither a use variable exists nor the variable exists in sys.sys_config.
-
-##### Example
-```SQL
-mysql> CALL sys.sys_get_config('sys.statement_truncate_len', 128);
-Query OK, 0 rows affected (0.00 sec)
-
-mysql> SELECT @sys.statement_truncate_len;
-+-----------------------------+
-| @sys.statement_truncate_len |
-+-----------------------------+
-| 64                          |
-+-----------------------------+
-1 row in set (0.01 sec)
 ```
