@@ -60,7 +60,7 @@ SELECT sys.ucfirst(VARIABLE_NAME) AS Variable_name, VARIABLE_VALUE AS Variable_v
 ) UNION ALL (
 SELECT sys.ucfirst(NAME) AS Variable_name, COUNT AS Variable_value,
        CONCAT('InnoDB Metrics - ', SUBSYSTEM) AS Type,
-       IF(TIME_ENABLED > TIME_DISABLED OR (TIME_ENABLED IS NOT NULL AND TIME_DISABLED IS NULL), TRUE, FALSE) AS Enabled
+       IF(STATUS = 'enabled', TRUE, FALSE) AS Enabled
   FROM information_schema.INNODB_METRICS
 ) UNION ALL (
 SELECT 'NOW()' AS Variable_name, NOW(3) AS Variable_value, 'System Time' AS Type, TRUE AS Enabled
