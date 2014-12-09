@@ -43,7 +43,7 @@ VIEW host_summary (
   file_io_latency,
   current_connections,
   total_connections,
-  unique_hosts
+  unique_users
 ) AS
 SELECT IF(accounts.host IS NULL, 'background', accounts.host) AS host,
        SUM(stmt.total) AS statements,
@@ -90,7 +90,7 @@ VIEW x$host_summary (
   file_io_latency,
   current_connections,
   total_connections,
-  unique_hosts
+  unique_users
 ) AS
 SELECT IF(accounts.host IS NULL, 'background', accounts.host) AS host,
        SUM(stmt.total) AS statements,
