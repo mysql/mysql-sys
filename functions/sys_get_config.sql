@@ -49,7 +49,7 @@ CREATE DEFINER='root'@'localhost' FUNCTION sys_get_config (
              Example
              -----------
 
-             mysql> SELECT sys.sys_get_config(''sys.statement_truncate_len'', 128) AS Value;
+             mysql> SELECT sys.sys_get_config(''statement_truncate_len'', 128) AS Value;
              +-------+
              | Value |
              +-------+
@@ -57,7 +57,7 @@ CREATE DEFINER='root'@'localhost' FUNCTION sys_get_config (
              +-------+
              1 row in set (0.00 sec)
 
-             mysql> SET @sys.statement_truncate_len = IFNULL(@sys.statement_truncate_len, sys.sys_get_config(''sys.statement_truncate_len'', 128));
+             mysql> SET @sys.statement_truncate_len = IFNULL(@statement_truncate_len, sys.sys_get_config(''statement_truncate_len'', 128));
              Query OK, 0 rows affected (0.00 sec)
             '
     SQL SECURITY INVOKER

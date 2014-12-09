@@ -74,9 +74,9 @@ Note, when functions check for configuration options, they first check whether a
 
 ##### Options included
 
-| Variable                   | Default Value | Description                                                                    |
-| -------------------------- | ------------- | ------------------------------------------------------------------------------ |
-| sys.statement_truncate_len | 64            | Sets the size to truncate statements to, for the `format_statement()` function |
+| Variable               | Default Value | Description                                                                    |
+| ---------------------- | ------------- | ------------------------------------------------------------------------------ |
+| statement_truncate_len | 64            | Sets the size to truncate statements to, for the `format_statement()` function |
 
 ### Views
 
@@ -1442,7 +1442,7 @@ mysql> select format_path('/Users/mark/sandboxes/SmallTree/AMaster/data/mysql/pr
 
 Formats a normalized statement, truncating it if it's > 64 characters long by default.
 
-To configure the length to truncate the statement to by default, update the `sys.statement_truncate_len` variable with `sys_config` table to a different value. Alternatively, to change it just for just your particular session, use `SET @sys.statement_truncate_len := <some new value>`.
+To configure the length to truncate the statement to by default, update the `statement_truncate_len` variable with `sys_config` table to a different value. Alternatively, to change it just for just your particular session, use `SET @sys.statement_truncate_len := <some new value>`.
 
 Useful for printing statement related data from Performance Schema from the command line.
 
@@ -1667,7 +1667,7 @@ VARCHAR(128)
 
 ##### Example
 ```SQL
-mysql> SELECT sys.sys_get_config('sys.statement_truncate_len', 128) AS Value;
+mysql> SELECT sys.sys_get_config('statement_truncate_len', 128) AS Value;
 +-------+
 | Value |
 +-------+
@@ -1675,7 +1675,7 @@ mysql> SELECT sys.sys_get_config('sys.statement_truncate_len', 128) AS Value;
 +-------+
 1 row in set (0.00 sec)
 
-mysql> SET @sys.statement_truncate_len = IFNULL(@sys.statement_truncate_len, sys.sys_get_config('sys.statement_truncate_len', 128));
+mysql> SET @sys.statement_truncate_len = IFNULL(@sys.statement_truncate_len, sys.sys_get_config('statement_truncate_len', 128));
 Query OK, 0 rows affected (0.00 sec)
 ```
 
