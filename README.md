@@ -419,25 +419,26 @@ Creates a union of the two Information Schema views GLOBAL_STATUS and INNODB_MET
 
 ```SQL
 mysql> SELECT * FROM sys.metrics WHERE Enabled;
-+--------------------------------------+-----------------------------------------------+---------+-------------------------+
-| Type                                 | Variable_name                                 | Enabled | Variable_value          |
-+--------------------------------------+-----------------------------------------------+---------+-------------------------+
-| Global Status                        | Aborted_clients                               |       1 | 0                       |
-| Global Status                        | Aborted_connects                              |       1 | 0                       |
-| Global Status                        | Binlog_cache_disk_use                         |       1 | 0                       |
-| Global Status                        | Binlog_cache_use                              |       1 | 0                       |
-| Global Status                        | Binlog_stmt_cache_disk_use                    |       1 | 0                       |
-| Global Status                        | Binlog_stmt_cache_use                         |       1 | 2                       |
-| Global Status                        | Bytes_received                                |       1 | 9350                    |
-| Global Status                        | Bytes_sent                                    |       1 | 320264                  |
-...
-| InnoDB Metrics - server              | Innodb_rwlock_x_os_waits                      |       1 | 0                       |
-| InnoDB Metrics - server              | Innodb_rwlock_x_spin_rounds                   |       1 | 18511                   |
-| InnoDB Metrics - server              | Innodb_rwlock_x_spin_waits                    |       1 | 0                       |
-| InnoDB Metrics - transaction         | Trx_rseg_history_len                          |       1 | 8                       |
-| System Time                          | NOW()                                         |       1 | 2014-12-08 15:17:34.482 |
-| System Time                          | UNIX_TIMESTAMP()                              |       1 | 1418012254.482          |
-+--------------------------------------+-----------------------------------------------+---------+-------------------------+
+SELECT * FROM sys.metrics WHERE Enabled;
++-----------------------------------------------+-------------------------+--------------------------------------+---------+
+| Variable_name                                 | Variable_value          | Type                                 | Enabled |
++-----------------------------------------------+-------------------------+--------------------------------------+---------+
+| Aborted_clients                               | 0                       | Global Status                        |       1 |
+| Aborted_connects                              | 0                       | Global Status                        |       1 |
+| Binlog_cache_disk_use                         | 0                       | Global Status                        |       1 |
+| Binlog_cache_use                              | 1                       | Global Status                        |       1 |
+| Binlog_stmt_cache_disk_use                    | 0                       | Global Status                        |       1 |
+| Binlog_stmt_cache_use                         | 17                      | Global Status                        |       1 |
+| Bytes_received                                | 2303731                 | Global Status                        |       1 |
+| Bytes_sent                                    | 371026                  | Global Status                        |       1 |
+ * ...
+| Innodb_rwlock_x_os_waits                      | 0                       | InnoDB Metrics - server              |       1 |
+| Innodb_rwlock_x_spin_rounds                   | 34247                   | InnoDB Metrics - server              |       1 |
+| Innodb_rwlock_x_spin_waits                    | 0                       | InnoDB Metrics - server              |       1 |
+| Trx_rseg_history_len                          | 2535                    | InnoDB Metrics - transaction         |       1 |
+| NOW()                                         | 2014-12-09 11:23:06.838 | System Time                          |       1 |
+| UNIX_TIMESTAMP()                              | 1418084586.838          | System Time                          |       1 |
++-----------------------------------------------+-------------------------+--------------------------------------+---------+
 420 rows in set (0.05 sec)
 ```
 
