@@ -44,7 +44,7 @@ VIEW host_summary (
   file_io_latency,
   current_connections,
   total_connections,
-  unique_hosts,
+  unique_users,
   current_memory,
   total_memory_allocated
 ) AS
