@@ -28,6 +28,7 @@ SOURCE ./functions/ps_is_instrument_default_enabled.sql
 SOURCE ./functions/ps_is_instrument_default_timed.sql
 SOURCE ./functions/ps_thread_id.sql
 SOURCE ./functions/ps_thread_stack.sql
+SOURCE ./functions/sys_get_config.sql
 
 SOURCE ./views/i_s/innodb_buffer_stats_by_schema.sql
 SOURCE ./views/i_s/innodb_buffer_stats_by_table.sql
