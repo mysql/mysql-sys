@@ -409,6 +409,39 @@ mysql> select * from memory_global_total;
 +-----------------+
 ```
 
+#### metrics
+
+##### Description
+
+Creates a union of the two Information Schema views GLOBAL_STATUS and INNODB_METRICS as well as includes information about when the view was outputted.
+
+##### Example
+
+```SQL
+mysql> SELECT * FROM sys.metrics WHERE Enabled;
+SELECT * FROM sys.metrics WHERE Enabled;
++-----------------------------------------------+-------------------------+--------------------------------------+---------+
+| Variable_name                                 | Variable_value          | Type                                 | Enabled |
++-----------------------------------------------+-------------------------+--------------------------------------+---------+
+| Aborted_clients                               | 0                       | Global Status                        |       1 |
+| Aborted_connects                              | 0                       | Global Status                        |       1 |
+| Binlog_cache_disk_use                         | 0                       | Global Status                        |       1 |
+| Binlog_cache_use                              | 1                       | Global Status                        |       1 |
+| Binlog_stmt_cache_disk_use                    | 0                       | Global Status                        |       1 |
+| Binlog_stmt_cache_use                         | 17                      | Global Status                        |       1 |
+| Bytes_received                                | 2303731                 | Global Status                        |       1 |
+| Bytes_sent                                    | 371026                  | Global Status                        |       1 |
+ * ...
+| Innodb_rwlock_x_os_waits                      | 0                       | InnoDB Metrics - server              |       1 |
+| Innodb_rwlock_x_spin_rounds                   | 34247                   | InnoDB Metrics - server              |       1 |
+| Innodb_rwlock_x_spin_waits                    | 0                       | InnoDB Metrics - server              |       1 |
+| Trx_rseg_history_len                          | 2535                    | InnoDB Metrics - transaction         |       1 |
+| NOW()                                         | 2014-12-09 11:23:06.838 | System Time                          |       1 |
+| UNIX_TIMESTAMP()                              | 1418084586.838          | System Time                          |       1 |
++-----------------------------------------------+-------------------------+--------------------------------------+---------+
+420 rows in set (0.05 sec)
+```
+
 #### processlist / x$processlist
 
 ##### Description
@@ -1645,6 +1678,37 @@ thread_stack: {"rankdir": "LR","nodesep": "0.10","stack_created": "2014-02-19 13
 [{"nesting_event_id": "0", "event_id": "10", "timer_wait": 256.35, "event_info": 
 "sql/select", "wait_info": "select @@version_comment limit 1\nerrors: 0\nwarnings: 0\nlock time:
 ...
+```
+
+
+#### ucfirst
+
+#### Description
+
+Takes a string and returns the same string with the first character in upper case and the remaining in lower case.
+
+##### Parameters
+
+* in_string (LONGTEXT): The string to convert
+
+##### Example
+
+```SQL
+mysql> SELECT ucfirst('no');
++---------------+
+| ucfirst('no') |
++---------------+
+| No            |
++---------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT ucfirst('YES');
++----------------+
+| ucfirst('YES') |
++----------------+
+| Yes            |
++----------------+
+1 row in set (0.00 sec)
 ```
 
 
