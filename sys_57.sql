@@ -28,11 +28,13 @@ SOURCE ./functions/ps_is_instrument_default_enabled.sql
 SOURCE ./functions/ps_is_instrument_default_timed.sql
 SOURCE ./functions/ps_thread_id.sql
 SOURCE ./functions/ps_thread_stack.sql
+SOURCE ./functions/ucfirst.sql
 SOURCE ./functions/sys_get_config.sql
 
 SOURCE ./views/i_s/innodb_buffer_stats_by_schema.sql
 SOURCE ./views/i_s/innodb_buffer_stats_by_table.sql
 SOURCE ./views/i_s/innodb_lock_waits.sql
+SOURCE ./views/i_s/metrics.sql
 SOURCE ./views/i_s/schema_object_overview.sql
 
 SOURCE ./views/p_s/ps_check_lost_instrumentation.sql
