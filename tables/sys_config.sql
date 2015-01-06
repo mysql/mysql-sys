@@ -34,9 +34,9 @@ CREATE TABLE IF NOT EXISTS sys_config (
 --
 --
 
-DELIMITER //
+DELIMITER $$
 
-DROP TRIGGER IF EXISTS sys_config_update_set_user//
+DROP TRIGGER IF EXISTS sys_config_update_set_user$$
 
 CREATE TRIGGER sys_config_update_set_user BEFORE UPDATE on sys_config
     FOR EACH ROW
@@ -44,7 +44,7 @@ BEGIN
     IF NEW.set_by IS NULL THEN
         SET NEW.set_by = USER();
     END IF;
-END//
+END$$
 
 DELIMITER ;
 
@@ -55,9 +55,9 @@ DELIMITER ;
 --
 --
 
-DELIMITER //
+DELIMITER $$
 
-DROP TRIGGER IF EXISTS sys_config_insert_set_user//
+DROP TRIGGER IF EXISTS sys_config_insert_set_user$$
 
 CREATE TRIGGER sys_config_insert_set_user BEFORE INSERT on sys_config
     FOR EACH ROW
@@ -65,9 +65,9 @@ BEGIN
     IF NEW.set_by IS NULL THEN
         SET NEW.set_by = USER();
     END IF;
-END//
+END$$
 
 DELIMITER ;
 
-INSERT IGNORE INTO sys_config (variable, value)
-VALUES ('statement_truncate_len', 64);
+INSERT IGNORE INTO sys_config (variable, value) VALUES ('statement_truncate_len', 64);
+
