@@ -1,5 +1,34 @@
 # Change history for the MySQL sys schema
 
+## 1.4.0 (not yet released)
+
+### Backwards Incompatible Changes
+
+* The `memory_global_by_current_allocated` views were renamed to `memory_global_by_current_bytes` for consistency with the other memory views
+* The `ps_setup_enable_consumers` procedure was renamed to `ps_setup_disable_consumer` for naming consistency (everything is now singular, not plural)
+
+### Improvements
+
+* The innodb_lock_waits/x$innodb_lock_waits views were improved (Contributed by Jesper Wisborg Krogh)
+** Add the wait_started column
+** Add the wait_age column
+** Order the result set so the oldest lock waits are first
+** The waiting_table and waiting_index will always be the same as the blocking_table and blocking_index. So the blocking_% columns have been removed and the waiting_% columns have been renamed to locked_%
+** The waiting_lock_typeand blocking_lock_type will also always the same. So these were removed and replaced with a single locked_type column
+** Rename the waiting_thread and blocking_thread to waiting_pid and blocking_pid respectively to avoid confusion with the threads from the Performance Schema.
+
+### Bug Fixes
+
+
+### Implementation Details
+
+Various changes were made to allow better generation of integration sql files:
+
+* The formatting for all comments has been standardized on -- line comments. C-style /* comments */ have been removed
+** Issue #35 had one instance of this resolved in this release (contributed by Joe Grasse), but the entire code base has now been done
+* Each object has been created within it's own file. No longer do x$ views live with their non-x$ counterparts
+* DELIMITERs were standardized to $$
+
 ## 1.3.0 (23/10/2014)
 
 ### Improvements
