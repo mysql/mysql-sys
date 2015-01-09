@@ -1,5 +1,5 @@
 #!/bin/bash
-#  Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+#  Copyright (c) 2014, 2015, Oracle and/or its affiliates. All rights reserved.
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -15,12 +15,22 @@
 #  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 OS=`uname`
+SYSDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+PWD=$( pwd )
 
 # Grab the current sys version
-SYSVERSIONTMP=`cat ./before_setup.sql | grep sys_version | awk '{print $8}'`
+SYSVERSIONTMP=`cat $SYSDIR/before_setup.sql | grep sys_version | awk '{print $17}'`
 SYSVERSION=`echo "${SYSVERSIONTMP//\'}"`
 
 MYSQLUSER="'root'@'localhost'"
+
+# Recursive sed
+if [ $OS == "Darwin" ] ;
+then
+  SED_R="sed -E"
+else
+  SED_R="sed -r"
+fi
 
 USAGE="
 Options:
@@ -32,6 +42,8 @@ Options:
 
     u: The user to set as the owner of the objects (useful for RDS)
 
+    m: Whether to generate a mysql_install_db / mysqld --bootstrap formatted file
+
 Examples:
 ================
 
@@ -42,10 +54,14 @@ Generate a MySQL 5.7 SQL file that uses the 'mark'@'localhost' user:
 Generate a MySQL 5.6 SQL file for RDS:
 
     $0 -v 56 -b -u CURRENT_USER
+
+Generate a MySQL 5.7 bootstrap file:
+
+    $0 -v 57 -m
 "
 
 # Grab options
-while getopts ":v:hbu:" opt; do
+while getopts ":v:bhmu:" opt; do
   case $opt in
     b)
       SKIPBINLOG=true
@@ -53,6 +69,9 @@ while getopts ":v:hbu:" opt; do
     h)
       echo $"$USAGE"
       exit 0
+      ;;
+    m)
+      MYSQLCOMPAT=true
       ;;
     u)
       MYSQLUSER="${OPTARG}"
@@ -83,32 +102,85 @@ done
 if [[ -z "$MYSQLVERSION" ]] ;
 then
   echo "  -v (MySQL Version) parameter required, please run again with either '-v 56' or '-v 57'"
+  echo $"$USAGE"
   exit 1
 fi
 
 # Create output file name
-OUTPUTFILE="sys_${SYSVERSION}_${MYSQLVERSION}_inline.sql"
-
-# Create the initial output file
-if [ $OS == "Darwin" ] ;
+if [[ ! -z "$MYSQLCOMPAT" ]] ;
 then
-  cat "./sys_$MYSQLVERSION.sql" | tr -d '\r' | grep 'SOURCE' | sed -E 's .{8}  ' | sed 's/^/./' | \
-      xargs sed -e "s/'root'@'localhost'/$MYSQLUSER/g" > "temp_${OUTPUTFILE}"
+  OUTPUTFILE="mysql_sys_schema.sql"
 else
-  cat "./sys_$MYSQLVERSION.sql" | tr -d '\r' | grep 'SOURCE' | sed -r 's .{8}  ' | sed 's/^/./' | \
-      xargs sed -e "s/'root'@'localhost'/$MYSQLUSER/g" > "temp_${OUTPUTFILE}"
+  OUTPUTFILE="sys_${SYSVERSION}_${MYSQLVERSION}_inline.sql"
 fi
 
-# Strip copyrights, retaining the first one
-head -n 15 "temp_${OUTPUTFILE}" > $OUTPUTFILE
-sed -e '/Copyright/,/51 Franklin St/d' "temp_${OUTPUTFILE}" >> $OUTPUTFILE
-rm "temp_${OUTPUTFILE}"
+# Create the initial output file
+if [[ ! -z "$MYSQLCOMPAT" ]] ;
+then
+  # Pre-process all the files in a copied temp directory
+  if [[ ! -d $SYSDIR/tmpgen ]] ;
+  then
+    mkdir $SYSDIR/tmpgen
+  fi
+  cd $SYSDIR/tmpgen
+  rm -rf *
+  cp -r ../after_setup.sql ../tables ../triggers ../functions ../views ../procedures .
+
+  # Switch user if requested
+  # Remove individual copyrights
+  # Replace newlines in COMMENTs with literal \n
+  # Drop added trailing \n <sad panda>
+  # Remove DELIMITER commands
+  # Remove DROP commands (other than DROP TEMPORARY TABLE)
+  # Replace $$ delimiter with ;
+  # Remove more than one empty line
+  # Remove leading spaces
+  # Remove -- line comments *after removing leading spaces*
+  for file in `find . -name '*.sql'`; do
+    sed -i -e "s/'root'@'localhost'/$MYSQLUSER/g" $file
+    sed -i -e "/Copyright/,/51 Franklin St/d" $file
+    sed -i -e "/COMMENT/,/            '/{G;s/\n/\\\n/g;}" $file
+    sed -i -e "s/            '\\\n/            '/g" $file
+    sed -i -e "/^DELIMITER/d" $file
+    sed -i -e "/^DROP PROCEDURE/d;/^DROP FUNCTION/d;/^DROP TRIGGER/d" $file
+    sed -i -e "s/\\$\\$/;/g" $file
+    sed -i -e "/^$/N;/^\n$/D" $file
+    sed -i -e "s/^ *//g" $file
+    sed -i -e "/^--/d" $file
+  done
+
+  # Start the output file from a non-removed copyright file
+  sed -e "/sql_log_bin/d" ../before_setup.sql > $OUTPUTFILE
+  echo "" >> $OUTPUTFILE
+
+  # Add the files in install file order, removing new lines along the way
+  cat "../sys_$MYSQLVERSION.sql" | tr -d '\r' | grep 'SOURCE' | grep -v before_setup | grep -v after_setup | $SED_R 's .{8}  ' | sed 's/^/./' >  "./sys_$MYSQLVERSION.sql"
+  while read file; do
+      cat $file | tr '\n' ' ' >> $OUTPUTFILE
+      echo "" >> $OUTPUTFILE
+      echo "" >> $OUTPUTFILE
+  done < "./sys_$MYSQLVERSION.sql"
+
+  # Does essentially nothing right now, but may in future
+  sed -e "/sql_log_bin/d" ./after_setup.sql >> $OUTPUTFILE
+
+  # Remove final leading spaces
+  sed -i -e "s/^ *//g" $OUTPUTFILE
+
+  # Move the generated file to root and clean up
+  mv $OUTPUTFILE $SYSDIR/
+  cd $PWD
+  rm -rf $SYSDIR/tmpgen/
+else
+  cat $SYSDIR/before_setup.sql > $SYSDIR/$OUTPUTFILE
+  cat "./sys_$MYSQLVERSION.sql" | tr -d '\r' | grep 'SOURCE' | $SED_R 's .{8}  ' | sed 's/^/./' | grep -v before_setup | \
+    xargs sed -e "/Copyright/,/51 Franklin St/d;s/'root'@'localhost'/$MYSQLUSER/g" >> $SYSDIR/$OUTPUTFILE
+fi
 
 # Check if sql_log_bin lines should be removed
 if [[ ! -z "$SKIPBINLOG" ]] ;
 then
-  sed -e "/sql_log_bin/d" $OUTPUTFILE > "temp_${OUTPUTFILE}"
-  mv "temp_${OUTPUTFILE}" $OUTPUTFILE
+  sed -i -e "/sql_log_bin/d" $SYSDIR/$OUTPUTFILE
   SKIPBINLOG="disabled"
 else
   SKIPBINLOG="enabled"
@@ -116,7 +188,7 @@ fi
 
 # Print summary
 echo $"
-       Wrote: $OUTPUTFILE
-        User: $MYSQLUSER
- sql_log_bin: $SKIPBINLOG
+    Wrote file: $SYSDIR/$OUTPUTFILE
+Object Definer: $MYSQLUSER
+   sql_log_bin: $SKIPBINLOG
  "
