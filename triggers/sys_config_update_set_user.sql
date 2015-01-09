@@ -20,11 +20,12 @@
 --
 --
 
+
+DROP TRIGGER IF EXISTS sys_config_update_set_user;
+
 DELIMITER $$
 
-DROP TRIGGER IF EXISTS sys_config_update_set_user$$
-
-CREATE TRIGGER sys_config_update_set_user BEFORE UPDATE on sys_config
+CREATE DEFINER='root'@'localhost' TRIGGER sys_config_update_set_user BEFORE UPDATE on sys_config
     FOR EACH ROW
 BEGIN
     IF NEW.set_by IS NULL THEN
