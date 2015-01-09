@@ -1,4 +1,4 @@
--- Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+-- Copyright (c) 2014, 2015, Oracle and/or its affiliates. All rights reserved.
 --
 -- This program is free software; you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -16,6 +16,10 @@
 SOURCE ./before_setup.sql
 
 SOURCE ./tables/sys_config.sql
+SOURCE ./tables/sys_config_data.sql
+
+SOURCE ./triggers/sys_config_insert_set_user.sql
+SOURCE ./triggers/sys_config_update_set_user.sql
 
 SOURCE ./functions/extract_schema_from_file_name.sql
 SOURCE ./functions/extract_table_from_file_name.sql
@@ -31,59 +35,104 @@ SOURCE ./functions/ps_thread_stack.sql
 SOURCE ./functions/sys_get_config.sql
 
 SOURCE ./views/i_s/innodb_buffer_stats_by_schema.sql
+SOURCE ./views/i_s/x_innodb_buffer_stats_by_schema.sql
 SOURCE ./views/i_s/innodb_buffer_stats_by_table.sql
+SOURCE ./views/i_s/x_innodb_buffer_stats_by_table.sql
 SOURCE ./views/i_s/innodb_lock_waits.sql
+SOURCE ./views/i_s/x_innodb_lock_waits.sql
 SOURCE ./views/i_s/schema_object_overview.sql
 
 SOURCE ./views/p_s/ps_check_lost_instrumentation.sql
 
 SOURCE ./views/p_s/latest_file_io.sql
+SOURCE ./views/p_s/x_latest_file_io.sql
 SOURCE ./views/p_s/io_by_thread_by_latency.sql
+SOURCE ./views/p_s/x_io_by_thread_by_latency.sql
 SOURCE ./views/p_s/io_global_by_file_by_bytes.sql
+SOURCE ./views/p_s/x_io_global_by_file_by_bytes.sql
 SOURCE ./views/p_s/io_global_by_file_by_latency.sql
+SOURCE ./views/p_s/x_io_global_by_file_by_latency.sql
 SOURCE ./views/p_s/io_global_by_wait_by_bytes.sql
+SOURCE ./views/p_s/x_io_global_by_wait_by_bytes.sql
 SOURCE ./views/p_s/io_global_by_wait_by_latency.sql
+SOURCE ./views/p_s/x_io_global_by_wait_by_latency.sql
 
-SOURCE ./views/p_s/memory_by_user.sql
-SOURCE ./views/p_s/memory_by_host.sql
-SOURCE ./views/p_s/memory_by_thread.sql
-SOURCE ./views/p_s/memory_global_by_current_allocated.sql
+SOURCE ./views/p_s/memory_by_user_by_current_bytes.sql
+SOURCE ./views/p_s/x_memory_by_user_by_current_bytes.sql
+SOURCE ./views/p_s/memory_by_host_by_current_bytes.sql
+SOURCE ./views/p_s/x_memory_by_host_by_current_bytes.sql
+SOURCE ./views/p_s/memory_by_thread_by_current_bytes.sql
+SOURCE ./views/p_s/x_memory_by_thread_by_current_bytes.sql
+SOURCE ./views/p_s/memory_global_by_current_bytes.sql
+SOURCE ./views/p_s/x_memory_global_by_current_bytes.sql
 SOURCE ./views/p_s/memory_global_total.sql
+SOURCE ./views/p_s/x_memory_global_total.sql
 
 SOURCE ./views/p_s/schema_index_statistics.sql
+SOURCE ./views/p_s/x_schema_index_statistics.sql
+SOURCE ./views/p_s/x_ps_schema_table_statistics_io.sql
 SOURCE ./views/p_s/schema_table_statistics.sql
+SOURCE ./views/p_s/x_schema_table_statistics.sql
 SOURCE ./views/p_s/schema_table_statistics_with_buffer.sql
+SOURCE ./views/p_s/x_schema_table_statistics_with_buffer.sql
 SOURCE ./views/p_s/schema_tables_with_full_table_scans.sql
+SOURCE ./views/p_s/x_schema_tables_with_full_table_scans.sql
 SOURCE ./views/p_s/schema_unused_indexes.sql
 
 SOURCE ./views/p_s/statement_analysis.sql
+SOURCE ./views/p_s/x_statement_analysis.sql
 SOURCE ./views/p_s/statements_with_errors_or_warnings.sql
+SOURCE ./views/p_s/x_statements_with_errors_or_warnings.sql
 SOURCE ./views/p_s/statements_with_full_table_scans.sql
+SOURCE ./views/p_s/x_statements_with_full_table_scans.sql
+SOURCE ./views/p_s/x_ps_digest_avg_latency_distribution.sql
+SOURCE ./views/p_s/x_ps_digest_95th_percentile_by_avg_us.sql
 SOURCE ./views/p_s/statements_with_runtimes_in_95th_percentile.sql
+SOURCE ./views/p_s/x_statements_with_runtimes_in_95th_percentile.sql
 SOURCE ./views/p_s/statements_with_sorting.sql
+SOURCE ./views/p_s/x_statements_with_sorting.sql
 SOURCE ./views/p_s/statements_with_temp_tables.sql
+SOURCE ./views/p_s/x_statements_with_temp_tables.sql
 
 SOURCE ./views/p_s/user_summary_by_file_io_type.sql
+SOURCE ./views/p_s/x_user_summary_by_file_io_type.sql
 SOURCE ./views/p_s/user_summary_by_file_io.sql
+SOURCE ./views/p_s/x_user_summary_by_file_io.sql
 SOURCE ./views/p_s/user_summary_by_statement_type.sql
+SOURCE ./views/p_s/x_user_summary_by_statement_type.sql
 SOURCE ./views/p_s/user_summary_by_statement_latency.sql
+SOURCE ./views/p_s/x_user_summary_by_statement_latency.sql
 SOURCE ./views/p_s/user_summary_by_stages.sql
+SOURCE ./views/p_s/x_user_summary_by_stages.sql
 SOURCE ./views/p_s/user_summary_57.sql
+SOURCE ./views/p_s/x_user_summary_57.sql
 
 SOURCE ./views/p_s/host_summary_by_file_io_type.sql
+SOURCE ./views/p_s/x_host_summary_by_file_io_type.sql
 SOURCE ./views/p_s/host_summary_by_file_io.sql
+SOURCE ./views/p_s/x_host_summary_by_file_io.sql
 SOURCE ./views/p_s/host_summary_by_statement_type.sql
+SOURCE ./views/p_s/x_host_summary_by_statement_type.sql
 SOURCE ./views/p_s/host_summary_by_statement_latency.sql
+SOURCE ./views/p_s/x_host_summary_by_statement_latency.sql
 SOURCE ./views/p_s/host_summary_by_stages.sql
+SOURCE ./views/p_s/x_host_summary_by_stages.sql
 SOURCE ./views/p_s/host_summary_57.sql
+SOURCE ./views/p_s/x_host_summary_57.sql
 
 SOURCE ./views/p_s/wait_classes_global_by_avg_latency.sql
+SOURCE ./views/p_s/x_wait_classes_global_by_avg_latency.sql
 SOURCE ./views/p_s/wait_classes_global_by_latency.sql
+SOURCE ./views/p_s/x_wait_classes_global_by_latency.sql
 SOURCE ./views/p_s/waits_by_user_by_latency.sql
+SOURCE ./views/p_s/x_waits_by_user_by_latency.sql
 SOURCE ./views/p_s/waits_by_host_by_latency.sql
+SOURCE ./views/p_s/x_waits_by_host_by_latency.sql
 SOURCE ./views/p_s/waits_global_by_latency.sql
+SOURCE ./views/p_s/x_waits_global_by_latency.sql
 
 SOURCE ./views/p_s/processlist_57.sql
+SOURCE ./views/p_s/x_processlist_57.sql
 
 SOURCE ./procedures/create_synonym_db.sql
 
@@ -102,7 +151,9 @@ SOURCE ./procedures/ps_setup_enable_instrument.sql
 SOURCE ./procedures/ps_setup_enable_thread.sql
 
 SOURCE ./procedures/ps_setup_reload_saved.sql
+SOURCE ./procedures/ps_setup_reset_to_default_57_before.sql
 SOURCE ./procedures/ps_setup_reset_to_default_57.sql
+SOURCE ./procedures/ps_setup_reset_to_default_57_after.sql
 SOURCE ./procedures/ps_setup_save.sql
 SOURCE ./procedures/ps_setup_show_disabled.sql
 SOURCE ./procedures/ps_setup_show_disabled_consumers.sql
