@@ -18,9 +18,11 @@ DROP FUNCTION IF EXISTS format_time;
 DELIMITER $$
 
 CREATE DEFINER='root'@'localhost' FUNCTION format_time (
-        picoseconds BIGINT UNSIGNED
+        -- We feed in and return TEXT here, as aggregates of
+        -- picoseconds can return numbers larger than BIGINT UNSIGNED
+        picoseconds TEXT
     )
-    RETURNS VARCHAR(16) CHARSET UTF8
+    RETURNS TEXT CHARSET UTF8
     COMMENT '
              Description
              -----------
@@ -57,7 +59,7 @@ CREATE DEFINER='root'@'localhost' FUNCTION format_time (
              +------------------------+
              | format_time(342342342) |
              +------------------------+
-             | 342.34 µs              |
+             | 342.34 us              |
              +------------------------+
              1 row in set (0.00 sec)
 
@@ -74,8 +76,10 @@ CREATE DEFINER='root'@'localhost' FUNCTION format_time (
     NO SQL
 BEGIN
   IF picoseconds IS NULL THEN RETURN NULL;
+  ELSEIF picoseconds >= 604800000000000000 THEN RETURN CONCAT(ROUND(picoseconds / 604800000000000000, 2), ' w');
+  ELSEIF picoseconds >= 86400000000000000 THEN RETURN CONCAT(ROUND(picoseconds / 86400000000000000, 2), ' d');
   ELSEIF picoseconds >= 3600000000000000 THEN RETURN CONCAT(ROUND(picoseconds / 3600000000000000, 2), ' h');
-  ELSEIF picoseconds >= 60000000000000 THEN RETURN SEC_TO_TIME(ROUND(picoseconds / 1000000000000, 2));
+  ELSEIF picoseconds >= 60000000000000 THEN RETURN CONCAT(ROUND(picoseconds / 60000000000000, 2), ' m');
   ELSEIF picoseconds >= 1000000000000 THEN RETURN CONCAT(ROUND(picoseconds / 1000000000000, 2), ' s');
   ELSEIF picoseconds >= 1000000000 THEN RETURN CONCAT(ROUND(picoseconds / 1000000000, 2), ' ms');
   ELSEIF picoseconds >= 1000000 THEN RETURN CONCAT(ROUND(picoseconds / 1000000, 2), ' us');
