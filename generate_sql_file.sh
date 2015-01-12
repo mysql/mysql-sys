@@ -40,9 +40,9 @@ Options:
 
     b: Whether to omit any lines that deal with sql_log_bin (useful for RDS)
 
-    u: The user to set as the owner of the objects (useful for RDS)
-
     m: Whether to generate a mysql_install_db / mysqld --bootstrap formatted file
+
+    u: The user to set as the owner of the objects (useful for RDS)
 
 Examples:
 ================
@@ -131,9 +131,7 @@ then
   # Replace newlines in COMMENTs with literal \n
   # Drop added trailing \n <sad panda>
   # Remove DELIMITER commands
-  # Remove DROP commands (other than DROP TEMPORARY TABLE)
   # Replace $$ delimiter with ;
-  # Remove more than one empty line
   # Remove leading spaces
   # Remove -- line comments *after removing leading spaces*
   for file in `find . -name '*.sql'`; do
@@ -142,9 +140,7 @@ then
     sed -i -e "/COMMENT/,/            '/{G;s/\n/\\\n/g;}" $file
     sed -i -e "s/            '\\\n/            '/g" $file
     sed -i -e "/^DELIMITER/d" $file
-    sed -i -e "/^DROP PROCEDURE/d;/^DROP FUNCTION/d;/^DROP TRIGGER/d" $file
     sed -i -e "s/\\$\\$/;/g" $file
-    sed -i -e "/^$/N;/^\n$/D" $file
     sed -i -e "s/^ *//g" $file
     sed -i -e "/^--/d" $file
   done
@@ -156,6 +152,12 @@ then
   # Add the files in install file order, removing new lines along the way
   cat "../sys_$MYSQLVERSION.sql" | tr -d '\r' | grep 'SOURCE' | grep -v before_setup | grep -v after_setup | $SED_R 's .{8}  ' | sed 's/^/./' >  "./sys_$MYSQLVERSION.sql"
   while read file; do
+      # First try and get a DROP command
+      grep -E '(^DROP PROCEDURE|^DROP FUNCTION|^DROP TRIGGER)' $file >> $OUTPUTFILE
+      # And remove any that may exist (but keep DROP TEMPORARY TABLE)
+      sed -i -e "/^DROP PROCEDURE/d;/^DROP FUNCTION/d;/^DROP TRIGGER/d" $file
+      echo "" >> $OUTPUTFILE
+      # Then collapse the rest of the file
       cat $file | tr '\n' ' ' >> $OUTPUTFILE
       echo "" >> $OUTPUTFILE
       echo "" >> $OUTPUTFILE
@@ -166,6 +168,8 @@ then
 
   # Remove final leading spaces
   sed -i -e "s/^ *//g" $OUTPUTFILE
+  # Remove more than one empty line
+  sed -i -e "/^$/N;/^\n$/D" $OUTPUTFILE
 
   # Move the generated file to root and clean up
   mv $OUTPUTFILE $SYSDIR/
