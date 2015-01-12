@@ -29,7 +29,7 @@
 --                  rows_fetched: 27087
 --                 fetch_latency: 442.72 ms
 --                 rows_inserted: 2
---                insert_latency: 185.04 µs 
+--                insert_latency: 185.04 us 
 --                  rows_updated: 5096
 --                update_latency: 1.39 s
 --                  rows_deleted: 0

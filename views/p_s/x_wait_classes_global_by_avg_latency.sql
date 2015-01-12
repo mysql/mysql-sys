@@ -54,4 +54,4 @@ SELECT SUBSTRING_INDEX(event_name,'/', 3) AS event_class,
    AND event_name != 'idle'
  GROUP BY event_class
  ORDER BY IFNULL(SUM(sum_timer_wait) / NULLIF(SUM(COUNT_STAR), 0), 0) DESC;
- 
+

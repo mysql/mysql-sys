@@ -874,22 +874,22 @@ mysql> select * from io_global_by_wait_by_bytes;
 +--------------------+--------+---------------+-------------+-------------+-------------+------------+------------+-----------+-------------+---------------+-------------+-----------------+
 | event_name         | total  | total_latency | min_latency | avg_latency | max_latency | count_read | total_read | avg_read  | count_write | total_written | avg_written | total_requested |
 +--------------------+--------+---------------+-------------+-------------+-------------+------------+------------+-----------+-------------+---------------+-------------+-----------------+
-| myisam/dfile       | 163681 | 983.13 ms     | 379.08 ns   | 6.01 µs     | 22.06 ms    |      68737 | 127.31 MiB | 1.90 KiB  |     1012221 | 121.52 MiB    | 126 bytes   | 248.83 MiB      |
-| myisam/kfile       |   1775 | 375.13 ms     | 1.02 µs     | 211.34 µs   | 35.15 ms    |      54066 | 9.97 MiB   | 193 bytes |      428257 | 12.40 MiB     | 30 bytes    | 22.37 MiB       |
-| sql/FRM            |  57889 | 8.40 s        | 19.44 ns    | 145.05 µs   | 336.71 ms   |       8009 | 2.60 MiB   | 341 bytes |       14675 | 2.91 MiB      | 208 bytes   | 5.51 MiB        |
-| sql/global_ddl_log |    164 | 75.96 ms      | 5.72 µs     | 463.19 µs   | 7.43 ms     |         20 | 80.00 KiB  | 4.00 KiB  |          76 | 304.00 KiB    | 4.00 KiB    | 384.00 KiB      |
-| sql/file_parser    |    419 | 601.37 ms     | 1.96 µs     | 1.44 ms     | 37.14 ms    |         66 | 42.01 KiB  | 652 bytes |          64 | 226.98 KiB    | 3.55 KiB    | 268.99 KiB      |
-| sql/binlog         |    190 | 6.79 s        | 1.56 µs     | 35.76 ms    | 4.21 s      |         52 | 60.54 KiB  | 1.16 KiB  |           0 | 0 bytes       | 0 bytes     | 60.54 KiB       |
-| sql/ERRMSG         |      5 | 2.03 s        | 8.61 µs     | 405.40 ms   | 2.03 s      |          3 | 51.82 KiB  | 17.27 KiB |           0 | 0 bytes       | 0 bytes     | 51.82 KiB       |
-| mysys/charset      |      3 | 196.52 µs     | 17.61 µs    | 65.51 µs    | 137.33 µs   |          1 | 17.83 KiB  | 17.83 KiB |           0 | 0 bytes       | 0 bytes     | 17.83 KiB       |
-| sql/partition      |     81 | 18.87 ms      | 888.08 ns   | 232.92 µs   | 4.67 ms     |         66 | 2.75 KiB   | 43 bytes  |           8 | 288 bytes     | 36 bytes    | 3.04 KiB        |
-| sql/dbopt          | 329166 | 26.95 s       | 2.06 µs     | 81.89 µs    | 178.71 ms   |          0 | 0 bytes    | 0 bytes   |           9 | 585 bytes     | 65 bytes    | 585 bytes       |
-| sql/relaylog       |      7 | 1.18 ms       | 838.84 ns   | 168.30 µs   | 892.70 µs   |          0 | 0 bytes    | 0 bytes   |           1 | 120 bytes     | 120 bytes   | 120 bytes       |
-| mysys/cnf          |      5 | 171.61 µs     | 303.26 ns   | 34.32 µs    | 115.21 µs   |          3 | 56 bytes   | 19 bytes  |           0 | 0 bytes       | 0 bytes     | 56 bytes        |
-| sql/pid            |      3 | 220.55 µs     | 29.29 µs    | 73.52 µs    | 143.11 µs   |          0 | 0 bytes    | 0 bytes   |           1 | 5 bytes       | 5 bytes     | 5 bytes         |
-| sql/casetest       |      1 | 121.19 µs     | 121.19 µs   | 121.19 µs   | 121.19 µs   |          0 | 0 bytes    | 0 bytes   |           0 | 0 bytes       | 0 bytes     | 0 bytes         |
-| sql/binlog_index   |      5 | 593.47 µs     | 1.07 µs     | 118.69 µs   | 535.90 µs   |          0 | 0 bytes    | 0 bytes   |           0 | 0 bytes       | 0 bytes     | 0 bytes         |
-| sql/misc           |     23 | 2.73 ms       | 65.14 µs    | 118.50 µs   | 255.31 µs   |          0 | 0 bytes    | 0 bytes   |           0 | 0 bytes       | 0 bytes     | 0 bytes         |
+| myisam/dfile       | 163681 | 983.13 ms     | 379.08 ns   | 6.01 us     | 22.06 ms    |      68737 | 127.31 MiB | 1.90 KiB  |     1012221 | 121.52 MiB    | 126 bytes   | 248.83 MiB      |
+| myisam/kfile       |   1775 | 375.13 ms     | 1.02 us     | 211.34 µs   | 35.15 ms    |      54066 | 9.97 MiB   | 193 bytes |      428257 | 12.40 MiB     | 30 bytes    | 22.37 MiB       |
+| sql/FRM            |  57889 | 8.40 s        | 19.44 ns    | 145.05 us   | 336.71 ms   |       8009 | 2.60 MiB   | 341 bytes |       14675 | 2.91 MiB      | 208 bytes   | 5.51 MiB        |
+| sql/global_ddl_log |    164 | 75.96 ms      | 5.72 us     | 463.19 µs   | 7.43 ms     |         20 | 80.00 KiB  | 4.00 KiB  |          76 | 304.00 KiB    | 4.00 KiB    | 384.00 KiB      |
+| sql/file_parser    |    419 | 601.37 ms     | 1.96 us     | 1.44 ms     | 37.14 ms    |         66 | 42.01 KiB  | 652 bytes |          64 | 226.98 KiB    | 3.55 KiB    | 268.99 KiB      |
+| sql/binlog         |    190 | 6.79 s        | 1.56 us     | 35.76 ms    | 4.21 s      |         52 | 60.54 KiB  | 1.16 KiB  |           0 | 0 bytes       | 0 bytes     | 60.54 KiB       |
+| sql/ERRMSG         |      5 | 2.03 s        | 8.61 us     | 405.40 ms   | 2.03 s      |          3 | 51.82 KiB  | 17.27 KiB |           0 | 0 bytes       | 0 bytes     | 51.82 KiB       |
+| mysys/charset      |      3 | 196.52 us     | 17.61 µs    | 65.51 µs    | 137.33 µs   |          1 | 17.83 KiB  | 17.83 KiB |           0 | 0 bytes       | 0 bytes     | 17.83 KiB       |
+| sql/partition      |     81 | 18.87 ms      | 888.08 ns   | 232.92 us   | 4.67 ms     |         66 | 2.75 KiB   | 43 bytes  |           8 | 288 bytes     | 36 bytes    | 3.04 KiB        |
+| sql/dbopt          | 329166 | 26.95 s       | 2.06 us     | 81.89 µs    | 178.71 ms   |          0 | 0 bytes    | 0 bytes   |           9 | 585 bytes     | 65 bytes    | 585 bytes       |
+| sql/relaylog       |      7 | 1.18 ms       | 838.84 ns   | 168.30 us   | 892.70 µs   |          0 | 0 bytes    | 0 bytes   |           1 | 120 bytes     | 120 bytes   | 120 bytes       |
+| mysys/cnf          |      5 | 171.61 us     | 303.26 ns   | 34.32 µs    | 115.21 µs   |          3 | 56 bytes   | 19 bytes  |           0 | 0 bytes       | 0 bytes     | 56 bytes        |
+| sql/pid            |      3 | 220.55 us     | 29.29 µs    | 73.52 µs    | 143.11 µs   |          0 | 0 bytes    | 0 bytes   |           1 | 5 bytes       | 5 bytes     | 5 bytes         |
+| sql/casetest       |      1 | 121.19 us     | 121.19 µs   | 121.19 µs   | 121.19 µs   |          0 | 0 bytes    | 0 bytes   |           0 | 0 bytes       | 0 bytes     | 0 bytes         |
+| sql/binlog_index   |      5 | 593.47 us     | 1.07 µs     | 118.69 µs   | 535.90 µs   |          0 | 0 bytes    | 0 bytes   |           0 | 0 bytes       | 0 bytes     | 0 bytes         |
+| sql/misc           |     23 | 2.73 ms       | 65.14 us    | 118.50 µs   | 255.31 µs   |          0 | 0 bytes    | 0 bytes   |           0 | 0 bytes       | 0 bytes     | 0 bytes         |
 +--------------------+--------+---------------+-------------+-------------+-------------+------------+------------+-----------+-------------+---------------+-------------+-----------------+
 ```
 
@@ -1012,10 +1012,10 @@ mysql> select * from latest_file_io limit 5;
 +----------------------+----------------------------------------+------------+-----------+-----------+
 | thread               | file                                   | latency    | operation | requested |
 +----------------------+----------------------------------------+------------+-----------+-----------+
-| msandbox@localhost:1 | @@tmpdir/#sqlcf28_1_4e.MYI             | 9.26 µs    | write     | 124 bytes |
-| msandbox@localhost:1 | @@tmpdir/#sqlcf28_1_4e.MYI             | 4.00 µs    | write     | 2 bytes   |
-| msandbox@localhost:1 | @@tmpdir/#sqlcf28_1_4e.MYI             | 56.34 µs   | close     | NULL      |
-| msandbox@localhost:1 | @@tmpdir/#sqlcf28_1_4e.MYD             | 53.93 µs   | close     | NULL      |
+| msandbox@localhost:1 | @@tmpdir/#sqlcf28_1_4e.MYI             | 9.26 us    | write     | 124 bytes |
+| msandbox@localhost:1 | @@tmpdir/#sqlcf28_1_4e.MYI             | 4.00 us    | write     | 2 bytes   |
+| msandbox@localhost:1 | @@tmpdir/#sqlcf28_1_4e.MYI             | 56.34 us   | close     | NULL      |
+| msandbox@localhost:1 | @@tmpdir/#sqlcf28_1_4e.MYD             | 53.93 us   | close     | NULL      |
 | msandbox@localhost:1 | @@tmpdir/#sqlcf28_1_4e.MYI             | 104.05 ms  | delete    | NULL      |
 +----------------------+----------------------------------------+------------+-----------+-----------+
 ```
@@ -1703,7 +1703,7 @@ mysql> select * from schema_table_statistics_with_buffer limit 1\G
                  rows_fetched: 27087
                 fetch_latency: 442.72 ms
                 rows_inserted: 2
-               insert_latency: 185.04 µs 
+               insert_latency: 185.04 us
                  rows_updated: 5096
                update_latency: 1.39 s
                  rows_deleted: 0
@@ -2713,12 +2713,12 @@ mysql> select * from wait_classes_global_by_avg_latency where event_class != 'id
 +-------------------+--------+---------------+-------------+-------------+-------------+
 | event_class       | total  | total_latency | min_latency | avg_latency | max_latency |
 +-------------------+--------+---------------+-------------+-------------+-------------+
-| wait/io/file      | 543123 | 44.60 s       | 19.44 ns    | 82.11 µs    | 4.21 s      |
-| wait/io/table     |  22002 | 766.60 ms     | 148.72 ns   | 34.84 µs    | 44.97 ms    |
-| wait/io/socket    |  79613 | 967.17 ms     | 0 ps        | 12.15 µs    | 27.10 ms    |
-| wait/lock/table   |  35409 | 18.68 ms      | 65.45 ns    | 527.51 ns   | 969.88 µs   |
-| wait/synch/rwlock |  37935 | 4.61 ms       | 21.38 ns    | 121.61 ns   | 34.65 µs    |
-| wait/synch/mutex  | 390622 | 18.60 ms      | 19.44 ns    | 47.61 ns    | 10.32 µs    |
+| wait/io/file      | 543123 | 44.60 s       | 19.44 ns    | 82.11 us    | 4.21 s      |
+| wait/io/table     |  22002 | 766.60 ms     | 148.72 ns   | 34.84 us    | 44.97 ms    |
+| wait/io/socket    |  79613 | 967.17 ms     | 0 ps        | 12.15 us    | 27.10 ms    |
+| wait/lock/table   |  35409 | 18.68 ms      | 65.45 ns    | 527.51 ns   | 969.88 us   |
+| wait/synch/rwlock |  37935 | 4.61 ms       | 21.38 ns    | 121.61 ns   | 34.65 us    |
+| wait/synch/mutex  | 390622 | 18.60 ms      | 19.44 ns    | 47.61 ns    | 10.32 us    |
 +-------------------+--------+---------------+-------------+-------------+-------------+
 ```
 
@@ -2765,12 +2765,12 @@ mysql> select * from wait_classes_global_by_latency;
 +-------------------+--------+---------------+-------------+-------------+-------------+
 | event_class       | total  | total_latency | min_latency | avg_latency | max_latency |
 +-------------------+--------+---------------+-------------+-------------+-------------+
-| wait/io/file      | 550470 | 46.01 s       | 19.44 ns    | 83.58 µs    | 4.21 s      |
-| wait/io/socket    | 228833 | 2.71 s        | 0 ps        | 11.86 µs    | 29.93 ms    |
-| wait/io/table     |  64063 | 1.89 s        | 99.79 ns    | 29.43 µs    | 68.07 ms    |
-| wait/lock/table   |  76029 | 47.19 ms      | 65.45 ns    | 620.74 ns   | 969.88 µs   |
-| wait/synch/mutex  | 635925 | 34.93 ms      | 19.44 ns    | 54.93 ns    | 107.70 µs   |
-| wait/synch/rwlock |  61287 | 7.62 ms       | 21.38 ns    | 124.37 ns   | 34.65 µs    |
+| wait/io/file      | 550470 | 46.01 s       | 19.44 ns    | 83.58 us    | 4.21 s      |
+| wait/io/socket    | 228833 | 2.71 s        | 0 ps        | 11.86 us    | 29.93 ms    |
+| wait/io/table     |  64063 | 1.89 s        | 99.79 ns    | 29.43 us    | 68.07 ms    |
+| wait/lock/table   |  76029 | 47.19 ms      | 65.45 ns    | 620.74 ns   | 969.88 us   |
+| wait/synch/mutex  | 635925 | 34.93 ms      | 19.44 ns    | 54.93 ns    | 107.70 us   |
+| wait/synch/rwlock |  61287 | 7.62 ms       | 21.38 ns    | 124.37 ns   | 34.65 us    |
 +-------------------+--------+---------------+-------------+-------------+-------------+
 ```
 
@@ -3164,7 +3164,7 @@ mysql> select format_time(342342342);
 +------------------------+
 | format_time(342342342) |
 +------------------------+
-| 342.34 µs              |
+| 342.34 us              |
 +------------------------+
 1 row in set (0.00 sec)
 
@@ -4102,13 +4102,13 @@ mysql> call ps_analyze_statement_digest('891ec6860f98ba46d89dd20b0c03652c', 10, 
 +------------------------------------------+-------+-----------+
 | event_name                               | count | latency   |
 +------------------------------------------+-------+-----------+
-| stage/sql/checking query cache for query |    16 | 724.37 µs |
-| stage/sql/statistics                     |    16 | 546.92 µs |
-| stage/sql/freeing items                  |    18 | 520.11 µs |
-| stage/sql/init                           |    51 | 466.80 µs |
+| stage/sql/checking query cache for query |    16 | 724.37 us |
+| stage/sql/statistics                     |    16 | 546.92 us |
+| stage/sql/freeing items                  |    18 | 520.11 us |
+| stage/sql/init                           |    51 | 466.80 us |
 ...
-| stage/sql/cleaning up                    |    18 | 11.92 µs  |
-| stage/sql/executing                      |    16 | 6.95 µs   |
+| stage/sql/cleaning up                    |    18 | 11.92 us  |
+| stage/sql/executing                      |    16 | 6.95 us   |
 +------------------------------------------+-------+-----------+
 17 rows in set (9.12 sec)
 
@@ -4122,7 +4122,7 @@ mysql> call ps_analyze_statement_digest('891ec6860f98ba46d89dd20b0c03652c', 10, 
 +-----------+-----------+-----------+-----------+---------------+------------+-----------+
 | thread_id | exec_time | lock_time | rows_sent | rows_examined | tmp_tables | full_scan |
 +-----------+-----------+-----------+-----------+---------------+------------+-----------+
-|    166646 | 618.43 µs | 1.00 ms   |         0 |             1 |          0 |         0 |
+|    166646 | 618.43 us | 1.00 ms   |         0 |             1 |          0 |         0 |
 +-----------+-----------+-----------+-----------+---------------+------------+-----------+
 1 row in set (9.16 sec)
 
@@ -4137,12 +4137,12 @@ mysql> call ps_analyze_statement_digest('891ec6860f98ba46d89dd20b0c03652c', 10, 
 +------------------------------------------+-----------+
 | event_name                               | latency   |
 +------------------------------------------+-----------+
-| stage/sql/init                           | 8.61 µs   |
-| stage/sql/Waiting for query cache lock   | 453.23 µs |
+| stage/sql/init                           | 8.61 us   |
+| stage/sql/Waiting for query cache lock   | 453.23 us |
 | stage/sql/init                           | 331.07 ns |
-| stage/sql/checking query cache for query | 43.04 µs  |
+| stage/sql/checking query cache for query | 43.04 us  |
 ...
-| stage/sql/freeing items                  | 30.46 µs  |
+| stage/sql/freeing items                  | 30.46 us  |
 | stage/sql/cleaning up                    | 662.13 ns |
 +------------------------------------------+-----------+
              18 rows in set (9.23 sec)

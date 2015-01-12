@@ -82,13 +82,13 @@ CREATE DEFINER='root'@'localhost' PROCEDURE ps_trace_statement_digest (
              +------------------------------------------+-------+-----------+
              | event_name                               | count | latency   |
              +------------------------------------------+-------+-----------+
-             | stage/sql/checking query cache for query |    16 | 724.37 µs |
-             | stage/sql/statistics                     |    16 | 546.92 µs |
-             | stage/sql/freeing items                  |    18 | 520.11 µs |
-             | stage/sql/init                           |    51 | 466.80 µs |
+             | stage/sql/checking query cache for query |    16 | 724.37 us |
+             | stage/sql/statistics                     |    16 | 546.92 us |
+             | stage/sql/freeing items                  |    18 | 520.11 us |
+             | stage/sql/init                           |    51 | 466.80 us |
              ...
-             | stage/sql/cleaning up                    |    18 | 11.92 µs  |
-             | stage/sql/executing                      |    16 | 6.95 µs   |
+             | stage/sql/cleaning up                    |    18 | 11.92 us  |
+             | stage/sql/executing                      |    16 | 6.95 us   |
              +------------------------------------------+-------+-----------+
              17 rows in set (9.12 sec)
 
@@ -102,7 +102,7 @@ CREATE DEFINER='root'@'localhost' PROCEDURE ps_trace_statement_digest (
              +-----------+-----------+-----------+-----------+---------------+------------+-----------+
              | thread_id | exec_time | lock_time | rows_sent | rows_examined | tmp_tables | full_scan |
              +-----------+-----------+-----------+-----------+---------------+------------+-----------+
-             |    166646 | 618.43 µs | 1.00 ms   |         0 |             1 |          0 |         0 |
+             |    166646 | 618.43 us | 1.00 ms   |         0 |             1 |          0 |         0 |
              +-----------+-----------+-----------+-----------+---------------+------------+-----------+
              1 row in set (9.16 sec)
 
@@ -117,12 +117,12 @@ CREATE DEFINER='root'@'localhost' PROCEDURE ps_trace_statement_digest (
              +------------------------------------------+-----------+
              | event_name                               | latency   |
              +------------------------------------------+-----------+
-             | stage/sql/init                           | 8.61 µs   |
-             | stage/sql/Waiting for query cache lock   | 453.23 µs |
+             | stage/sql/init                           | 8.61 us   |
+             | stage/sql/Waiting for query cache lock   | 453.23 us |
              | stage/sql/init                           | 331.07 ns |
-             | stage/sql/checking query cache for query | 43.04 µs  |
+             | stage/sql/checking query cache for query | 43.04 us  |
              ...
-             | stage/sql/freeing items                  | 30.46 µs  |
+             | stage/sql/freeing items                  | 30.46 us  |
              | stage/sql/cleaning up                    | 662.13 ns |
              +------------------------------------------+-----------+
              18 rows in set (9.23 sec)
