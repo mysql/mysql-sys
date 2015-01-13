@@ -18,9 +18,11 @@ DROP FUNCTION IF EXISTS format_bytes;
 DELIMITER $$
 
 CREATE DEFINER='root'@'localhost' FUNCTION format_bytes (
-        bytes BIGINT
+        -- We feed in and return TEXT here, as aggregates of
+        -- bytes can return numbers larger than BIGINT UNSIGNED
+        bytes TEXT
     )
-    RETURNS VARCHAR(16)
+    RETURNS TEXT
     COMMENT '
              Description
              -----------
@@ -30,13 +32,13 @@ CREATE DEFINER='root'@'localhost' FUNCTION format_bytes (
              Parameters
              -----------
 
-             bytes (BIGINT):
+             bytes (TEXT):
                A raw bytes value.
 
              Returns
              -----------
 
-             VARCHAR(16)
+             TEXT
 
              Example
              -----------

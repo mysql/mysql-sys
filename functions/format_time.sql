@@ -36,13 +36,13 @@ CREATE DEFINER='root'@'localhost' FUNCTION format_time (
              Parameters
              -----------
 
-             picoseconds (BIGINT UNSIGNED): 
+             picoseconds (TEXT): 
                The raw picoseconds value to convert.
 
              Returns
              -----------
 
-             VARCHAR(16) CHARSET UTF8
+             TEXT
 
              Example
              -----------

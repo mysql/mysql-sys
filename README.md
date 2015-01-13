@@ -3031,11 +3031,11 @@ Takes a raw bytes value, and converts it to a human readable format.
 
 ##### Parameters
 
-* bytes (BIGINT): A raw bytes value.
+* bytes (TEXT): A raw bytes value.
 
 ##### Returns
 
-VARCHAR(16)
+TEXT
 
 ##### Example
 ```SQL
@@ -3144,11 +3144,11 @@ Picoseconds are the precision that all latency values are printed in within Perf
 
 ##### Parameters
 
-* picoseconds (BIGINT UNSIGNED): The raw picoseconds value to convert.
+* picoseconds (TEXT): The raw picoseconds value to convert.
 
 ##### Returns
 
-VARCHAR(16) CHARSET UTF8
+TEXT
 
 ##### Example
 ```SQL
