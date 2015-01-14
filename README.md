@@ -3253,6 +3253,31 @@ mysql> SELECT sys.ps_is_instrument_default_timed('statement/sql/select');
 1 row in set (0.00 sec)
 ```
 
+#### ps_is_thread_instrumented
+
+##### Description
+
+Checks whether the provided connection id is instrumented within Performance Schema.
+
+##### Parameters
+
+* in_connection_id (BIGINT UNSIGNED): the id of the connection to check.
+
+##### Returns
+
+ENUM('YES', 'NO')
+
+##### Example
+```SQL
+mysql> SELECT sys.ps_is_thread_instrumented(CONNECTION_ID());
++------------------------------------------------+
+| sys.ps_is_thread_instrumented(CONNECTION_ID()) |
++------------------------------------------------+
+| YES                                            |
++------------------------------------------------+
+1 row in set (0.10 sec)
+```
+
 #### ps_thread_id
 
 ##### Description

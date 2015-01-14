@@ -30,6 +30,7 @@ SOURCE ./functions/format_time.sql
 SOURCE ./functions/ps_is_account_enabled.sql
 SOURCE ./functions/ps_is_instrument_default_enabled.sql
 SOURCE ./functions/ps_is_instrument_default_timed.sql
+SOURCE ./functions/ps_is_thread_instrumented.sql
 SOURCE ./functions/ps_thread_id.sql
 SOURCE ./functions/ps_thread_stack.sql
 SOURCE ./functions/sys_get_config.sql
