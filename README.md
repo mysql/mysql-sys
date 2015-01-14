@@ -3290,7 +3290,7 @@ Checks whether the provided connection id is instrumented within Performance Sch
 
 ##### Returns
 
-ENUM('YES', 'NO')
+ENUM('YES', 'NO', 'UNKNOWN')
 
 ##### Example
 ```SQL

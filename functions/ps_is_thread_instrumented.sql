@@ -19,7 +19,7 @@ DELIMITER $$
 
 CREATE DEFINER='root'@'localhost' FUNCTION ps_is_thread_instrumented (
         in_connection_id BIGINT UNSIGNED
-    ) RETURNS ENUM('YES', 'NO')
+    ) RETURNS ENUM('YES', 'NO', 'UNKNOWN')
     COMMENT '
              Description
              -----------
@@ -35,7 +35,7 @@ CREATE DEFINER='root'@'localhost' FUNCTION ps_is_thread_instrumented (
              Returns
              -----------
 
-             ENUM(\'YES\', \'NO\')
+             ENUM(\'YES\', \'NO\', \'UNKNOWN\')
 
              Example
              -----------
@@ -52,13 +52,21 @@ CREATE DEFINER='root'@'localhost' FUNCTION ps_is_thread_instrumented (
     NOT DETERMINISTIC
     READS SQL DATA
 BEGIN
-    DECLARE v_enabled ENUM('YES', 'NO');
+    DECLARE v_enabled ENUM('YES', 'NO', 'UNKNOWN');
+
+    IF (in_connection_id IS NULL) THEN
+        RETURN NULL;
+    END IF;
 
     SELECT INSTRUMENTED INTO v_enabled
       FROM performance_schema.threads 
      WHERE PROCESSLIST_ID = in_connection_id;
 
-    RETURN v_enabled;
+    IF (v_enabled IS NULL) THEN
+        RETURN 'UNKNOWN';
+    ELSE
+        RETURN v_enabled;
+    END IF;
 END$$
 
 DELIMITER ;
