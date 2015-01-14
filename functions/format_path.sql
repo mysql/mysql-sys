@@ -66,6 +66,7 @@ CREATE DEFINER='root'@'localhost' FUNCTION format_path (
     NO SQL
 BEGIN
   DECLARE v_path VARCHAR(260);
+  DECLARE v_undo_dir VARCHAR(1024);
 
   -- OSX hides /private/ in variables, but Performance Schema does not
   IF path LIKE '/private/%' 
@@ -73,11 +74,22 @@ BEGIN
     ELSE SET v_path = path;
   END IF;
 
+  -- @@global.innodb_undo_directory is only set when separate undo logs are used
+  SET v_undo_dir = IFNULL((SELECT VARIABLE_NAME FROM information_schema.GLOBAL_VARIABLES WHERE VARIABLE_NAME = 'innodb_undo_directory'), '');
+
   IF v_path IS NULL THEN RETURN NULL;
-  ELSEIF v_path LIKE CONCAT(@@global.datadir, '%') ESCAPE '|' THEN 
+  ELSEIF v_path LIKE CONCAT(@@global.datadir, '%') ESCAPE '|' THEN
     RETURN REPLACE(REPLACE(REPLACE(v_path, @@global.datadir, '@@datadir/'), '\\\\', ''), '\\', '/');
-  ELSEIF v_path LIKE CONCAT(@@global.tmpdir, '%') ESCAPE '|' THEN 
+  ELSEIF v_path LIKE CONCAT(@@global.tmpdir, '%') ESCAPE '|' THEN
     RETURN REPLACE(REPLACE(REPLACE(v_path, @@global.tmpdir, '@@tmpdir/'), '\\\\', ''), '\\', '/');
+  ELSEIF v_path LIKE CONCAT(@@global.slave_load_tmpdir, '%') ESCAPE '|' THEN
+    RETURN REPLACE(REPLACE(REPLACE(v_path, @@global.slave_load_tmpdir, '@@slave_load_tmpdir/'), '\\\\', ''), '\\', '/');
+  ELSEIF v_path LIKE CONCAT(@@global.innodb_data_home_dir, '%') ESCAPE '|' THEN
+    RETURN REPLACE(REPLACE(REPLACE(v_path, @@global.innodb_data_home_dir, '@@innodb_data_home_dir/'), '\\\\', ''), '\\', '/');
+  ELSEIF v_path LIKE CONCAT(@@global.innodb_log_group_home_dir, '%') ESCAPE '|' THEN
+    RETURN REPLACE(REPLACE(REPLACE(v_path, @@global.innodb_log_group_home_dir, '@@innodb_log_group_home_dir/'), '\\\\', ''), '\\', '/');
+  ELSEIF v_path LIKE CONCAT(v_undo_dir, '%') ESCAPE '|' THEN
+    RETURN REPLACE(REPLACE(REPLACE(v_path, v_undo_dir, '@@innodb_undo_directory/'), '\\\\', ''), '\\', '/');
   ELSE RETURN v_path;
   END IF;
 END$$
