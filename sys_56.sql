@@ -28,6 +28,7 @@ SOURCE ./functions/format_path.sql
 SOURCE ./functions/format_statement.sql
 SOURCE ./functions/format_time.sql
 SOURCE ./functions/ps_is_account_enabled.sql
+SOURCE ./functions/ps_is_consumer_enabled.sql
 SOURCE ./functions/ps_is_instrument_default_enabled.sql
 SOURCE ./functions/ps_is_instrument_default_timed.sql
 SOURCE ./functions/ps_is_thread_instrumented.sql

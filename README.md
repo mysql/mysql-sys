@@ -3203,6 +3203,31 @@ mysql> SELECT sys.ps_is_account_enabled('localhost', 'root');
 1 row in set (0.01 sec)
 ```
 
+#### ps_is_consumer_enabled
+
+##### Description
+
+Determines whether a consumer is enabled (taking the consumer hierarchy into consideration) within the Performance Schema.
+
+##### Parameters
+
+* in_consumer VARCHAR(64): The name of the consumer to check.
+
+##### Returns
+
+ENUM('YES', 'NO')
+
+##### Example
+```SQL
+mysql> SELECT sys.ps_is_consumer_enabled('events_stages_history');
++-----------------------------------------------------+
+| sys.ps_is_consumer_enabled('events_stages_history') |
++-----------------------------------------------------+
+| NO                                                  |
++-----------------------------------------------------+
+1 row in set (0.00 sec)
+```
+
 #### ps_is_instrument_default_enabled
 
 ##### Description
