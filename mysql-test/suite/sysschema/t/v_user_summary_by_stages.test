@@ -1,0 +1,6 @@
+# Tests for sys schema
+# Verify the sys.user_summary_by_stages view
+
+DESC sys.user_summary_by_stages;
+
+DESC sys.x$user_summary_by_stages;

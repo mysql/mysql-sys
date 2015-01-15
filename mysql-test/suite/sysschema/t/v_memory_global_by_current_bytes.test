@@ -1,0 +1,6 @@
+# Tests for sys schema
+# Verify the sys.memory_global_by_current_bytes view
+
+DESC sys.memory_global_by_current_bytes;
+
+DESC sys.x$memory_global_by_current_bytes;

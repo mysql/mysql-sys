@@ -1,0 +1,6 @@
+# Tests for sys schema
+# Verify the sys.processlist view
+
+DESC sys.processlist;
+
+DESC sys.x$processlist;

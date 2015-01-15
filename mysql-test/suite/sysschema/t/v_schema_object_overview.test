@@ -1,0 +1,4 @@
+# Tests for sys schema
+# Verify the sys.schema_object_overview view
+
+DESC sys.schema_object_overview;

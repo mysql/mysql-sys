@@ -1,0 +1,6 @@
+# Tests for sys schema
+# Verify the sys.host_summary_by_statement_latency view
+
+DESC sys.host_summary_by_statement_latency;
+
+DESC sys.x$host_summary_by_statement_latency;

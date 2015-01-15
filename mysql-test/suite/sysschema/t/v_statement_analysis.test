@@ -1,0 +1,6 @@
+# Tests for sys schema
+# Verify the sys.statement_analysis view
+
+DESC sys.statement_analysis;
+
+DESC sys.x$statement_analysis;

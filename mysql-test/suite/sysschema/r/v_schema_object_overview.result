@@ -1,0 +1,5 @@
+DESC sys.schema_object_overview;
+Field	Type	Null	Key	Default	Extra
+db	varchar(64)	NO			
+object_type	varchar(64)	YES		NULL	
+count	bigint(21)	NO		0	

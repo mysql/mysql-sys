@@ -1,0 +1,6 @@
+# Tests for sys schema
+# Verify the sys.io_global_by_file_by_bytes view
+
+DESC sys.io_global_by_file_by_bytes;
+
+DESC sys.x$io_global_by_file_by_bytes;

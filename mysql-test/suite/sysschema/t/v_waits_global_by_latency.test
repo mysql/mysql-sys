@@ -1,0 +1,6 @@
+# Tests for sys schema
+# Verify the sys.waits_global_by_latency view
+
+DESC sys.waits_global_by_latency;
+
+DESC sys.x$waits_global_by_latency;

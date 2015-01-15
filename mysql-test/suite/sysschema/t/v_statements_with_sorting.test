@@ -1,0 +1,6 @@
+# Tests for sys schema
+# Verify the sys.statements_with_sorting view
+
+DESC sys.statements_with_sorting;
+
+DESC sys.x$statements_with_sorting;

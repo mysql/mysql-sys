@@ -1,0 +1,4 @@
+# Tests for sys schema
+# Verify the sys.version view
+
+DESC sys.version;

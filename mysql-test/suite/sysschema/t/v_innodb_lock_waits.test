@@ -1,0 +1,6 @@
+# Tests for sys schema
+# Verify the sys.innodb_lock_waits view
+
+DESC sys.innodb_lock_waits;
+
+DESC sys.x$innodb_lock_waits;

@@ -1,0 +1,6 @@
+# Tests for sys schema
+# Verify the sys.memory_global_total view
+
+DESC sys.memory_global_total;
+
+DESC sys.x$memory_global_total;

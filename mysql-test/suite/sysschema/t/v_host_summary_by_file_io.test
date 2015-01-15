@@ -1,0 +1,6 @@
+# Tests for sys schema
+# Verify the sys.host_summary_by_file_io view
+
+DESC sys.host_summary_by_file_io;
+
+DESC sys.x$host_summary_by_file_io;

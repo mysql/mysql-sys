@@ -1,0 +1,6 @@
+# Tests for sys schema
+# Verify the sys.io_global_by_file_by_latency view
+
+DESC sys.io_global_by_file_by_latency;
+
+DESC sys.x$io_global_by_file_by_latency;

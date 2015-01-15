@@ -1,0 +1,6 @@
+# Tests for sys schema
+# Verify the sys.user_summary_by_statement_type view
+
+DESC sys.user_summary_by_statement_type;
+
+DESC sys.x$user_summary_by_statement_type;

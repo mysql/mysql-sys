@@ -1,0 +1,4 @@
+# Tests for sys schema
+# Verify the sys.ps_check_lost_instrumentation view
+
+DESC sys.ps_check_lost_instrumentation;

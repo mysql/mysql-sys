@@ -1,0 +1,6 @@
+# Tests for sys schema
+# Verify the sys.schema_table_statistics view
+
+DESC sys.schema_table_statistics;
+
+DESC sys.x$schema_table_statistics;

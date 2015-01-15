@@ -1,0 +1,6 @@
+# Tests for sys schema
+# Verify the sys.io_by_thread_by_latency view
+
+DESC sys.io_by_thread_by_latency;
+
+DESC sys.x$io_by_thread_by_latency;

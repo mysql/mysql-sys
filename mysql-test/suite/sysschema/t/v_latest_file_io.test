@@ -1,0 +1,6 @@
+# Tests for sys schema
+# Verify the sys.latest_file_io view
+
+DESC sys.latest_file_io;
+
+DESC sys.x$latest_file_io;

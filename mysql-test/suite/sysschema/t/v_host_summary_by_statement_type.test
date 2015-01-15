@@ -1,0 +1,6 @@
+# Tests for sys schema
+# Verify the sys.host_summary_by_statement_type view
+
+DESC sys.host_summary_by_statement_type;
+
+DESC sys.x$host_summary_by_statement_type;
