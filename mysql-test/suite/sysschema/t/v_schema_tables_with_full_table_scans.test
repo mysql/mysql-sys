@@ -36,7 +36,23 @@ CALL sys.ps_truncate_all_tables(false);
 # Following returns 28 rows, but should full scan as j has no index
 SELECT * FROM v_schema_tables_with_full_table_scans.t WHERE j = 12;
 
-# Now verify the table shows up in the views with the right row count
+# Now verify the table shows up in the views with the right row count (should be 768)
+SELECT object_schema, object_name, rows_full_scanned FROM sys.schema_tables_with_full_table_scans;
+
+SELECT object_schema, object_name, rows_full_scanned FROM sys.x$schema_tables_with_full_table_scans;
+
+# Scan again
+SELECT * FROM v_schema_tables_with_full_table_scans.t WHERE j = 12;
+
+# Now verify that double the amount of rows in the table should be shown as scanned (should be 1536)
+SELECT object_schema, object_name, rows_full_scanned FROM sys.schema_tables_with_full_table_scans;
+
+SELECT object_schema, object_name, rows_full_scanned FROM sys.x$schema_tables_with_full_table_scans;
+
+# Do a point lookup
+SELECT * FROM v_schema_tables_with_full_table_scans.t WHERE i = 10;
+
+# The number of rows scanned should not have changed (should still be 1536)
 SELECT object_schema, object_name, rows_full_scanned FROM sys.schema_tables_with_full_table_scans;
 
 SELECT object_schema, object_name, rows_full_scanned FROM sys.x$schema_tables_with_full_table_scans;
