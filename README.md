@@ -106,18 +106,18 @@ mysql> desc host_summary;
 +------------------------+---------------+------+-----+---------+-------+
 | host                   | varchar(60)   | YES  |     | NULL    |       |
 | statements             | decimal(64,0) | YES  |     | NULL    |       |
-| statement_latency      | varchar(16)   | YES  |     | NULL    |       |
-| statement_avg_latency  | varchar(16)   | YES  |     | NULL    |       |
+| statement_latency      | text          | YES  |     | NULL    |       |
+| statement_avg_latency  | text          | YES  |     | NULL    |       |
 | table_scans            | decimal(65,0) | YES  |     | NULL    |       |
 | file_ios               | decimal(64,0) | YES  |     | NULL    |       |
-| file_io_latency        | varchar(16)   | YES  |     | NULL    |       |
+| file_io_latency        | text          | YES  |     | NULL    |       |
 | current_connections    | decimal(41,0) | YES  |     | NULL    |       |
 | total_connections      | decimal(41,0) | YES  |     | NULL    |       |
 | unique_users           | bigint(21)    | NO   |     | 0       |       |
-| current_memory         | varchar(16)   | YES  |     | NULL    |       |
-| total_memory_allocated | varchar(16)   | YES  |     | NULL    |       |
+| current_memory         | text          | YES  |     | NULL    |       |
+| total_memory_allocated | text          | YES  |     | NULL    |       |
 +------------------------+---------------+------+-----+---------+-------+
-12 rows in set (0.62 sec)
+12 rows in set (0.15 sec)
 
 mysql> desc x$host_summary;
 +------------------------+---------------+------+-----+---------+-------+
@@ -136,7 +136,7 @@ mysql> desc x$host_summary;
 | current_memory         | decimal(63,0) | YES  |     | NULL    |       |
 | total_memory_allocated | decimal(64,0) | YES  |     | NULL    |       |
 +------------------------+---------------+------+-----+---------+-------+
-12 rows in set (0.01 sec)
+12 rows in set (0.00 sec)
 ```
 
 ##### Example
@@ -167,9 +167,9 @@ mysql> desc host_summary_by_file_io;
 +------------+---------------+------+-----+---------+-------+
 | host       | varchar(60)   | YES  |     | NULL    |       |
 | ios        | decimal(42,0) | YES  |     | NULL    |       |
-| io_latency | varchar(16)   | YES  |     | NULL    |       |
+| io_latency | text          | YES  |     | NULL    |       |
 +------------+---------------+------+-----+---------+-------+
-3 rows in set (0.13 sec)
+3 rows in set (0.00 sec)
 
 mysql> desc x$host_summary_by_file_io;
 +------------+---------------+------+-----+---------+-------+
@@ -179,7 +179,7 @@ mysql> desc x$host_summary_by_file_io;
 | ios        | decimal(42,0) | YES  |     | NULL    |       |
 | io_latency | decimal(42,0) | YES  |     | NULL    |       |
 +------------+---------------+------+-----+---------+-------+
-3 rows in set (0.01 sec)
+3 rows in set (0.06 sec)
 ```
 
 ##### Example
@@ -212,10 +212,10 @@ mysql> desc host_summary_by_file_io_type;
 | host          | varchar(60)         | YES  |     | NULL    |       |
 | event_name    | varchar(128)        | NO   |     | NULL    |       |
 | total         | bigint(20) unsigned | NO   |     | NULL    |       |
-| total_latency | varchar(16)         | YES  |     | NULL    |       |
-| max_latency   | varchar(16)         | YES  |     | NULL    |       |
+| total_latency | text                | YES  |     | NULL    |       |
+| max_latency   | text                | YES  |     | NULL    |       |
 +---------------+---------------------+------+-----+---------+-------+
-5 rows in set (0.01 sec)
+5 rows in set (0.70 sec)
 
 mysql> desc x$host_summary_by_file_io_type;
 +---------------+---------------------+------+-----+---------+-------+
@@ -275,10 +275,10 @@ mysql> desc host_summary_by_stages;
 | host          | varchar(60)         | YES  |     | NULL    |       |
 | event_name    | varchar(128)        | NO   |     | NULL    |       |
 | total         | bigint(20) unsigned | NO   |     | NULL    |       |
-| total_latency | varchar(16)         | YES  |     | NULL    |       |
-| avg_latency   | varchar(16)         | YES  |     | NULL    |       |
+| total_latency | text                | YES  |     | NULL    |       |
+| avg_latency   | text                | YES  |     | NULL    |       |
 +---------------+---------------------+------+-----+---------+-------+
-5 rows in set (0.00 sec)
+5 rows in set (0.06 sec)
 
 mysql> desc x$host_summary_by_stages;
 +---------------+---------------------+------+-----+---------+-------+
@@ -290,7 +290,7 @@ mysql> desc x$host_summary_by_stages;
 | total_latency | bigint(20) unsigned | NO   |     | NULL    |       |
 | avg_latency   | bigint(20) unsigned | NO   |     | NULL    |       |
 +---------------+---------------------+------+-----+---------+-------+
-5 rows in set (0.01 sec)
+5 rows in set (0.81 sec)
 ```
 
 ##### Example
@@ -336,15 +336,15 @@ mysql> desc host_summary_by_statement_latency;
 +---------------+---------------+------+-----+---------+-------+
 | host          | varchar(60)   | YES  |     | NULL    |       |
 | total         | decimal(42,0) | YES  |     | NULL    |       |
-| total_latency | varchar(16)   | YES  |     | NULL    |       |
-| max_latency   | varchar(16)   | YES  |     | NULL    |       |
-| lock_latency  | varchar(16)   | YES  |     | NULL    |       |
+| total_latency | text          | YES  |     | NULL    |       |
+| max_latency   | text          | YES  |     | NULL    |       |
+| lock_latency  | text          | YES  |     | NULL    |       |
 | rows_sent     | decimal(42,0) | YES  |     | NULL    |       |
 | rows_examined | decimal(42,0) | YES  |     | NULL    |       |
 | rows_affected | decimal(42,0) | YES  |     | NULL    |       |
 | full_scans    | decimal(43,0) | YES  |     | NULL    |       |
 +---------------+---------------+------+-----+---------+-------+
-9 rows in set (0.02 sec)
+9 rows in set (0.29 sec)
 
 mysql> desc x$host_summary_by_statement_latency;
 +---------------+---------------+------+-----+---------+-------+
@@ -360,7 +360,7 @@ mysql> desc x$host_summary_by_statement_latency;
 | rows_affected | decimal(42,0) | YES  |     | NULL    |       |
 | full_scans    | decimal(43,0) | YES  |     | NULL    |       |
 +---------------+---------------+------+-----+---------+-------+
-9 rows in set (0.00 sec)
+9 rows in set (0.54 sec)
 ```
 
 ##### Example
@@ -390,24 +390,24 @@ mysql> desc host_summary_by_statement_type;
 | Field         | Type                | Null | Key | Default | Extra |
 +---------------+---------------------+------+-----+---------+-------+
 | host          | varchar(60)         | YES  |     | NULL    |       |
-| statement     | varchar(128)        | NO   |     |         |       |
+| statement     | varchar(128)        | YES  |     | NULL    |       |
 | total         | bigint(20) unsigned | NO   |     | NULL    |       |
-| total_latency | varchar(16)         | YES  |     | NULL    |       |
-| max_latency   | varchar(16)         | YES  |     | NULL    |       |
-| lock_latency  | varchar(16)         | YES  |     | NULL    |       |
+| total_latency | text                | YES  |     | NULL    |       |
+| max_latency   | text                | YES  |     | NULL    |       |
+| lock_latency  | text                | YES  |     | NULL    |       |
 | rows_sent     | bigint(20) unsigned | NO   |     | NULL    |       |
 | rows_examined | bigint(20) unsigned | NO   |     | NULL    |       |
 | rows_affected | bigint(20) unsigned | NO   |     | NULL    |       |
 | full_scans    | bigint(21) unsigned | NO   |     | 0       |       |
 +---------------+---------------------+------+-----+---------+-------+
-10 rows in set (0.10 sec)
+10 rows in set (0.30 sec)
 
 mysql> desc x$host_summary_by_statement_type;
 +---------------+---------------------+------+-----+---------+-------+
 | Field         | Type                | Null | Key | Default | Extra |
 +---------------+---------------------+------+-----+---------+-------+
 | host          | varchar(60)         | YES  |     | NULL    |       |
-| statement     | varchar(128)        | NO   |     |         |       |
+| statement     | varchar(128)        | YES  |     | NULL    |       |
 | total         | bigint(20) unsigned | NO   |     | NULL    |       |
 | total_latency | bigint(20) unsigned | NO   |     | NULL    |       |
 | max_latency   | bigint(20) unsigned | NO   |     | NULL    |       |
@@ -417,7 +417,7 @@ mysql> desc x$host_summary_by_statement_type;
 | rows_affected | bigint(20) unsigned | NO   |     | NULL    |       |
 | full_scans    | bigint(21) unsigned | NO   |     | 0       |       |
 +---------------+---------------------+------+-----+---------+-------+
-10 rows in set (0.00 sec)
+10 rows in set (0.76 sec)
 ```
 
 ##### Example
@@ -450,14 +450,14 @@ mysql> desc innodb_buffer_stats_by_schema;
 | Field         | Type          | Null | Key | Default | Extra |
 +---------------+---------------+------+-----+---------+-------+
 | object_schema | text          | YES  |     | NULL    |       |
-| allocated     | varchar(16)   | YES  |     | NULL    |       |
-| data          | varchar(16)   | YES  |     | NULL    |       |
+| allocated     | text          | YES  |     | NULL    |       |
+| data          | text          | YES  |     | NULL    |       |
 | pages         | bigint(21)    | NO   |     | 0       |       |
 | pages_hashed  | bigint(21)    | NO   |     | 0       |       |
 | pages_old     | bigint(21)    | NO   |     | 0       |       |
 | rows_cached   | decimal(44,0) | YES  |     | NULL    |       |
 +---------------+---------------+------+-----+---------+-------+
-7 rows in set (0.01 sec)
+7 rows in set (0.08 sec)
 
 mysql> desc x$innodb_buffer_stats_by_schema;
 +---------------+---------------+------+-----+---------+-------+
@@ -471,7 +471,7 @@ mysql> desc x$innodb_buffer_stats_by_schema;
 | pages_old     | bigint(21)    | NO   |     | 0       |       |
 | rows_cached   | decimal(44,0) | NO   |     | 0       |       |
 +---------------+---------------+------+-----+---------+-------+
-7 rows in set (0.00 sec)
+7 rows in set (0.12 sec)
 ````
 
 ##### Example
@@ -502,14 +502,14 @@ mysql> desc innodb_buffer_stats_by_table;
 +---------------+---------------+------+-----+---------+-------+
 | object_schema | text          | YES  |     | NULL    |       |
 | object_name   | text          | YES  |     | NULL    |       |
-| allocated     | varchar(16)   | YES  |     | NULL    |       |
-| data          | varchar(16)   | YES  |     | NULL    |       |
+| allocated     | text          | YES  |     | NULL    |       |
+| data          | text          | YES  |     | NULL    |       |
 | pages         | bigint(21)    | NO   |     | 0       |       |
 | pages_hashed  | bigint(21)    | NO   |     | 0       |       |
 | pages_old     | bigint(21)    | NO   |     | 0       |       |
 | rows_cached   | decimal(44,0) | YES  |     | NULL    |       |
 +---------------+---------------+------+-----+---------+-------+
-8 rows in set (0.00 sec)
+8 rows in set (0.09 sec)
 
 mysql> desc x$innodb_buffer_stats_by_table;
 +---------------+---------------+------+-----+---------+-------+
@@ -524,7 +524,7 @@ mysql> desc x$innodb_buffer_stats_by_table;
 | pages_old     | bigint(21)    | NO   |     | 0       |       |
 | rows_cached   | decimal(44,0) | NO   |     | 0       |       |
 +---------------+---------------+------+-----+---------+-------+
-8 rows in set (0.01 sec)
+8 rows in set (0.18 sec)
 ```
 
 ##### Example
@@ -594,7 +594,7 @@ mysql> desc innodb_lock_waits;
 | blocking_lock_id   | varchar(81)         | NO   |     |         |       |
 | blocking_lock_mode | varchar(32)         | NO   |     |         |       |
 +--------------------+---------------------+------+-----+---------+-------+
-15 rows in set (0.00 sec)
+15 rows in set (0.23 sec)
 
 mysql> desc x$innodb_lock_waits;
 +--------------------+---------------------+------+-----+---------+-------+
@@ -616,7 +616,7 @@ mysql> desc x$innodb_lock_waits;
 | blocking_lock_id   | varchar(81)         | NO   |     |         |       |
 | blocking_lock_mode | varchar(32)         | NO   |     |         |       |
 +--------------------+---------------------+------+-----+---------+-------+
-15 rows in set (0.00 sec)
+15 rows in set (0.01 sec)
 ```
 
 ##### Example
@@ -657,14 +657,14 @@ mysql> desc io_by_thread_by_latency;
 +----------------+---------------------+------+-----+---------+-------+
 | user           | varchar(128)        | YES  |     | NULL    |       |
 | total          | decimal(42,0)       | YES  |     | NULL    |       |
-| total_latency  | varchar(16)         | YES  |     | NULL    |       |
-| min_latency    | varchar(16)         | YES  |     | NULL    |       |
-| avg_latency    | varchar(16)         | YES  |     | NULL    |       |
-| max_latency    | varchar(16)         | YES  |     | NULL    |       |
+| total_latency  | text                | YES  |     | NULL    |       |
+| min_latency    | text                | YES  |     | NULL    |       |
+| avg_latency    | text                | YES  |     | NULL    |       |
+| max_latency    | text                | YES  |     | NULL    |       |
 | thread_id      | bigint(20) unsigned | NO   |     | NULL    |       |
 | processlist_id | bigint(20) unsigned | YES  |     | NULL    |       |
 +----------------+---------------------+------+-----+---------+-------+
-8 rows in set (0.06 sec)
+8 rows in set (0.14 sec)
 
 mysql> desc x$io_by_thread_by_latency;
 +----------------+---------------------+------+-----+---------+-------+
@@ -679,7 +679,7 @@ mysql> desc x$io_by_thread_by_latency;
 | thread_id      | bigint(20) unsigned | NO   |     | NULL    |       |
 | processlist_id | bigint(20) unsigned | YES  |     | NULL    |       |
 +----------------+---------------------+------+-----+---------+-------+
-8 rows in set (0.05 sec)
+8 rows in set (0.03 sec)
 ```
 
 ##### Example
@@ -718,15 +718,15 @@ mysql> desc io_global_by_file_by_bytes;
 +---------------+---------------------+------+-----+---------+-------+
 | file          | varchar(260)        | YES  |     | NULL    |       |
 | count_read    | bigint(20) unsigned | NO   |     | NULL    |       |
-| total_read    | varchar(16)         | YES  |     | NULL    |       |
-| avg_read      | varchar(16)         | YES  |     | NULL    |       |
+| total_read    | text                | YES  |     | NULL    |       |
+| avg_read      | text                | YES  |     | NULL    |       |
 | count_write   | bigint(20) unsigned | NO   |     | NULL    |       |
-| total_written | varchar(16)         | YES  |     | NULL    |       |
-| avg_write     | varchar(16)         | YES  |     | NULL    |       |
-| total         | varchar(16)         | YES  |     | NULL    |       |
+| total_written | text                | YES  |     | NULL    |       |
+| avg_write     | text                | YES  |     | NULL    |       |
+| total         | text                | YES  |     | NULL    |       |
 | write_pct     | decimal(26,2)       | NO   |     | 0.00    |       |
 +---------------+---------------------+------+-----+---------+-------+
-9 rows in set (0.18 sec)
+9 rows in set (0.15 sec)
 
 mysql> desc x$io_global_by_file_by_bytes;
 +---------------+---------------------+------+-----+---------+-------+
@@ -742,7 +742,7 @@ mysql> desc x$io_global_by_file_by_bytes;
 | total         | bigint(21)          | NO   |     | 0       |       |
 | write_pct     | decimal(26,2)       | NO   |     | 0.00    |       |
 +---------------+---------------------+------+-----+---------+-------+
-9 rows in set (0.00 sec)
+9 rows in set (0.14 sec)
 ```
 
 ##### Example
@@ -775,15 +775,15 @@ mysql> desc io_global_by_file_by_latency;
 +---------------+---------------------+------+-----+---------+-------+
 | file          | varchar(260)        | YES  |     | NULL    |       |
 | total         | bigint(20) unsigned | NO   |     | NULL    |       |
-| total_latency | varchar(16)         | YES  |     | NULL    |       |
+| total_latency | text                | YES  |     | NULL    |       |
 | count_read    | bigint(20) unsigned | NO   |     | NULL    |       |
-| read_latency  | varchar(16)         | YES  |     | NULL    |       |
+| read_latency  | text                | YES  |     | NULL    |       |
 | count_write   | bigint(20) unsigned | NO   |     | NULL    |       |
-| write_latency | varchar(16)         | YES  |     | NULL    |       |
+| write_latency | text                | YES  |     | NULL    |       |
 | count_misc    | bigint(20) unsigned | NO   |     | NULL    |       |
-| misc_latency  | varchar(16)         | YES  |     | NULL    |       |
+| misc_latency  | text                | YES  |     | NULL    |       |
 +---------------+---------------------+------+-----+---------+-------+
-9 rows in set (0.09 sec)
+9 rows in set (0.00 sec)
 
 mysql> desc x$io_global_by_file_by_latency;
 +---------------+---------------------+------+-----+---------+-------+
@@ -799,7 +799,7 @@ mysql> desc x$io_global_by_file_by_latency;
 | count_misc    | bigint(20) unsigned | NO   |     | NULL    |       |
 | misc_latency  | bigint(20) unsigned | NO   |     | NULL    |       |
 +---------------+---------------------+------+-----+---------+-------+
-9 rows in set (0.00 sec)
+9 rows in set (0.07 sec)
 ```
 
 ##### Example
@@ -830,27 +830,27 @@ mysql> desc io_global_by_wait_by_bytes;
 +-----------------+---------------------+------+-----+---------+-------+
 | Field           | Type                | Null | Key | Default | Extra |
 +-----------------+---------------------+------+-----+---------+-------+
-| event_name      | varchar(128)        | NO   |     |         |       |
+| event_name      | varchar(128)        | YES  |     | NULL    |       |
 | total           | bigint(20) unsigned | NO   |     | NULL    |       |
-| total_latency   | varchar(16)         | YES  |     | NULL    |       |
-| min_latency     | varchar(16)         | YES  |     | NULL    |       |
-| avg_latency     | varchar(16)         | YES  |     | NULL    |       |
-| max_latency     | varchar(16)         | YES  |     | NULL    |       |
+| total_latency   | text                | YES  |     | NULL    |       |
+| min_latency     | text                | YES  |     | NULL    |       |
+| avg_latency     | text                | YES  |     | NULL    |       |
+| max_latency     | text                | YES  |     | NULL    |       |
 | count_read      | bigint(20) unsigned | NO   |     | NULL    |       |
-| total_read      | varchar(16)         | YES  |     | NULL    |       |
-| avg_read        | varchar(16)         | YES  |     | NULL    |       |
+| total_read      | text                | YES  |     | NULL    |       |
+| avg_read        | text                | YES  |     | NULL    |       |
 | count_write     | bigint(20) unsigned | NO   |     | NULL    |       |
-| total_written   | varchar(16)         | YES  |     | NULL    |       |
-| avg_written     | varchar(16)         | YES  |     | NULL    |       |
-| total_requested | varchar(16)         | YES  |     | NULL    |       |
+| total_written   | text                | YES  |     | NULL    |       |
+| avg_written     | text                | YES  |     | NULL    |       |
+| total_requested | text                | YES  |     | NULL    |       |
 +-----------------+---------------------+------+-----+---------+-------+
-13 rows in set (0.13 sec)
+13 rows in set (0.02 sec)
 
 mysql> desc x$io_global_by_wait_by_bytes;
 +-----------------+---------------------+------+-----+---------+-------+
 | Field           | Type                | Null | Key | Default | Extra |
 +-----------------+---------------------+------+-----+---------+-------+
-| event_name      | varchar(128)        | NO   |     |         |       |
+| event_name      | varchar(128)        | YES  |     | NULL    |       |
 | total           | bigint(20) unsigned | NO   |     | NULL    |       |
 | total_latency   | bigint(20) unsigned | NO   |     | NULL    |       |
 | min_latency     | bigint(20) unsigned | NO   |     | NULL    |       |
@@ -864,7 +864,7 @@ mysql> desc x$io_global_by_wait_by_bytes;
 | avg_written     | decimal(23,4)       | NO   |     | 0.0000  |       |
 | total_requested | bigint(21)          | NO   |     | 0       |       |
 +-----------------+---------------------+------+-----+---------+-------+
-13 rows in set (0.00 sec)
+13 rows in set (0.01 sec)
 ```
 
 ##### Example
@@ -906,28 +906,28 @@ mysql> desc io_global_by_wait_by_latency;
 +---------------+---------------------+------+-----+---------+-------+
 | Field         | Type                | Null | Key | Default | Extra |
 +---------------+---------------------+------+-----+---------+-------+
-| event_name    | varchar(128)        | NO   |     |         |       |
+| event_name    | varchar(128)        | YES  |     | NULL    |       |
 | total         | bigint(20) unsigned | NO   |     | NULL    |       |
-| total_latency | varchar(16)         | YES  |     | NULL    |       |
-| avg_latency   | varchar(16)         | YES  |     | NULL    |       |
-| max_latency   | varchar(16)         | YES  |     | NULL    |       |
-| read_latency  | varchar(16)         | YES  |     | NULL    |       |
-| write_latency | varchar(16)         | YES  |     | NULL    |       |
-| misc_latency  | varchar(16)         | YES  |     | NULL    |       |
+| total_latency | text                | YES  |     | NULL    |       |
+| avg_latency   | text                | YES  |     | NULL    |       |
+| max_latency   | text                | YES  |     | NULL    |       |
+| read_latency  | text                | YES  |     | NULL    |       |
+| write_latency | text                | YES  |     | NULL    |       |
+| misc_latency  | text                | YES  |     | NULL    |       |
 | count_read    | bigint(20) unsigned | NO   |     | NULL    |       |
-| total_read    | varchar(16)         | YES  |     | NULL    |       |
-| avg_read      | varchar(16)         | YES  |     | NULL    |       |
+| total_read    | text                | YES  |     | NULL    |       |
+| avg_read      | text                | YES  |     | NULL    |       |
 | count_write   | bigint(20) unsigned | NO   |     | NULL    |       |
-| total_written | varchar(16)         | YES  |     | NULL    |       |
-| avg_written   | varchar(16)         | YES  |     | NULL    |       |
+| total_written | text                | YES  |     | NULL    |       |
+| avg_written   | text                | YES  |     | NULL    |       |
 +---------------+---------------------+------+-----+---------+-------+
-14 rows in set (0.01 sec)
+14 rows in set (0.19 sec)
 
 mysql> desc x$io_global_by_wait_by_latency;
 +---------------+---------------------+------+-----+---------+-------+
 | Field         | Type                | Null | Key | Default | Extra |
 +---------------+---------------------+------+-----+---------+-------+
-| event_name    | varchar(128)        | NO   |     |         |       |
+| event_name    | varchar(128)        | YES  |     | NULL    |       |
 | total         | bigint(20) unsigned | NO   |     | NULL    |       |
 | total_latency | bigint(20) unsigned | NO   |     | NULL    |       |
 | avg_latency   | bigint(20) unsigned | NO   |     | NULL    |       |
@@ -986,11 +986,11 @@ mysql> desc latest_file_io;
 +-----------+--------------+------+-----+---------+-------+
 | thread    | varchar(149) | YES  |     | NULL    |       |
 | file      | varchar(260) | YES  |     | NULL    |       |
-| latency   | varchar(16)  | YES  |     | NULL    |       |
+| latency   | text         | YES  |     | NULL    |       |
 | operation | varchar(32)  | NO   |     | NULL    |       |
-| requested | varchar(16)  | YES  |     | NULL    |       |
+| requested | text         | YES  |     | NULL    |       |
 +-----------+--------------+------+-----+---------+-------+
-5 rows in set (0.00 sec)
+5 rows in set (0.10 sec)
 
 mysql> desc x$latest_file_io;
 +-----------+---------------------+------+-----+---------+-------+
@@ -1002,7 +1002,7 @@ mysql> desc x$latest_file_io;
 | operation | varchar(32)         | NO   |     | NULL    |       |
 | requested | bigint(20)          | YES  |     | NULL    |       |
 +-----------+---------------------+------+-----+---------+-------+
-5 rows in set (0.00 sec)
+5 rows in set (0.05 sec)
 ```
 
 ##### Example
@@ -1037,12 +1037,12 @@ mysql> desc memory_by_host_by_current_bytes;
 +--------------------+---------------+------+-----+---------+-------+
 | host               | varchar(60)   | YES  |     | NULL    |       |
 | current_count_used | decimal(41,0) | YES  |     | NULL    |       |
-| current_allocated  | varchar(16)   | YES  |     | NULL    |       |
-| current_avg_alloc  | varchar(16)   | YES  |     | NULL    |       |
-| current_max_alloc  | varchar(16)   | YES  |     | NULL    |       |
-| total_allocated    | varchar(16)   | YES  |     | NULL    |       |
+| current_allocated  | text          | YES  |     | NULL    |       |
+| current_avg_alloc  | text          | YES  |     | NULL    |       |
+| current_max_alloc  | text          | YES  |     | NULL    |       |
+| total_allocated    | text          | YES  |     | NULL    |       |
 +--------------------+---------------+------+-----+---------+-------+
-6 rows in set (0.10 sec)
+6 rows in set (0.24 sec)
 
 mysql> desc x$memory_by_host_by_current_bytes;
 +--------------------+---------------+------+-----+---------+-------+
@@ -1055,7 +1055,7 @@ mysql> desc x$memory_by_host_by_current_bytes;
 | current_max_alloc  | bigint(20)    | YES  |     | NULL    |       |
 | total_allocated    | decimal(42,0) | YES  |     | NULL    |       |
 +--------------------+---------------+------+-----+---------+-------+
-6 rows in set (0.00 sec)
+6 rows in set (0.28 sec)
 ```
 
 ##### Example
@@ -1088,12 +1088,12 @@ mysql> desc memory_by_thread_by_current_bytes;
 | thread_id          | bigint(20) unsigned | NO   |     | NULL    |       |
 | user               | varchar(128)        | YES  |     | NULL    |       |
 | current_count_used | decimal(41,0)       | YES  |     | NULL    |       |
-| current_allocated  | varchar(16)         | YES  |     | NULL    |       |
-| current_avg_alloc  | varchar(16)         | YES  |     | NULL    |       |
-| current_max_alloc  | varchar(16)         | YES  |     | NULL    |       |
-| total_allocated    | varchar(16)         | YES  |     | NULL    |       |
+| current_allocated  | text                | YES  |     | NULL    |       |
+| current_avg_alloc  | text                | YES  |     | NULL    |       |
+| current_max_alloc  | text                | YES  |     | NULL    |       |
+| total_allocated    | text                | YES  |     | NULL    |       |
 +--------------------+---------------------+------+-----+---------+-------+
-7 rows in set (0.01 sec)
+7 rows in set (0.49 sec)
 
 mysql> desc x$memory_by_thread_by_current_bytes;
 +--------------------+---------------------+------+-----+---------+-------+
@@ -1107,7 +1107,7 @@ mysql> desc x$memory_by_thread_by_current_bytes;
 | current_max_alloc  | bigint(20)          | YES  |     | NULL    |       |
 | total_allocated    | decimal(42,0)       | YES  |     | NULL    |       |
 +--------------------+---------------------+------+-----+---------+-------+
-7 rows in set (0.00 sec)
+7 rows in set (0.25 sec)
 ```
 
 ##### Example
@@ -1142,12 +1142,12 @@ mysql> desc memory_by_user_by_current_bytes;
 +--------------------+---------------+------+-----+---------+-------+
 | user               | varchar(16)   | YES  |     | NULL    |       |
 | current_count_used | decimal(41,0) | YES  |     | NULL    |       |
-| current_allocated  | varchar(16)   | YES  |     | NULL    |       |
-| current_avg_alloc  | varchar(16)   | YES  |     | NULL    |       |
-| current_max_alloc  | varchar(16)   | YES  |     | NULL    |       |
-| total_allocated    | varchar(16)   | YES  |     | NULL    |       |
+| current_allocated  | text          | YES  |     | NULL    |       |
+| current_avg_alloc  | text          | YES  |     | NULL    |       |
+| current_max_alloc  | text          | YES  |     | NULL    |       |
+| total_allocated    | text          | YES  |     | NULL    |       |
 +--------------------+---------------+------+-----+---------+-------+
-6 rows in set (0.01 sec)
+6 rows in set (0.06 sec)
 
 mysql> desc x$memory_by_user_by_current_bytes;
 +--------------------+---------------+------+-----+---------+-------+
@@ -1160,7 +1160,7 @@ mysql> desc x$memory_by_user_by_current_bytes;
 | current_max_alloc  | bigint(20)    | YES  |     | NULL    |       |
 | total_allocated    | decimal(42,0) | YES  |     | NULL    |       |
 +--------------------+---------------+------+-----+---------+-------+
-6 rows in set (0.06 sec)
+6 rows in set (0.12 sec)
 ```
 
 ##### Example
@@ -1190,13 +1190,13 @@ mysql> desc memory_global_by_current_bytes;
 +-------------------+--------------+------+-----+---------+-------+
 | event_name        | varchar(128) | NO   |     | NULL    |       |
 | current_count     | bigint(20)   | NO   |     | NULL    |       |
-| current_alloc     | varchar(16)  | YES  |     | NULL    |       |
-| current_avg_alloc | varchar(16)  | YES  |     | NULL    |       |
+| current_alloc     | text         | YES  |     | NULL    |       |
+| current_avg_alloc | text         | YES  |     | NULL    |       |
 | high_count        | bigint(20)   | NO   |     | NULL    |       |
-| high_alloc        | varchar(16)  | YES  |     | NULL    |       |
-| high_avg_alloc    | varchar(16)  | YES  |     | NULL    |       |
+| high_alloc        | text         | YES  |     | NULL    |       |
+| high_avg_alloc    | text         | YES  |     | NULL    |       |
 +-------------------+--------------+------+-----+---------+-------+
-7 rows in set (0.09 sec)
+7 rows in set (0.08 sec)
 
 mysql> desc x$memory_global_by_current_bytes;
 +-------------------+---------------+------+-----+---------+-------+
@@ -1210,7 +1210,7 @@ mysql> desc x$memory_global_by_current_bytes;
 | high_alloc        | bigint(20)    | NO   |     | NULL    |       |
 | high_avg_alloc    | decimal(23,4) | NO   |     | 0.0000  |       |
 +-------------------+---------------+------+-----+---------+-------+
-7 rows in set (0.00 sec)
+7 rows in set (0.16 sec)
 ```
 
 ##### Example
@@ -1239,12 +1239,12 @@ Shows the total memory usage within the server globally.
 
 ```SQL
 mysql> desc memory_global_total;
-+-----------------+-------------+------+-----+---------+-------+
-| Field           | Type        | Null | Key | Default | Extra |
-+-----------------+-------------+------+-----+---------+-------+
-| total_allocated | varchar(16) | YES  |     | NULL    |       |
-+-----------------+-------------+------+-----+---------+-------+
-1 row in set (0.01 sec)
++-----------------+------+------+-----+---------+-------+
+| Field           | Type | Null | Key | Default | Extra |
++-----------------+------+------+-----+---------+-------+
+| total_allocated | text | YES  |     | NULL    |       |
++-----------------+------+------+-----+---------+-------+
+1 row in set (0.07 sec)
 
 mysql> desc x$memory_global_total;
 +-----------------+---------------+------+-----+---------+-------+
@@ -1252,7 +1252,7 @@ mysql> desc x$memory_global_total;
 +-----------------+---------------+------+-----+---------+-------+
 | total_allocated | decimal(41,0) | YES  |     | NULL    |       |
 +-----------------+---------------+------+-----+---------+-------+
-1 row in set (0.01 sec)
+1 row in set (0.00 sec)
 ```
 
 ##### Example
@@ -1289,21 +1289,21 @@ mysql> desc processlist;
 | state                  | varchar(64)         | YES  |     | NULL    |       |
 | time                   | bigint(20)          | YES  |     | NULL    |       |
 | current_statement      | longtext            | YES  |     | NULL    |       |
-| lock_latency           | varchar(16)         | YES  |     | NULL    |       |
+| lock_latency           | text                | YES  |     | NULL    |       |
 | rows_examined          | bigint(20) unsigned | YES  |     | NULL    |       |
 | rows_sent              | bigint(20) unsigned | YES  |     | NULL    |       |
 | rows_affected          | bigint(20) unsigned | YES  |     | NULL    |       |
 | tmp_tables             | bigint(20) unsigned | YES  |     | NULL    |       |
 | tmp_disk_tables        | bigint(20) unsigned | YES  |     | NULL    |       |
 | full_scan              | varchar(3)          | NO   |     |         |       |
-| current_memory         | varchar(16)         | YES  |     | NULL    |       |
+| current_memory         | text                | YES  |     | NULL    |       |
 | last_statement         | longtext            | YES  |     | NULL    |       |
-| last_statement_latency | varchar(16)         | YES  |     | NULL    |       |
+| last_statement_latency | text                | YES  |     | NULL    |       |
 | last_wait              | varchar(128)        | YES  |     | NULL    |       |
-| last_wait_latency      | varchar(16)         | YES  |     | NULL    |       |
+| last_wait_latency      | text                | YES  |     | NULL    |       |
 | source                 | varchar(64)         | YES  |     | NULL    |       |
 +------------------------+---------------------+------+-----+---------+-------+
-21 rows in set (0.09 sec)
+21 rows in set (0.00 sec)
 
 mysql> desc x$processlist;
 +------------------------+---------------------+------+-----+---------+-------+
@@ -1331,7 +1331,7 @@ mysql> desc x$processlist;
 | last_wait_latency      | varchar(20)         | YES  |     | NULL    |       |
 | source                 | varchar(64)         | YES  |     | NULL    |       |
 +------------------------+---------------------+------+-----+---------+-------+
-21 rows in set (0.00 sec)
+21 rows in set (0.15 sec)
 ```
 
 ##### Example
@@ -1412,15 +1412,15 @@ mysql> desc schema_index_statistics;
 | table_name     | varchar(64)         | YES  |     | NULL    |       |
 | index_name     | varchar(64)         | YES  |     | NULL    |       |
 | rows_selected  | bigint(20) unsigned | NO   |     | NULL    |       |
-| select_latency | varchar(16)         | YES  |     | NULL    |       |
+| select_latency | text                | YES  |     | NULL    |       |
 | rows_inserted  | bigint(20) unsigned | NO   |     | NULL    |       |
-| insert_latency | varchar(16)         | YES  |     | NULL    |       |
+| insert_latency | text                | YES  |     | NULL    |       |
 | rows_updated   | bigint(20) unsigned | NO   |     | NULL    |       |
-| update_latency | varchar(16)         | YES  |     | NULL    |       |
+| update_latency | text                | YES  |     | NULL    |       |
 | rows_deleted   | bigint(20) unsigned | NO   |     | NULL    |       |
-| delete_latency | varchar(16)         | YES  |     | NULL    |       |
+| delete_latency | text                | YES  |     | NULL    |       |
 +----------------+---------------------+------+-----+---------+-------+
-11 rows in set (0.00 sec)
+11 rows in set (0.17 sec)
 
 mysql> desc x$schema_index_statistics;
 +----------------+---------------------+------+-----+---------+-------+
@@ -1438,7 +1438,7 @@ mysql> desc x$schema_index_statistics;
 | rows_deleted   | bigint(20) unsigned | NO   |     | NULL    |       |
 | delete_latency | bigint(20) unsigned | NO   |     | NULL    |       |
 +----------------+---------------------+------+-----+---------+-------+
-11 rows in set (0.01 sec)
+11 rows in set (0.42 sec)
 ```
 
 ##### Example
@@ -1514,34 +1514,31 @@ Also includes the helper view (used by schema_table_statistics_with_buffer as we
 ##### Structures
 
 ```SQL
-Structures
-==========
-
 mysql> desc schema_table_statistics;
 +-------------------+---------------------+------+-----+---------+-------+
 | Field             | Type                | Null | Key | Default | Extra |
 +-------------------+---------------------+------+-----+---------+-------+
 | table_schema      | varchar(64)         | YES  |     | NULL    |       |
 | table_name        | varchar(64)         | YES  |     | NULL    |       |
-| total_latency     | varchar(16)         | YES  |     | NULL    |       |
+| total_latency     | text                | YES  |     | NULL    |       |
 | rows_fetched      | bigint(20) unsigned | NO   |     | NULL    |       |
-| fetch_latency     | varchar(16)         | YES  |     | NULL    |       |
+| fetch_latency     | text                | YES  |     | NULL    |       |
 | rows_inserted     | bigint(20) unsigned | NO   |     | NULL    |       |
-| insert_latency    | varchar(16)         | YES  |     | NULL    |       |
+| insert_latency    | text                | YES  |     | NULL    |       |
 | rows_updated      | bigint(20) unsigned | NO   |     | NULL    |       |
-| update_latency    | varchar(16)         | YES  |     | NULL    |       |
+| update_latency    | text                | YES  |     | NULL    |       |
 | rows_deleted      | bigint(20) unsigned | NO   |     | NULL    |       |
-| delete_latency    | varchar(16)         | YES  |     | NULL    |       |
+| delete_latency    | text                | YES  |     | NULL    |       |
 | io_read_requests  | decimal(42,0)       | YES  |     | NULL    |       |
-| io_read           | varchar(16)         | YES  |     | NULL    |       |
-| io_read_latency   | varchar(16)         | YES  |     | NULL    |       |
+| io_read           | text                | YES  |     | NULL    |       |
+| io_read_latency   | text                | YES  |     | NULL    |       |
 | io_write_requests | decimal(42,0)       | YES  |     | NULL    |       |
-| io_write          | varchar(16)         | YES  |     | NULL    |       |
-| io_write_latency  | varchar(16)         | YES  |     | NULL    |       |
+| io_write          | text                | YES  |     | NULL    |       |
+| io_write_latency  | text                | YES  |     | NULL    |       |
 | io_misc_requests  | decimal(42,0)       | YES  |     | NULL    |       |
-| io_misc_latency   | varchar(16)         | YES  |     | NULL    |       |
+| io_misc_latency   | text                | YES  |     | NULL    |       |
 +-------------------+---------------------+------+-----+---------+-------+
-19 rows in set (0.05 sec)
+19 rows in set (0.12 sec)
 
 mysql> desc x$schema_table_statistics;
 +-------------------+---------------------+------+-----+---------+-------+
@@ -1567,7 +1564,7 @@ mysql> desc x$schema_table_statistics;
 | io_misc_requests  | decimal(42,0)       | YES  |     | NULL    |       |
 | io_misc_latency   | decimal(42,0)       | YES  |     | NULL    |       |
 +-------------------+---------------------+------+-----+---------+-------+
-19 rows in set (0.00 sec)
+19 rows in set (0.13 sec)
 
 mysql> desc x$ps_schema_table_statistics_io;
 +---------------------------+---------------+------+-----+---------+-------+
@@ -1584,7 +1581,7 @@ mysql> desc x$ps_schema_table_statistics_io;
 | count_misc                | decimal(42,0) | YES  |     | NULL    |       |
 | sum_timer_misc            | decimal(42,0) | YES  |     | NULL    |       |
 +---------------------------+---------------+------+-----+---------+-------+
-10 rows in set (0.00 sec)
+10 rows in set (0.10 sec)
 ```
 
 ##### Example
@@ -1635,30 +1632,30 @@ mysql> desc schema_table_statistics_with_buffer;
 | table_schema               | varchar(64)         | YES  |     | NULL    |       |
 | table_name                 | varchar(64)         | YES  |     | NULL    |       |
 | rows_fetched               | bigint(20) unsigned | NO   |     | NULL    |       |
-| fetch_latency              | varchar(16)         | YES  |     | NULL    |       |
+| fetch_latency              | text                | YES  |     | NULL    |       |
 | rows_inserted              | bigint(20) unsigned | NO   |     | NULL    |       |
-| insert_latency             | varchar(16)         | YES  |     | NULL    |       |
+| insert_latency             | text                | YES  |     | NULL    |       |
 | rows_updated               | bigint(20) unsigned | NO   |     | NULL    |       |
-| update_latency             | varchar(16)         | YES  |     | NULL    |       |
+| update_latency             | text                | YES  |     | NULL    |       |
 | rows_deleted               | bigint(20) unsigned | NO   |     | NULL    |       |
-| delete_latency             | varchar(16)         | YES  |     | NULL    |       |
+| delete_latency             | text                | YES  |     | NULL    |       |
 | io_read_requests           | decimal(42,0)       | YES  |     | NULL    |       |
-| io_read                    | varchar(16)         | YES  |     | NULL    |       |
-| io_read_latency            | varchar(16)         | YES  |     | NULL    |       |
+| io_read                    | text                | YES  |     | NULL    |       |
+| io_read_latency            | text                | YES  |     | NULL    |       |
 | io_write_requests          | decimal(42,0)       | YES  |     | NULL    |       |
-| io_write                   | varchar(16)         | YES  |     | NULL    |       |
-| io_write_latency           | varchar(16)         | YES  |     | NULL    |       |
+| io_write                   | text                | YES  |     | NULL    |       |
+| io_write_latency           | text                | YES  |     | NULL    |       |
 | io_misc_requests           | decimal(42,0)       | YES  |     | NULL    |       |
-| io_misc_latency            | varchar(16)         | YES  |     | NULL    |       |
-| innodb_buffer_allocated    | varchar(16)         | YES  |     | NULL    |       |
-| innodb_buffer_data         | varchar(16)         | YES  |     | NULL    |       |
-| innodb_buffer_free         | varchar(16)         | YES  |     | NULL    |       |
+| io_misc_latency            | text                | YES  |     | NULL    |       |
+| innodb_buffer_allocated    | text                | YES  |     | NULL    |       |
+| innodb_buffer_data         | text                | YES  |     | NULL    |       |
+| innodb_buffer_free         | text                | YES  |     | NULL    |       |
 | innodb_buffer_pages        | bigint(21)          | YES  |     | 0       |       |
 | innodb_buffer_pages_hashed | bigint(21)          | YES  |     | 0       |       |
 | innodb_buffer_pages_old    | bigint(21)          | YES  |     | 0       |       |
 | innodb_buffer_rows_cached  | decimal(44,0)       | YES  |     | 0       |       |
 +----------------------------+---------------------+------+-----+---------+-------+
-25 rows in set (0.10 sec)
+25 rows in set (0.05 sec)
 
 mysql> desc x$schema_table_statistics_with_buffer;
 +----------------------------+---------------------+------+-----+---------+-------+
@@ -1690,7 +1687,7 @@ mysql> desc x$schema_table_statistics_with_buffer;
 | innodb_buffer_pages_old    | bigint(21)          | YES  |     | 0       |       |
 | innodb_buffer_rows_cached  | decimal(44,0)       | YES  |     | 0       |       |
 +----------------------------+---------------------+------+-----+---------+-------+
-25 rows in set (0.01 sec)
+25 rows in set (0.17 sec)
 ```
 
 ##### Example
@@ -1740,9 +1737,9 @@ mysql> desc schema_tables_with_full_table_scans;
 | object_schema     | varchar(64)         | YES  |     | NULL    |       |
 | object_name       | varchar(64)         | YES  |     | NULL    |       |
 | rows_full_scanned | bigint(20) unsigned | NO   |     | NULL    |       |
-| latency           | varchar(16)         | YES  |     | NULL    |       |
+| latency           | text                | YES  |     | NULL    |       |
 +-------------------+---------------------+------+-----+---------+-------+
-4 rows in set (0.39 sec)
+4 rows in set (0.02 sec)
 
 mysql> desc x$schema_tables_with_full_table_scans;
 +-------------------+---------------------+------+-----+---------+-------+
@@ -1753,7 +1750,7 @@ mysql> desc x$schema_tables_with_full_table_scans;
 | rows_full_scanned | bigint(20) unsigned | NO   |     | NULL    |       |
 | latency           | bigint(20) unsigned | NO   |     | NULL    |       |
 +-------------------+---------------------+------+-----+---------+-------+
-4 rows in set (0.00 sec)
+4 rows in set (0.03 sec)
 ```
 
 ##### Example
@@ -1829,10 +1826,10 @@ mysql> desc statement_analysis;
 | exec_count        | bigint(20) unsigned | NO   |     | NULL                |       |
 | err_count         | bigint(20) unsigned | NO   |     | NULL                |       |
 | warn_count        | bigint(20) unsigned | NO   |     | NULL                |       |
-| total_latency     | varchar(16)         | YES  |     | NULL                |       |
-| max_latency       | varchar(16)         | YES  |     | NULL                |       |
-| avg_latency       | varchar(16)         | YES  |     | NULL                |       |
-| lock_latency      | varchar(16)         | YES  |     | NULL                |       |
+| total_latency     | text                | YES  |     | NULL                |       |
+| max_latency       | text                | YES  |     | NULL                |       |
+| avg_latency       | text                | YES  |     | NULL                |       |
+| lock_latency      | text                | YES  |     | NULL                |       |
 | rows_sent         | bigint(20) unsigned | NO   |     | NULL                |       |
 | rows_sent_avg     | decimal(21,0)       | NO   |     | 0                   |       |
 | rows_examined     | bigint(20) unsigned | NO   |     | NULL                |       |
@@ -1847,7 +1844,7 @@ mysql> desc statement_analysis;
 | first_seen        | timestamp           | NO   |     | 0000-00-00 00:00:00 |       |
 | last_seen         | timestamp           | NO   |     | 0000-00-00 00:00:00 |       |
 +-------------------+---------------------+------+-----+---------------------+-------+
-23 rows in set (0.00 sec)
+23 rows in set (0.26 sec)
 
 mysql> desc x$statement_analysis;
 +-------------------+---------------------+------+-----+---------------------+-------+
@@ -1877,7 +1874,7 @@ mysql> desc x$statement_analysis;
 | first_seen        | timestamp           | NO   |     | 0000-00-00 00:00:00 |       |
 | last_seen         | timestamp           | NO   |     | 0000-00-00 00:00:00 |       |
 +-------------------+---------------------+------+-----+---------------------+-------+
-23 rows in set (0.00 sec)
+23 rows in set (0.27 sec)
 ```
 
 ##### Example
@@ -1934,7 +1931,7 @@ mysql> desc statements_with_errors_or_warnings;
 | last_seen   | timestamp           | NO   |     | 0000-00-00 00:00:00 |       |
 | digest      | varchar(32)         | YES  |     | NULL                |       |
 +-------------+---------------------+------+-----+---------------------+-------+
-10 rows in set (0.04 sec)
+10 rows in set (0.55 sec)
 
 mysql> desc x$statements_with_errors_or_warnings;
 +-------------+---------------------+------+-----+---------------------+-------+
@@ -1951,7 +1948,7 @@ mysql> desc x$statements_with_errors_or_warnings;
 | last_seen   | timestamp           | NO   |     | 0000-00-00 00:00:00 |       |
 | digest      | varchar(32)         | YES  |     | NULL                |       |
 +-------------+---------------------+------+-----+---------------------+-------+
-10 rows in set (0.00 sec)
+10 rows in set (0.25 sec)
 ```
 
 ##### Example
@@ -1989,7 +1986,7 @@ mysql> desc statements_with_full_table_scans;
 | query                    | longtext               | YES  |     | NULL                |       |
 | db                       | varchar(64)            | YES  |     | NULL                |       |
 | exec_count               | bigint(20) unsigned    | NO   |     | NULL                |       |
-| total_latency            | varchar(16)            | YES  |     | NULL                |       |
+| total_latency            | text                   | YES  |     | NULL                |       |
 | no_index_used_count      | bigint(20) unsigned    | NO   |     | NULL                |       |
 | no_good_index_used_count | bigint(20) unsigned    | NO   |     | NULL                |       |
 | no_index_used_pct        | decimal(24,0)          | NO   |     | 0                   |       |
@@ -2001,7 +1998,7 @@ mysql> desc statements_with_full_table_scans;
 | last_seen                | timestamp              | NO   |     | 0000-00-00 00:00:00 |       |
 | digest                   | varchar(32)            | YES  |     | NULL                |       |
 +--------------------------+------------------------+------+-----+---------------------+-------+
-14 rows in set (0.01 sec)
+14 rows in set (0.04 sec)
 
 mysql> desc x$statements_with_full_table_scans;
 +--------------------------+------------------------+------+-----+---------------------+-------+
@@ -2022,7 +2019,7 @@ mysql> desc x$statements_with_full_table_scans;
 | last_seen                | timestamp              | NO   |     | 0000-00-00 00:00:00 |       |
 | digest                   | varchar(32)            | YES  |     | NULL                |       |
 +--------------------------+------------------------+------+-----+---------------------+-------+
-14 rows in set (0.00 sec)
+14 rows in set (0.14 sec)
 ```
 
 ##### Example
@@ -2070,9 +2067,9 @@ mysql> desc statements_with_runtimes_in_95th_percentile;
 | exec_count        | bigint(20) unsigned | NO   |     | NULL                |       |
 | err_count         | bigint(20) unsigned | NO   |     | NULL                |       |
 | warn_count        | bigint(20) unsigned | NO   |     | NULL                |       |
-| total_latency     | varchar(16)         | YES  |     | NULL                |       |
-| max_latency       | varchar(16)         | YES  |     | NULL                |       |
-| avg_latency       | varchar(16)         | YES  |     | NULL                |       |
+| total_latency     | text                | YES  |     | NULL                |       |
+| max_latency       | text                | YES  |     | NULL                |       |
+| avg_latency       | text                | YES  |     | NULL                |       |
 | rows_sent         | bigint(20) unsigned | NO   |     | NULL                |       |
 | rows_sent_avg     | decimal(21,0)       | NO   |     | 0                   |       |
 | rows_examined     | bigint(20) unsigned | NO   |     | NULL                |       |
@@ -2081,7 +2078,7 @@ mysql> desc statements_with_runtimes_in_95th_percentile;
 | last_seen         | timestamp           | NO   |     | 0000-00-00 00:00:00 |       |
 | digest            | varchar(32)         | YES  |     | NULL                |       |
 +-------------------+---------------------+------+-----+---------------------+-------+
-16 rows in set (0.00 sec)
+16 rows in set (0.11 sec)
 
 mysql> desc x$statements_with_runtimes_in_95th_percentile;
 +-------------------+---------------------+------+-----+---------------------+-------+
@@ -2113,7 +2110,7 @@ mysql> desc x$ps_digest_avg_latency_distribution;
 | cnt    | bigint(21)    | NO   |     | 0       |       |
 | avg_us | decimal(21,0) | YES  |     | NULL    |       |
 +--------+---------------+------+-----+---------+-------+
-2 rows in set (0.01 sec)
+2 rows in set (0.10 sec)
 
 mysql> desc x$ps_digest_95th_percentile_by_avg_us;
 +------------+---------------+------+-----+---------+-------+
@@ -2122,7 +2119,7 @@ mysql> desc x$ps_digest_95th_percentile_by_avg_us;
 | avg_us     | decimal(21,0) | YES  |     | NULL    |       |
 | percentile | decimal(46,4) | NO   |     | 0.0000  |       |
 +------------+---------------+------+-----+---------+-------+
-2 rows in set (0.00 sec)
+2 rows in set (0.15 sec)
 ```
 
 ##### Example
@@ -2164,7 +2161,7 @@ mysql> desc statements_with_sorting;
 | query             | longtext            | YES  |     | NULL                |       |
 | db                | varchar(64)         | YES  |     | NULL                |       |
 | exec_count        | bigint(20) unsigned | NO   |     | NULL                |       |
-| total_latency     | varchar(16)         | YES  |     | NULL                |       |
+| total_latency     | text                | YES  |     | NULL                |       |
 | sort_merge_passes | bigint(20) unsigned | NO   |     | NULL                |       |
 | avg_sort_merges   | decimal(21,0)       | NO   |     | 0                   |       |
 | sorts_using_scans | bigint(20) unsigned | NO   |     | NULL                |       |
@@ -2175,7 +2172,7 @@ mysql> desc statements_with_sorting;
 | last_seen         | timestamp           | NO   |     | 0000-00-00 00:00:00 |       |
 | digest            | varchar(32)         | YES  |     | NULL                |       |
 +-------------------+---------------------+------+-----+---------------------+-------+
-13 rows in set (0.12 sec)
+13 rows in set (0.01 sec)
 
 mysql> desc x$statements_with_sorting;
 +-------------------+---------------------+------+-----+---------------------+-------+
@@ -2195,7 +2192,7 @@ mysql> desc x$statements_with_sorting;
 | last_seen         | timestamp           | NO   |     | 0000-00-00 00:00:00 |       |
 | digest            | varchar(32)         | YES  |     | NULL                |       |
 +-------------------+---------------------+------+-----+---------------------+-------+
-13 rows in set (0.00 sec)
+13 rows in set (0.04 sec)
 ```
 
 ##### Example
@@ -2234,7 +2231,7 @@ mysql> desc statements_with_temp_tables;
 | query                    | longtext            | YES  |     | NULL                |       |
 | db                       | varchar(64)         | YES  |     | NULL                |       |
 | exec_count               | bigint(20) unsigned | NO   |     | NULL                |       |
-| total_latency            | varchar(16)         | YES  |     | NULL                |       |
+| total_latency            | text                | YES  |     | NULL                |       |
 | memory_tmp_tables        | bigint(20) unsigned | NO   |     | NULL                |       |
 | disk_tmp_tables          | bigint(20) unsigned | NO   |     | NULL                |       |
 | avg_tmp_tables_per_query | decimal(21,0)       | NO   |     | 0                   |       |
@@ -2243,7 +2240,7 @@ mysql> desc statements_with_temp_tables;
 | last_seen                | timestamp           | NO   |     | 0000-00-00 00:00:00 |       |
 | digest                   | varchar(32)         | YES  |     | NULL                |       |
 +--------------------------+---------------------+------+-----+---------------------+-------+
-11 rows in set (0.04 sec)
+11 rows in set (0.30 sec)
 
 mysql> desc x$statements_with_temp_tables;
 +--------------------------+---------------------+------+-----+---------------------+-------+
@@ -2261,7 +2258,7 @@ mysql> desc x$statements_with_temp_tables;
 | last_seen                | timestamp           | NO   |     | 0000-00-00 00:00:00 |       |
 | digest                   | varchar(32)         | YES  |     | NULL                |       |
 +--------------------------+---------------------+------+-----+---------------------+-------+
-11 rows in set (0.00 sec)
+11 rows in set (0.05 sec)
 ```
 
 ##### Example
@@ -2299,18 +2296,18 @@ mysql> desc user_summary;
 +------------------------+---------------+------+-----+---------+-------+
 | user                   | varchar(16)   | YES  |     | NULL    |       |
 | statements             | decimal(64,0) | YES  |     | NULL    |       |
-| statement_latency      | varchar(16)   | YES  |     | NULL    |       |
-| statement_avg_latency  | varchar(16)   | YES  |     | NULL    |       |
+| statement_latency      | text          | YES  |     | NULL    |       |
+| statement_avg_latency  | text          | YES  |     | NULL    |       |
 | table_scans            | decimal(65,0) | YES  |     | NULL    |       |
 | file_ios               | decimal(64,0) | YES  |     | NULL    |       |
-| file_io_latency        | varchar(16)   | YES  |     | NULL    |       |
+| file_io_latency        | text          | YES  |     | NULL    |       |
 | current_connections    | decimal(41,0) | YES  |     | NULL    |       |
 | total_connections      | decimal(41,0) | YES  |     | NULL    |       |
 | unique_hosts           | bigint(21)    | NO   |     | 0       |       |
-| current_memory         | varchar(16)   | YES  |     | NULL    |       |
-| total_memory_allocated | varchar(16)   | YES  |     | NULL    |       |
+| current_memory         | text          | YES  |     | NULL    |       |
+| total_memory_allocated | text          | YES  |     | NULL    |       |
 +------------------------+---------------+------+-----+---------+-------+
-12 rows in set (0.10 sec)
+12 rows in set (0.00 sec)
 
 mysql> desc x$user_summary;
 +------------------------+---------------+------+-----+---------+-------+
@@ -2381,9 +2378,9 @@ mysql> desc user_summary_by_file_io;
 +------------+---------------+------+-----+---------+-------+
 | user       | varchar(16)   | YES  |     | NULL    |       |
 | ios        | decimal(42,0) | YES  |     | NULL    |       |
-| io_latency | varchar(16)   | YES  |     | NULL    |       |
+| io_latency | text          | YES  |     | NULL    |       |
 +------------+---------------+------+-----+---------+-------+
-3 rows in set (0.00 sec)
+3 rows in set (0.20 sec)
 
 mysql> desc x$user_summary_by_file_io;
 +------------+---------------+------+-----+---------+-------+
@@ -2393,7 +2390,7 @@ mysql> desc x$user_summary_by_file_io;
 | ios        | decimal(42,0) | YES  |     | NULL    |       |
 | io_latency | decimal(42,0) | YES  |     | NULL    |       |
 +------------+---------------+------+-----+---------+-------+
-3 rows in set (0.00 sec)
+3 rows in set (0.02 sec)
 ```
 
 ##### Example
@@ -2426,10 +2423,10 @@ mysql> desc user_summary_by_file_io_type;
 | user        | varchar(16)         | YES  |     | NULL    |       |
 | event_name  | varchar(128)        | NO   |     | NULL    |       |
 | total       | bigint(20) unsigned | NO   |     | NULL    |       |
-| latency     | varchar(16)         | YES  |     | NULL    |       |
-| max_latency | varchar(16)         | YES  |     | NULL    |       |
+| latency     | text                | YES  |     | NULL    |       |
+| max_latency | text                | YES  |     | NULL    |       |
 +-------------+---------------------+------+-----+---------+-------+
-5 rows in set (0.01 sec)
+5 rows in set (0.02 sec)
 
 mysql> desc x$user_summary_by_file_io_type;
 +-------------+---------------------+------+-----+---------+-------+
@@ -2441,7 +2438,7 @@ mysql> desc x$user_summary_by_file_io_type;
 | latency     | bigint(20) unsigned | NO   |     | NULL    |       |
 | max_latency | bigint(20) unsigned | NO   |     | NULL    |       |
 +-------------+---------------------+------+-----+---------+-------+
-5 rows in set (0.01 sec)
+5 rows in set (0.00 sec)
 ```
 
 ##### Example
@@ -2498,10 +2495,10 @@ mysql> desc user_summary_by_stages;
 | user          | varchar(16)         | YES  |     | NULL    |       |
 | event_name    | varchar(128)        | NO   |     | NULL    |       |
 | total         | bigint(20) unsigned | NO   |     | NULL    |       |
-| total_latency | varchar(16)         | YES  |     | NULL    |       |
-| avg_latency   | varchar(16)         | YES  |     | NULL    |       |
+| total_latency | text                | YES  |     | NULL    |       |
+| avg_latency   | text                | YES  |     | NULL    |       |
 +---------------+---------------------+------+-----+---------+-------+
-5 rows in set (0.06 sec)
+5 rows in set (0.01 sec)
 
 mysql> desc x$user_summary_by_stages;
 +---------------+---------------------+------+-----+---------+-------+
@@ -2559,9 +2556,9 @@ mysql> desc user_summary_by_statement_latency;
 +---------------+---------------+------+-----+---------+-------+
 | user          | varchar(16)   | YES  |     | NULL    |       |
 | total         | decimal(42,0) | YES  |     | NULL    |       |
-| total_latency | varchar(16)   | YES  |     | NULL    |       |
-| max_latency   | varchar(16)   | YES  |     | NULL    |       |
-| lock_latency  | varchar(16)   | YES  |     | NULL    |       |
+| total_latency | text          | YES  |     | NULL    |       |
+| max_latency   | text          | YES  |     | NULL    |       |
+| lock_latency  | text          | YES  |     | NULL    |       |
 | rows_sent     | decimal(42,0) | YES  |     | NULL    |       |
 | rows_examined | decimal(42,0) | YES  |     | NULL    |       |
 | rows_affected | decimal(42,0) | YES  |     | NULL    |       |
@@ -2583,7 +2580,7 @@ mysql> desc x$user_summary_by_statement_latency;
 | rows_affected | decimal(42,0) | YES  |     | NULL    |       |
 | full_scans    | decimal(43,0) | YES  |     | NULL    |       |
 +---------------+---------------+------+-----+---------+-------+
-9 rows in set (0.00 sec)
+9 rows in set (0.28 sec)
 ```
 
 ##### Example
@@ -2615,15 +2612,15 @@ mysql> desc user_summary_by_statement_type;
 | user          | varchar(16)         | YES  |     | NULL    |       |
 | statement     | varchar(128)        | YES  |     | NULL    |       |
 | total         | bigint(20) unsigned | NO   |     | NULL    |       |
-| total_latency | varchar(16)         | YES  |     | NULL    |       |
-| max_latency   | varchar(16)         | YES  |     | NULL    |       |
-| lock_latency  | varchar(16)         | YES  |     | NULL    |       |
+| total_latency | text                | YES  |     | NULL    |       |
+| max_latency   | text                | YES  |     | NULL    |       |
+| lock_latency  | text                | YES  |     | NULL    |       |
 | rows_sent     | bigint(20) unsigned | NO   |     | NULL    |       |
 | rows_examined | bigint(20) unsigned | NO   |     | NULL    |       |
 | rows_affected | bigint(20) unsigned | NO   |     | NULL    |       |
 | full_scans    | bigint(21) unsigned | NO   |     | 0       |       |
 +---------------+---------------------+------+-----+---------+-------+
-10 rows in set (0.00 sec)
+10 rows in set (0.21 sec)
 
 mysql> desc x$user_summary_by_statement_type;
 +---------------+---------------------+------+-----+---------+-------+
@@ -2640,7 +2637,7 @@ mysql> desc x$user_summary_by_statement_type;
 | rows_affected | bigint(20) unsigned | NO   |     | NULL    |       |
 | full_scans    | bigint(21) unsigned | NO   |     | 0       |       |
 +---------------+---------------------+------+-----+---------+-------+
-10 rows in set (0.03 sec)
+10 rows in set (0.37 sec)
 ```
 
 ##### Example
@@ -2685,12 +2682,12 @@ mysql> desc wait_classes_global_by_avg_latency;
 +---------------+---------------+------+-----+---------+-------+
 | event_class   | varchar(128)  | YES  |     | NULL    |       |
 | total         | decimal(42,0) | YES  |     | NULL    |       |
-| total_latency | varchar(16)   | YES  |     | NULL    |       |
-| min_latency   | varchar(16)   | YES  |     | NULL    |       |
-| avg_latency   | varchar(16)   | YES  |     | NULL    |       |
-| max_latency   | varchar(16)   | YES  |     | NULL    |       |
+| total_latency | text          | YES  |     | NULL    |       |
+| min_latency   | text          | YES  |     | NULL    |       |
+| avg_latency   | text          | YES  |     | NULL    |       |
+| max_latency   | text          | YES  |     | NULL    |       |
 +---------------+---------------+------+-----+---------+-------+
-6 rows in set (0.17 sec)
+6 rows in set (0.11 sec)
 
 mysql> desc x$wait_classes_global_by_avg_latency;
 +---------------+---------------------+------+-----+---------+-------+
@@ -2703,7 +2700,7 @@ mysql> desc x$wait_classes_global_by_avg_latency;
 | avg_latency   | decimal(46,4)       | NO   |     | 0.0000  |       |
 | max_latency   | bigint(20) unsigned | YES  |     | NULL    |       |
 +---------------+---------------------+------+-----+---------+-------+
-6 rows in set (0.10 sec)
+6 rows in set (0.02 sec)
 ```
 
 ##### Example
@@ -2737,12 +2734,12 @@ mysql> desc wait_classes_global_by_latency;
 +---------------+---------------+------+-----+---------+-------+
 | event_class   | varchar(128)  | YES  |     | NULL    |       |
 | total         | decimal(42,0) | YES  |     | NULL    |       |
-| total_latency | varchar(16)   | YES  |     | NULL    |       |
-| min_latency   | varchar(16)   | YES  |     | NULL    |       |
-| avg_latency   | varchar(16)   | YES  |     | NULL    |       |
-| max_latency   | varchar(16)   | YES  |     | NULL    |       |
+| total_latency | text          | YES  |     | NULL    |       |
+| min_latency   | text          | YES  |     | NULL    |       |
+| avg_latency   | text          | YES  |     | NULL    |       |
+| max_latency   | text          | YES  |     | NULL    |       |
 +---------------+---------------+------+-----+---------+-------+
-6 rows in set (0.12 sec)
+6 rows in set (0.00 sec)
 
 mysql> desc x$wait_classes_global_by_latency;
 +---------------+---------------------+------+-----+---------+-------+
@@ -2755,7 +2752,7 @@ mysql> desc x$wait_classes_global_by_latency;
 | avg_latency   | decimal(46,4)       | NO   |     | 0.0000  |       |
 | max_latency   | bigint(20) unsigned | YES  |     | NULL    |       |
 +---------------+---------------------+------+-----+---------+-------+
-6 rows in set (0.00 sec)
+6 rows in set (0.02 sec)
 ```
 
 ##### Example
@@ -2790,11 +2787,11 @@ mysql> desc waits_by_user_by_latency;
 | user          | varchar(16)         | YES  |     | NULL    |       |
 | event         | varchar(128)        | NO   |     | NULL    |       |
 | total         | bigint(20) unsigned | NO   |     | NULL    |       |
-| total_latency | varchar(16)         | YES  |     | NULL    |       |
-| avg_latency   | varchar(16)         | YES  |     | NULL    |       |
-| max_latency   | varchar(16)         | YES  |     | NULL    |       |
+| total_latency | text                | YES  |     | NULL    |       |
+| avg_latency   | text                | YES  |     | NULL    |       |
+| max_latency   | text                | YES  |     | NULL    |       |
 +---------------+---------------------+------+-----+---------+-------+
-6 rows in set (0.08 sec)
+6 rows in set (0.00 sec)
 
 mysql> desc x$waits_by_user_by_latency;
 +---------------+---------------------+------+-----+---------+-------+
@@ -2807,7 +2804,7 @@ mysql> desc x$waits_by_user_by_latency;
 | avg_latency   | bigint(20) unsigned | NO   |     | NULL    |       |
 | max_latency   | bigint(20) unsigned | NO   |     | NULL    |       |
 +---------------+---------------------+------+-----+---------+-------+
-6 rows in set (0.00 sec)
+6 rows in set (0.30 sec)
 ```
 
 ##### Example
@@ -2851,11 +2848,11 @@ mysql> desc waits_by_host_by_latency;
 | host          | varchar(60)         | YES  |     | NULL    |       |
 | event         | varchar(128)        | NO   |     | NULL    |       |
 | total         | bigint(20) unsigned | NO   |     | NULL    |       |
-| total_latency | varchar(16)         | YES  |     | NULL    |       |
-| avg_latency   | varchar(16)         | YES  |     | NULL    |       |
-| max_latency   | varchar(16)         | YES  |     | NULL    |       |
+| total_latency | text                | YES  |     | NULL    |       |
+| avg_latency   | text                | YES  |     | NULL    |       |
+| max_latency   | text                | YES  |     | NULL    |       |
 +---------------+---------------------+------+-----+---------+-------+
-6 rows in set (0.12 sec)
+6 rows in set (0.36 sec)
 
 mysql> desc x$waits_by_host_by_latency;
 +---------------+---------------------+------+-----+---------+-------+
@@ -2868,7 +2865,7 @@ mysql> desc x$waits_by_host_by_latency;
 | avg_latency   | bigint(20) unsigned | NO   |     | NULL    |       |
 | max_latency   | bigint(20) unsigned | NO   |     | NULL    |       |
 +---------------+---------------------+------+-----+---------+-------+
-6 rows in set (0.01 sec)
+6 rows in set (0.25 sec)
 ```
 
 ##### Example
@@ -2911,11 +2908,11 @@ mysql> desc waits_global_by_latency;
 +---------------+---------------------+------+-----+---------+-------+
 | events        | varchar(128)        | NO   |     | NULL    |       |
 | total         | bigint(20) unsigned | NO   |     | NULL    |       |
-| total_latency | varchar(16)         | YES  |     | NULL    |       |
-| avg_latency   | varchar(16)         | YES  |     | NULL    |       |
-| max_latency   | varchar(16)         | YES  |     | NULL    |       |
+| total_latency | text                | YES  |     | NULL    |       |
+| avg_latency   | text                | YES  |     | NULL    |       |
+| max_latency   | text                | YES  |     | NULL    |       |
 +---------------+---------------------+------+-----+---------+-------+
-5 rows in set (0.05 sec)
+5 rows in set (0.01 sec)
 
 mysql> desc x$waits_global_by_latency;
 +---------------+---------------------+------+-----+---------+-------+
@@ -2927,7 +2924,7 @@ mysql> desc x$waits_global_by_latency;
 | avg_latency   | bigint(20) unsigned | NO   |     | NULL    |       |
 | max_latency   | bigint(20) unsigned | NO   |     | NULL    |       |
 +---------------+---------------------+------+-----+---------+-------+
-5 rows in set (0.00 sec)
+5 rows in set (0.03 sec)
 ```
 
 ##### Example
