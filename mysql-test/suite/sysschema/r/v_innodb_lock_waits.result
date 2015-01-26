@@ -15,6 +15,7 @@ blocking_pid	bigint(21) unsigned	NO		0
 blocking_query	longtext	YES		NULL	
 blocking_lock_id	varchar(81)	NO			
 blocking_lock_mode	varchar(32)	NO			
+SELECT * FROM sys.innodb_lock_waits;
 DESC sys.x$innodb_lock_waits;
 Field	Type	Null	Key	Default	Extra
 wait_started	datetime	YES		NULL	
@@ -32,3 +33,4 @@ blocking_pid	bigint(21) unsigned	NO		0
 blocking_query	varchar(1024)	YES		NULL	
 blocking_lock_id	varchar(81)	NO			
 blocking_lock_mode	varchar(32)	NO			
+SELECT * FROM sys.x$innodb_lock_waits;

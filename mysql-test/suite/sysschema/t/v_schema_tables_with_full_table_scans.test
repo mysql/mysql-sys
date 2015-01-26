@@ -1,9 +1,22 @@
 # Tests for sys schema
-# Verify the sys.schema_tables_with_full_table_scans/sys.x$schema_tables_with_full_table_scans views
+# Verify the sys.schema_tables_with_full_table_scans view
 
+# Ensure structure changes don't slip in
 DESC sys.schema_tables_with_full_table_scans;
 
+# Make sure view select does not error, but ignore results
+--disable_result_log
+SELECT * FROM sys.schema_tables_with_full_table_scans;
+--enable_result_log
+
+
+# Ensure structure changes don't slip in
 DESC sys.x$schema_tables_with_full_table_scans;
+
+# Make sure view select does not error, but ignore results
+--disable_result_log
+SELECT * FROM sys.x$schema_tables_with_full_table_scans;
+--enable_result_log
 
 # Create a dummy table, force some full table scans, verify the results
 CREATE DATABASE v_schema_tables_with_full_table_scans;
@@ -59,3 +72,12 @@ SELECT object_schema, object_name, rows_full_scanned FROM sys.x$schema_tables_wi
 
 # Cleanup
 DROP DATABASE v_schema_tables_with_full_table_scans;
+
+# Ensure structure changes don't slip in
+DESC sys.x$schema_tables_with_full_table_scans;
+
+# Make sure view select does not error, but ignore results
+--disable_result_log
+SELECT * FROM sys.x$schema_tables_with_full_table_scans;
+--enable_result_log
+

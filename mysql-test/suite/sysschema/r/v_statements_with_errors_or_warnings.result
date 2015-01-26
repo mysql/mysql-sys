@@ -10,6 +10,7 @@ warning_pct	decimal(27,4)	NO		0.0000
 first_seen	timestamp	NO		0000-00-00 00:00:00	
 last_seen	timestamp	NO		0000-00-00 00:00:00	
 digest	varchar(32)	YES		NULL	
+SELECT * FROM sys.statements_with_errors_or_warnings;
 DESC sys.x$statements_with_errors_or_warnings;
 Field	Type	Null	Key	Default	Extra
 query	longtext	YES		NULL	
@@ -22,3 +23,4 @@ warning_pct	decimal(27,4)	NO		0.0000
 first_seen	timestamp	NO		0000-00-00 00:00:00	
 last_seen	timestamp	NO		0000-00-00 00:00:00	
 digest	varchar(32)	YES		NULL	
+SELECT * FROM sys.x$statements_with_errors_or_warnings;

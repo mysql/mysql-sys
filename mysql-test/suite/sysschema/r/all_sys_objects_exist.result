@@ -102,8 +102,10 @@ format_path	FUNCTION
 format_statement	FUNCTION
 format_time	FUNCTION
 ps_is_account_enabled	FUNCTION
+ps_is_consumer_enabled	FUNCTION
 ps_is_instrument_default_enabled	FUNCTION
 ps_is_instrument_default_timed	FUNCTION
+ps_is_thread_instrumented	FUNCTION
 ps_thread_id	FUNCTION
 ps_thread_stack	FUNCTION
 sys_get_config	FUNCTION

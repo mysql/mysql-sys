@@ -21,6 +21,7 @@ last_statement_latency	text	YES		NULL
 last_wait	varchar(128)	YES		NULL	
 last_wait_latency	text	YES		NULL	
 source	varchar(64)	YES		NULL	
+SELECT * FROM sys.processlist;
 DESC sys.x$processlist;
 Field	Type	Null	Key	Default	Extra
 thd_id	bigint(20) unsigned	NO		NULL	
@@ -44,3 +45,4 @@ last_statement_latency	bigint(20) unsigned	YES		NULL
 last_wait	varchar(128)	YES		NULL	
 last_wait_latency	varchar(20)	YES		NULL	
 source	varchar(64)	YES		NULL	
+SELECT * FROM sys.x$processlist;

@@ -8,6 +8,7 @@ pages	bigint(21)	NO		0
 pages_hashed	bigint(21)	NO		0	
 pages_old	bigint(21)	NO		0	
 rows_cached	decimal(44,0)	YES		NULL	
+SELECT * FROM sys.innodb_buffer_stats_by_table;
 DESC sys.x$innodb_buffer_stats_by_table;
 Field	Type	Null	Key	Default	Extra
 object_schema	text	YES		NULL	
@@ -18,3 +19,4 @@ pages	bigint(21)	NO		0
 pages_hashed	bigint(21)	NO		0	
 pages_old	bigint(21)	NO		0	
 rows_cached	decimal(44,0)	NO		0	
+SELECT * FROM sys.x$innodb_buffer_stats_by_table;

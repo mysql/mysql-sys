@@ -23,6 +23,7 @@ sort_merge_passes	bigint(20) unsigned	NO		NULL
 digest	varchar(32)	YES		NULL	
 first_seen	timestamp	NO		0000-00-00 00:00:00	
 last_seen	timestamp	NO		0000-00-00 00:00:00	
+SELECT * FROM sys.statement_analysis;
 DESC sys.x$statement_analysis;
 Field	Type	Null	Key	Default	Extra
 query	longtext	YES		NULL	
@@ -48,3 +49,4 @@ sort_merge_passes	bigint(20) unsigned	NO		NULL
 digest	varchar(32)	YES		NULL	
 first_seen	timestamp	NO		0000-00-00 00:00:00	
 last_seen	timestamp	NO		0000-00-00 00:00:00	
+SELECT * FROM sys.x$statement_analysis;

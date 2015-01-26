@@ -1,4 +1,5 @@
 DESC sys.version;
 Field	Type	Null	Key	Default	Extra
 sys_version	varchar(5)	NO			
-mysql_version	varchar(9)	NO			
+mysql_version	varchar(19)	NO			
+SELECT * FROM sys.version;

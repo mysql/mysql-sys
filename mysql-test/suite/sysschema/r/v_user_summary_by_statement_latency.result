@@ -9,6 +9,7 @@ rows_sent	decimal(42,0)	YES		NULL
 rows_examined	decimal(42,0)	YES		NULL	
 rows_affected	decimal(42,0)	YES		NULL	
 full_scans	decimal(43,0)	YES		NULL	
+SELECT * FROM sys.user_summary_by_statement_latency;
 DESC sys.x$user_summary_by_statement_latency;
 Field	Type	Null	Key	Default	Extra
 user	varchar(16)	YES		NULL	
@@ -20,3 +21,4 @@ rows_sent	decimal(42,0)	YES		NULL
 rows_examined	decimal(42,0)	YES		NULL	
 rows_affected	decimal(42,0)	YES		NULL	
 full_scans	decimal(43,0)	YES		NULL	
+SELECT * FROM sys.x$user_summary_by_statement_latency;

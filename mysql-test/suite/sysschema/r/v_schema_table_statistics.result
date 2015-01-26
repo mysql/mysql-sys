@@ -19,6 +19,7 @@ io_write	text	YES		NULL
 io_write_latency	text	YES		NULL	
 io_misc_requests	decimal(42,0)	YES		NULL	
 io_misc_latency	text	YES		NULL	
+SELECT * FROM sys.schema_table_statistics;
 DESC sys.x$schema_table_statistics;
 Field	Type	Null	Key	Default	Extra
 table_schema	varchar(64)	YES		NULL	
@@ -40,3 +41,4 @@ io_write	decimal(41,0)	YES		NULL
 io_write_latency	decimal(42,0)	YES		NULL	
 io_misc_requests	decimal(42,0)	YES		NULL	
 io_misc_latency	decimal(42,0)	YES		NULL	
+SELECT * FROM sys.x$schema_table_statistics;

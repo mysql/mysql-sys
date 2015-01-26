@@ -25,6 +25,7 @@ innodb_buffer_pages	bigint(21)	YES		0
 innodb_buffer_pages_hashed	bigint(21)	YES		0	
 innodb_buffer_pages_old	bigint(21)	YES		0	
 innodb_buffer_rows_cached	decimal(44,0)	YES		0	
+SELECT * FROM sys.schema_table_statistics_with_buffer;
 DESC sys.x$schema_table_statistics_with_buffer;
 Field	Type	Null	Key	Default	Extra
 table_schema	varchar(64)	YES		NULL	
@@ -52,3 +53,4 @@ innodb_buffer_pages	bigint(21)	YES		0
 innodb_buffer_pages_hashed	bigint(21)	YES		0	
 innodb_buffer_pages_old	bigint(21)	YES		0	
 innodb_buffer_rows_cached	decimal(44,0)	YES		0	
+SELECT * FROM sys.x$schema_table_statistics_with_buffer;

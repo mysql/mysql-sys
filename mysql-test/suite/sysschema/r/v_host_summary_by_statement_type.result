@@ -10,6 +10,7 @@ rows_sent	bigint(20) unsigned	NO		NULL
 rows_examined	bigint(20) unsigned	NO		NULL	
 rows_affected	bigint(20) unsigned	NO		NULL	
 full_scans	bigint(21) unsigned	NO		0	
+SELECT * FROM sys.host_summary_by_statement_type;
 DESC sys.x$host_summary_by_statement_type;
 Field	Type	Null	Key	Default	Extra
 host	varchar(60)	YES		NULL	
@@ -22,3 +23,4 @@ rows_sent	bigint(20) unsigned	NO		NULL
 rows_examined	bigint(20) unsigned	NO		NULL	
 rows_affected	bigint(20) unsigned	NO		NULL	
 full_scans	bigint(21) unsigned	NO		0	
+SELECT * FROM sys.x$host_summary_by_statement_type;
