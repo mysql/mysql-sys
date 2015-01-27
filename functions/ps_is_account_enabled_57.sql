@@ -61,6 +61,7 @@ BEGIN
                        FROM performance_schema.setup_actors
                       WHERE (`HOST` = '%' OR in_host LIKE `HOST`)
                         AND (`USER` = '%' OR `USER` = in_user)
+                        AND (`ENABLED` = 'YES')
                     ),
               'YES', 'NO'
            );

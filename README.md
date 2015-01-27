@@ -3187,7 +3187,7 @@ Determines whether instrumentation of an account is enabled within Performance S
 
 ##### Returns
 
-ENUM('YES', 'NO', 'PARTIAL')
+ENUM('YES', 'NO')
 
 ##### Example
 ```SQL
