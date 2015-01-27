@@ -76,9 +76,9 @@ SELECT r.trx_wait_started AS wait_started, TIMEDIFF(NOW(), r.trx_wait_started) A
        sys.format_statement(b.trx_query) AS blocking_query,
        bl.lock_id AS blocking_lock_id,
        bl.lock_mode AS blocking_lock_mode
-  FROM information_schema.INNODB_LOCK_WAITS w
-       INNER JOIN information_schema.INNODB_TRX b    ON b.trx_id = w.blocking_trx_id
-       INNER JOIN information_schema.INNODB_TRX r    ON r.trx_id = w.requesting_trx_id
-       INNER JOIN information_schema.INNODB_LOCKS bl ON bl.lock_id = w.blocking_lock_id
-       INNER JOIN information_schema.INNODB_LOCKS rl ON rl.lock_id = w.requested_lock_id
+  FROM information_schema.innodb_lock_waits w
+       INNER JOIN information_schema.innodb_trx b    ON b.trx_id = w.blocking_trx_id
+       INNER JOIN information_schema.innodb_trx r    ON r.trx_id = w.requesting_trx_id
+       INNER JOIN information_schema.innodb_locks bl ON bl.lock_id = w.blocking_lock_id
+       INNER JOIN information_schema.innodb_locks rl ON rl.lock_id = w.requested_lock_id
  ORDER BY r.trx_wait_started;
