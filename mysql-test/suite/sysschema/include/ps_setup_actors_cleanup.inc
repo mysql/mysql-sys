@@ -2,4 +2,4 @@
 
 TRUNCATE TABLE performance_schema.setup_actors;
 
-INSERT INTO performance_schema.setup_actors VALUES ('%', '%', '%');
+INSERT INTO performance_schema.setup_actors VALUES ('%', '%', '%', 'YES');
