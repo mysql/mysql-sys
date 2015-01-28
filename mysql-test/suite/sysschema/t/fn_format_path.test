@@ -18,18 +18,9 @@ SET @mypath := CONCAT(@@global.tmpdir, 'foo/bar.foo');
 
 SELECT sys.format_path(@mypath);
 
-# Ensure slave_load_tmpdir is recognized and stripped
-SET @mypath := CONCAT(@@global.slave_load_tmpdir, 'foo/bar.foo');
-
-SELECT sys.format_path(@mypath);
-
 # Ensure innodb_log_group_home_dir is recognized and stripped
 SET @mypath := CONCAT(@@global.innodb_log_group_home_dir, 'foo/bar.foo');
 
-SELECT sys.format_path(@mypath);
-
-# Ensure /private is stripped for OSX systems
-SET @mypath := CONCAT('/private', @@global.tmpdir, 'foo/bar.foo');
 SELECT sys.format_path(@mypath);
 
 # Unrecognized paths should return the full path
