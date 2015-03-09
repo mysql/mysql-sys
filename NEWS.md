@@ -1,34 +1,37 @@
 # Change history for the MySQL sys schema
 
-## 1.4.0 (not yet released)
+## 1.4.0 (09/03/2015)
 
 ### Backwards Incompatible Changes
 
 * The `memory_global_by_current_allocated` views were renamed to `memory_global_by_current_bytes` for consistency with the other memory views
 * The `ps_setup_enable_consumers` procedure was renamed to `ps_setup_disable_consumer` for naming consistency (everything is now singular, not plural)
+* The `format_time` function displayed values in minutes incorrectly, it now rounds to minutes, and uses an 'm' suffix, like the rest of the units
 
 ### Improvements
 
-* The `innodb_lock_waits`/`x$innodb_lock_waits` views were improved (Contributed by Jesper Wisborg Krogh)
-** Added the `wait_started` column
-** Added the `wait_age` column
+* The beginnings of a mysql-test suite have been added
+* The `innodb_lock_waits`/`x$innodb_lock_waits` views were improved (Contributions by both Jesper Wisborg Krogh and Mark Matthews)
+** Added the `wait_started`, `wait_age`, `waiting_trx_started` `waiting_trx_age`, `waiting_trx_rows_locked` and `waiting_trx_rows_modified` columns for waiting transactions
+** Added the `blocking_trx_started`, `blocking_trx_age`, `blocking_trx_rows_locked` and `blocking_trx_rows_modified` for blocking transactions
 ** Order the result set so the oldest lock waits are first
-** The waiting_table and waiting_index will always be the same as the blocking_table and blocking_index. So the blocking_% columns have been removed and the waiting_% columns have been renamed to locked_%
-** The `waiting_table` and `waiting_index` were always the same as the `blocking_table` and `blocking_index`. So the blocking_% columns have been removed and the waiting_% columns have been renamed to
-** The `waiting_lock_type` and b`locking_lock_type` were also always the same. So these were removed and replaced with a single `locked_type` column
-** Rename the `waiting_thread` and `blocking_thread` to `waiting_pid` and `blocking_pid` respectively to avoid confusion with the threads from the Performance Schema.
-* Added the `sys_get_config` function, used to get configuration parameters from the `sys_config` table - primarily from other sys objects, but can be used individually (Contributed by Jesper Wisborg K
-* Add an option to generate_sql_file.sh to generate a mysql_install_db / --bootstrap format friendly file
+** The `waiting_table` and `waiting_index` were always the same as the `blocking_table` and `blocking_index`. So the blocking_% columns have been removed and the waiting_% columns have been renamed to locked_%
+** The `waiting_lock_type` and `blocking_lock_type` were also always the same. So these were removed and replaced with a single `locked_type` column
+** Renamed the `waiting_thread` and `blocking_thread` to `waiting_pid` and `blocking_pid` respectively to avoid confusion with the threads from the Performance Schema.
+* Added the `sys_get_config` function, used to get configuration parameters from the `sys_config` table - primarily from other sys objects, but can be used individually (Contributed by Jesper Wisborg Krogh)
+* Add an option to generate_sql_file.sh to generate a mysql_install_db / mysqld --initialize format friendly file
 * Added the `ps_is_thread_instrumented` function, to check whether a specified thread is instrumented within Performance Schema
-* Added the `ps_is_consumer_enabled` function, to check whether a specified consumer is enabled within Performance Schema
+* Added the `ps_is_consumer_enabled` function, to check whether a specified consumer is enabled within Performance Schema (Contributed by Jesper Wisborg Krogh)
 * Added some further replacements to the `format_path` function (`slave_load_tmpdir`, `innodb_data_home_dir`, `innodb_log_group_home_dir` and `innodb_undo_directory`)
 
 ### Bug Fixes
 
 * The 5.6 `host_summary` and `x$host_summary` views incorrectly had the column with `COUNT(DISTINCT accounts.user)` named `unique_hosts` instead of `unique_users` (Contributed by Jesper Wisborg Krogh)
-* Both the `format_time` and `format_bytes` took a BIGINT as input, and output VARCHAR, but BIGINT could be too small for aggregated values for the inputs. Now both functions both use TEXT as their inp
-* The `format_time` function displayed values in minutes incorrectly
+* Both the `format_time` and `format_bytes` took a BIGINT as input, and output VARCHAR, but BIGINT could be too small for aggregated values for the inputs. Now both functions both use TEXT as their input (Issue #34, Issue #38)
+* The `format_time` function displayed values in minutes incorrectly, it now rounds to minutes, and uses an 'm' suffix, like the rest of the units
 * The `sys_config` related triggers had no DEFINER clause set
+* The `ps_setup_disable_thread` procedure always disabled the current thread and was ignoring the connection id given as an argument (Contributed by Jesper Wisborg Krogh)
+* The `ps_trace_thread` procedure had an incorrect calculation of how long the procedure has been running (Contributed by Jesper Wisborg Krogh)
 
 ### Implementation Details
 
