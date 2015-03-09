@@ -1,3 +1,4 @@
+-- source include/not_embedded.inc
 # Ensure database exists
 USE sys;
 

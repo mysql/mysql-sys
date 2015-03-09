@@ -1,3 +1,4 @@
+-- source include/not_embedded.inc
 
 DESC sys.x$ps_digest_95th_percentile_by_avg_us;
 

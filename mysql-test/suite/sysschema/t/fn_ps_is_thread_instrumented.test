@@ -1,3 +1,4 @@
+-- source include/not_embedded.inc
 # Tests for sys schema
 # Verify the sys.ps_is_thread_instrumented() function perfoms as expected
 

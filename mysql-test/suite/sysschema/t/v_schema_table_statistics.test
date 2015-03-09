@@ -1,3 +1,4 @@
+-- source include/not_embedded.inc
 # Tests for sys schema
 # Verify the sys.schema_table_statistics view
 

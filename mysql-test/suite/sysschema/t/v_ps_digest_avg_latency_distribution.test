@@ -1,3 +1,4 @@
+-- source include/not_embedded.inc
 
 DESC sys.x$ps_digest_avg_latency_distribution;
 
