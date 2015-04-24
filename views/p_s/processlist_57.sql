@@ -72,7 +72,9 @@ VIEW processlist (
   last_statement_latency,
   last_wait,
   last_wait_latency,
-  source
+  source,
+  pid,
+  program_name
 ) AS
 SELECT pps.thread_id AS thd_id,
        pps.processlist_id AS conn_id,
@@ -103,9 +105,15 @@ SELECT pps.thread_id AS thd_id,
        IF(ewc.timer_wait IS NULL AND ewc.event_name IS NOT NULL, 
           'Still Waiting', 
           sys.format_time(ewc.timer_wait)) last_wait_latency,
-       ewc.source
+       ewc.source,
+       conattr_pid.attr_value as pid,
+       conattr_progname.attr_value as program_name
   FROM performance_schema.threads AS pps
   LEFT JOIN performance_schema.events_waits_current AS ewc USING (thread_id)
   LEFT JOIN performance_schema.events_statements_current AS esc USING (thread_id)
   LEFT JOIN sys.x$memory_by_thread_by_current_bytes AS mem USING (thread_id)
+  LEFT JOIN performance_schema.session_connect_attrs AS conattr_pid
+    ON conattr_pid.processlist_id=pps.processlist_id and conattr_pid.attr_name='_pid'
+  LEFT JOIN performance_schema.session_connect_attrs AS conattr_progname
+    ON conattr_progname.processlist_id=pps.processlist_id and conattr_progname.attr_name='program_name'
  ORDER BY pps.processlist_time DESC, last_wait_latency DESC;
