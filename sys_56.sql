@@ -124,6 +124,8 @@ SOURCE ./views/p_s/x_waits_by_host_by_latency.sql
 SOURCE ./views/p_s/waits_global_by_latency.sql
 SOURCE ./views/p_s/x_waits_global_by_latency.sql
 
+SOURCE ./views/p_s/metrics_56.sql
+
 SOURCE ./procedures/create_synonym_db.sql
 
 SOURCE ./procedures/ps_statement_avg_latency_histogram.sql
