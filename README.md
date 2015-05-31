@@ -1289,6 +1289,90 @@ mysql> select * from memory_global_total;
 +-----------------+
 ```
 
+#### metrics / metrics_56
+
+##### Description
+
+Creates a union of the following information:
+
+   *  performance_schema.global_status (information_schema.GLOBAL_STATUS for metrics_56)
+   *  information_schema.INNODB_METRICS
+   *  Performance Schema global memory usage information
+   *  Current time
+
+The difference betweem the metrics and the metrics_56 views are whether the global status is taken from performance_schema.global_status instead of
+from the Information Schema.Use the metrics view if the MySQL version is 5.7.6 or later and show_compatibility_56 = OFF. Otherwise use metrics_56.
+See also https://dev.mysql.com/doc/refman/5.7/en/server-system-variables.html#sysvar_show_compatibility_56
+
+In MySQL 5.7.6 and later the metrics_56 view will generate one warning that INFORMATION_SCHEMA.GLOBAL_STATUS is deprectatedd.
+
+For view has the following columns:
+
+   * Variable_name: The name of the variable
+   * Variable_value: The value of the variable
+   * Type: The type of the variable. This will depend on the source, e.g. Global Status, InnoDB Metrics - ..., etc.
+   * Enabled: Whether the variable is enabled or not. Possible values are 'YES', 'NO', 'PARTIAL'.
+
+##### Structures
+
+```SQL
+mysql> DESC metrics;
++----------------+--------------+------+-----+---------+-------+
+| Field          | Type         | Null | Key | Default | Extra |
++----------------+--------------+------+-----+---------+-------+
+| Variable_name  | varchar(193) | YES  |     | NULL    |       |
+| Variable_value | text         | YES  |     | NULL    |       |
+| Type           | varchar(210) | YES  |     | NULL    |       |
+| Enabled        | varchar(7)   | NO   |     |         |       |
++----------------+--------------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+mysq> DESC metrics_56;
++----------------+--------------+------+-----+---------+-------+
+| Field          | Type         | Null | Key | Default | Extra |
++----------------+--------------+------+-----+---------+-------+
+| Variable_name  | varchar(193) | YES  |     | NULL    |       |
+| Variable_value | text         | YES  |     | NULL    |       |
+| Type           | varchar(210) | YES  |     | NULL    |       |
+| Enabled        | varchar(7)   | NO   |     |         |       |
++----------------+--------------+------+-----+---------+-------+
+4 rows in set (0.01 sec)
+```
+
+##### Example
+
+```SQL
+mysql> SELECT * FROM metrics;
++-----------------------------------------------+-------------------------...+--------------------------------------+---------+
+| Variable_name                                 | Variable_value          ...| Type                                 | Enabled |
++-----------------------------------------------+-------------------------...+--------------------------------------+---------+
+| aborted_clients                               | 0                       ...| Global Status                        | YES     |
+| aborted_connects                              | 0                       ...| Global Status                        | YES     |
+| binlog_cache_disk_use                         | 0                       ...| Global Status                        | YES     |
+| binlog_cache_use                              | 0                       ...| Global Status                        | YES     |
+| binlog_stmt_cache_disk_use                    | 0                       ...| Global Status                        | YES     |
+| binlog_stmt_cache_use                         | 0                       ...| Global Status                        | YES     |
+| bytes_received                                | 217081                  ...| Global Status                        | YES     |
+| bytes_sent                                    | 27257                   ...| Global Status                        | YES     |
+...
+| innodb_rwlock_x_os_waits                      | 0                       ...| InnoDB Metrics - server              | YES     |
+| innodb_rwlock_x_spin_rounds                   | 2723                    ...| InnoDB Metrics - server              | YES     |
+| innodb_rwlock_x_spin_waits                    | 1                       ...| InnoDB Metrics - server              | YES     |
+| trx_active_transactions                       | 0                       ...| InnoDB Metrics - transaction         | NO      |
+...
+| trx_rseg_current_size                         | 0                       ...| InnoDB Metrics - transaction         | NO      |
+| trx_rseg_history_len                          | 4                       ...| InnoDB Metrics - transaction         | YES     |
+| trx_rw_commits                                | 0                       ...| InnoDB Metrics - transaction         | NO      |
+| trx_undo_slots_cached                         | 0                       ...| InnoDB Metrics - transaction         | NO      |
+| trx_undo_slots_used                           | 0                       ...| InnoDB Metrics - transaction         | NO      |
+| memory_current_allocated                      | 138244216               ...| Performance Schema                   | PARTIAL |
+| memory_total_allocated                        | 138244216               ...| Performance Schema                   | PARTIAL |
+| NOW()                                         | 2015-05-31 13:27:50.382 ...| System Time                          | YES     |
+| UNIX_TIMESTAMP()                              | 1433042870.382          ...| System Time                          | YES     |
++-----------------------------------------------+-------------------------...+--------------------------------------+---------+
+412 rows in set (0.02 sec)
+```
+
 #### processlist / x$processlist
 
 ##### Description
