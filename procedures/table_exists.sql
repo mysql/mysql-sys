@@ -106,6 +106,9 @@ CREATE DEFINER='root'@'localhost' PROCEDURE table_exists (
              +---------+
              1 row in set (0.00 sec)
             '
+    SQL SECURITY INVOKER
+    NOT DETERMINISTIC
+    CONTAINS SQL
 BEGIN
     DECLARE v_error BOOLEAN DEFAULT FALSE;
     DECLARE CONTINUE HANDLER FOR 1050 SET v_error = TRUE;
