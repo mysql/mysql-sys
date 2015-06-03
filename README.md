@@ -1312,6 +1312,7 @@ For view has the following columns:
    * Variable_value: The value of the variable
    * Type: The type of the variable. This will depend on the source, e.g. Global Status, InnoDB Metrics - ..., etc.
    * Enabled: Whether the variable is enabled or not. Possible values are 'YES', 'NO', 'PARTIAL'.
+     PARTIAL is currently only supported for the memory usage variables and means some but not all of the memory/% instruments are enabled.
 
 ##### Structures
 
