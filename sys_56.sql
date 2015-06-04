@@ -155,6 +155,7 @@ SOURCE ./procedures/ps_setup_show_enabled_consumers.sql
 SOURCE ./procedures/ps_setup_show_enabled_instruments.sql
 SOURCE ./procedures/ps_truncate_all_tables.sql
 
+SOURCE ./procedures/statement_performance_analyzer.sql
 SOURCE ./procedures/table_exists.sql
 
 SOURCE ./after_setup.sql
