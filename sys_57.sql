@@ -81,6 +81,8 @@ SOURCE ./views/p_s/schema_tables_with_full_table_scans.sql
 SOURCE ./views/p_s/x_schema_tables_with_full_table_scans.sql
 SOURCE ./views/p_s/schema_unused_indexes.sql
 
+SOURCE ./views/p_s/ssl_per_thread.sql
+
 SOURCE ./views/p_s/statement_analysis.sql
 SOURCE ./views/p_s/x_statement_analysis.sql
 SOURCE ./views/p_s/statements_with_errors_or_warnings.sql
