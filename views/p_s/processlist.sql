@@ -102,5 +102,4 @@ SELECT pps.thread_id AS thd_id,
   FROM performance_schema.threads AS pps
   LEFT JOIN performance_schema.events_waits_current AS ewc USING (thread_id)
   LEFT JOIN performance_schema.events_statements_current as esc USING (thread_id)
- GROUP BY thread_id
  ORDER BY pps.processlist_time DESC, last_wait_latency DESC;
