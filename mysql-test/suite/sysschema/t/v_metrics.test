@@ -1,0 +1,21 @@
+-- source include/not_embedded.inc
+# Tests for sys schema
+# Verify the sys.metrics and sys.metrics_56 views
+
+# Ensure structure changes don't slip in
+DESC sys.metrics;
+
+# Make sure view select does not error, but ignore results
+--disable_result_log
+SELECT * FROM sys.metrics;
+--enable_result_log
+
+
+# Ensure structure changes don't slip in
+DESC sys.metrics_56;
+
+# Make sure view select does not error, but ignore results
+--disable_result_log
+SELECT * FROM sys.metrics_56;
+--enable_result_log
+
