@@ -112,21 +112,31 @@ BEGIN
     DECLARE v_sql_status_summary_select, v_sql_status_summary_delta, v_sql_status_summary_from, v_no_delta_names TEXT;
     DECLARE v_output_time, v_output_time_prev DECIMAL(20,3) UNSIGNED;
     DECLARE v_output_count, v_count, v_old_group_concat_max_len INT UNSIGNED DEFAULT 0;
-    DECLARE v_status_summary_width TINYINT UNSIGNED DEFAULT 50; -- The width of each of the status outputs in the summery
+    -- The width of each of the status outputs in the summery
+    DECLARE v_status_summary_width TINYINT UNSIGNED DEFAULT 50;
     DECLARE v_done BOOLEAN DEFAULT FALSE;
+    -- Do not include the following ndbinfo views:
+    --    'blocks'                    Static
+    --    'config_params'             Static
+    --    'dict_obj_types'            Static
+    --    'disk_write_speed_base'     Can generate lots of output - only include aggregate views here
+    --    'memory_per_fragment'       Can generate lots of output
+    --    'memoryusage'               Handled separately
+    --    'operations_per_fragment'   Can generate lots of output
+    --    'threadblocks'              Only needed once
     DECLARE c_ndbinfo CURSOR FOR
         SELECT TABLE_NAME
           FROM information_schema.TABLES
          WHERE TABLE_SCHEMA = 'ndbinfo'
                AND TABLE_NAME NOT IN (
-                  'blocks',                  -- Static
-                  'config_params',           -- Static
-                  'dict_obj_types',          -- Static
-                  'disk_write_speed_base',   -- Can generate lots of output - only include aggregate views here
-                  'memory_per_fragment',     -- Can generate lots of output
-                  'memoryusage',             -- Handled separately
-                  'operations_per_fragment', -- Can generate lots of output
-                  'threadblocks'             -- Only needed once
+                  'blocks',
+                  'config_params',
+                  'dict_obj_types',
+                  'disk_write_speed_base',
+                  'memory_per_fragment',
+                  'memoryusage',
+                  'operations_per_fragment',
+                  'threadblocks'
                );
     DECLARE c_sysviews_w_delta CURSOR FOR
         SELECT table_name
