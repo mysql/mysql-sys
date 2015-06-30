@@ -240,7 +240,8 @@ BEGIN
     DECLARE v_quoted_table, v_quoted_custom_view VARCHAR(133) DEFAULT '';
     DECLARE v_table_db, v_table_name, v_custom_db, v_custom_name VARCHAR(64);
     DECLARE v_digest_table_template, v_checksum_ref, v_checksum_table text;
-    DECLARE v_error_msg VARCHAR(128); -- Maximum supported legnth for MESSAGE_TEXT with the SIGNAL command.
+    -- Maximum supported length for MESSAGE_TEXT with the SIGNAL command is 128 chars.
+    DECLARE v_error_msg VARCHAR(128);
 
 
     -- Don't instrument this thread
@@ -271,7 +272,8 @@ BEGIN
     ELSEIF (in_table IS NOT NULL) THEN
         IF (NOT INSTR(in_table, '.')) THEN
             -- No . in the table name - use current database
-            SET v_table_db   = DATABASE(), -- will be the database of the procedure
+            -- DATABASE() will be the database of the procedure
+            SET v_table_db   = DATABASE(),
                 v_table_name = in_table;
         ELSE
             SET v_table_db   = SUBSTRING_INDEX(in_table, '.', 1);
@@ -383,7 +385,8 @@ BEGIN
                    SET MESSAGE_TEXT = v_error_msg;
             END IF;
 
-        WHEN in_action = 'cleanup' THEN -- doesn't use any of the arguments 
+        WHEN in_action = 'cleanup' THEN
+            -- doesn't use any of the arguments 
             DO (SELECT 1);
         ELSE
             SET v_error_msg = CONCAT('Unknown action: ''', in_action, '''');
@@ -735,7 +738,8 @@ HAVING percentile > 0.95
                 -- No spaces, so can't be a query
                 IF (NOT INSTR(@sys.statement_analyzer_view, '.')) THEN
                     -- No . in the table name - use current database
-                    SET v_custom_db   = DATABASE(), -- will be the database of the procedure
+                    -- DATABASE() will be the database of the procedure
+                    SET v_custom_db   = DATABASE(),
                         v_custom_name = @sys.statement_analyzer_view;
                 ELSE
                     SET v_custom_db   = SUBSTRING_INDEX(@sys.statement_analyzer_view, '.', 1);
