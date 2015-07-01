@@ -127,6 +127,7 @@ SOURCE ./views/p_s/x_waits_global_by_latency.sql
 SOURCE ./views/p_s/metrics_56.sql
 
 SOURCE ./procedures/create_synonym_db.sql
+SOURCE ./procedures/execute_prepared_stmt.sql
 
 SOURCE ./procedures/ps_statement_avg_latency_histogram.sql
 SOURCE ./procedures/ps_trace_statement_digest.sql
@@ -155,6 +156,7 @@ SOURCE ./procedures/ps_setup_show_enabled_consumers.sql
 SOURCE ./procedures/ps_setup_show_enabled_instruments.sql
 SOURCE ./procedures/ps_truncate_all_tables.sql
 
+SOURCE ./procedures/statement_performance_analyzer.sql
 SOURCE ./procedures/table_exists.sql
 
 SOURCE ./after_setup.sql
