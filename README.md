@@ -4410,14 +4410,14 @@ Requires the SUPER privilege for "SET sql_log_bin = 0;".
 
 The following configuration options are supported:
 
-   * sys.statement_analyzer_limit
+   * sys.statement_performance_analyzer.limit
      The maximum number of rows to include for the views that does not have a built-in limit (e.g. the 95th percentile view).
      If not set the limit is 100.
 
-   * sys.statement_analyzer_view
+   * sys.statement_performance_analyzer.view
      Used together with the 'custom' view. If the value contains a space, it is considered a query, otherwise it must be
      an existing view querying the performance_schema.events_statements_summary_by_digest table. There cannot be any limit
-     clause including in the query or view definition if @sys.statement_analyzer_limit > 0.
+     clause including in the query or view definition if @sys.statement_performance_analyzer.limit > 0.
      If specifying a view, use the same format as for in_table.
 
    * sys.debug
@@ -4436,11 +4436,11 @@ The following configuration options are supported:
                     in_table can be NOW() to use a fresh snapshot. This will overwrite an existing snapshot.
                     Use NULL for in_table to use the existing snapshot. If in_table IS NULL and no snapshot
                     exists, a new will be created.
-                    See also in_views and @sys.statement_analyzer_limit.
+                    See also in_views and @sys.statement_performance_analyzer.limit.
     - delta         Generate a delta analysis. The delta will be calculated between the reference table in
                     in_table and the snapshot. An existing snapshot must exist.
                     The action uses the sys.tmp_digests_delta temporary table.
-                    See also in_views and @sys.statement_analyzer_limit.
+                    See also in_views and @sys.statement_performance_analyzer.limit.
     - create_table  Create a regular table suitable for storing the snapshot for later use, e.g. for
                     calculating deltas.
     - create_tmp    Create a temporary table suitable for storing the snapshot for later use, e.g. for
@@ -4479,7 +4479,7 @@ The following configuration options are supported:
     - with_full_table_scans             Based on the sys.statements_with_full_table_scans view
     - with_sorting                      Based on the sys.statements_with_sorting view
     - with_temp_tables                  Based on the sys.statements_with_temp_tables view
-    - custom                            Use a custom view. This view must be specified in @sys.statement_analyzer_view to an existing view or a query
+    - custom                            Use a custom view. This view must be specified in @sys.statement_performance_analyzer.view to an existing view or a query
 
   Default is to include all except 'custom'.
 
@@ -4536,7 +4536,7 @@ mysql> CALL sys.statement_performance_analyzer('delta', 'mydb.tmp_digests_ini', 
 mysql> CALL sys.statement_performance_analyzer('snapshot', NULL, NULL);
 Query OK, 0 rows affected (0.01 sec)                                   
 
-mysql> SET @sys.statement_analyzer_limit = 10;
+mysql> SET @sys.statement_performance_analyzer.limit = 10;
 Query OK, 0 rows affected (0.00 sec)          
 
 mysql> CALL sys.statement_performance_analyzer('overall', NULL, 'with_runtimes_in_95th_percentile,with_full_table_scans');
@@ -4580,8 +4580,8 @@ mysql> CALL sys.statement_performance_analyzer('create_table', 'mydb.digests_pre
 Query OK, 0 rows affected (0.10 sec)
 
 shell$ watch -n 60 "mysql sys --table -e \"
-> SET @sys.statement_analyzer_view = 'mydb.my_statements';
-> SET @sys.statement_analyzer_limit = 10;
+> SET @sys.statement_performance_analyzer.view = 'mydb.my_statements';
+> SET @sys.statement_performance_analyzer.limit = 10;
 > CALL statement_performance_analyzer('snapshot', NULL, NULL);
 > CALL statement_performance_analyzer('delta', 'mydb.digests_prev', 'custom');
 > CALL statement_performance_analyzer('save', 'mydb.digests_prev', NULL);
