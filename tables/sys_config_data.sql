@@ -13,6 +13,7 @@
 -- along with this program; if not, write to the Free Software
 -- Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-INSERT IGNORE INTO sys_config (variable, value) VALUES ('statement_truncate_len', 64);
-INSERT IGNORE INTO sys_config (variable, value) VALUES ('statement_performance_analyzer.limit', 100);
-INSERT IGNORE INTO sys_config (variable, value) VALUES ('statement_performance_analyzer.view', NULL);
+INSERT IGNORE INTO sys_config (variable, value) VALUES
+    ('statement_truncate_len', 64),
+    ('statement_performance_analyzer.limit', 100),
+    ('statement_performance_analyzer.view', NULL);
