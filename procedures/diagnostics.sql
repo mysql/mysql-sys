@@ -311,25 +311,25 @@ BEGIN
     IF (v_has_innodb IN ('DEFAULT', 'YES')) THEN
         -- Need to use prepared statement as just having the query as a plain command
         -- will generate an error if the InnoDB storage engine is not present
-        SET @SQL = 'SHOW ENGINE InnoDB STATUS';
-        PREPARE stmt_innodb_status FROM @SQL;
+        SET @sys.diagnostics.sql = 'SHOW ENGINE InnoDB STATUS';
+        PREPARE stmt_innodb_status FROM @sys.diagnostics.sql;
     END IF;
 
     IF (v_has_ps = 'YES') THEN
         -- Need to use prepared statement as just having the query as a plain command
         -- will generate an error if the InnoDB storage engine is not present
-        SET @SQL = 'SHOW ENGINE PERFORMANCE_SCHEMA STATUS';
-        PREPARE stmt_ps_status FROM @SQL;
+        SET @sys.diagnostics.sql = 'SHOW ENGINE PERFORMANCE_SCHEMA STATUS';
+        PREPARE stmt_ps_status FROM @sys.diagnostics.sql;
     END IF;
 
     IF (v_has_ndb IN ('DEFAULT', 'YES')) THEN
         -- Need to use prepared statement as just having the query as a plain command
         -- will generate an error if the NDBCluster storage engine is not present
-        SET @SQL = 'SHOW ENGINE NDBCLUSTER STATUS';
-        PREPARE stmt_ndbcluster_status FROM @SQL;
+        SET @sys.diagnostics.sql = 'SHOW ENGINE NDBCLUSTER STATUS';
+        PREPARE stmt_ndbcluster_status FROM @sys.diagnostics.sql;
     END IF;
 
-    SET @sys.tmp.SQL_GEN_QUERY_TEMPLATE = 'SELECT CONCAT(
+    SET @sys.diagnostics.sql_gen_query_template = 'SELECT CONCAT(
            ''SELECT '',
            GROUP_CONCAT(
                CASE WHEN (SUBSTRING(TABLE_NAME, 3), COLUMN_NAME) IN (
@@ -348,12 +348,12 @@ BEGIN
                SEPARATOR '',\n       ''
            ),
            ''\n  FROM tmp_'', SUBSTRING(TABLE_NAME FROM 3), ''_%{OUTPUT}''
-       ) AS Query INTO @sys.tmp.SQL_SELECT
+       ) AS Query INTO @sys.diagnostics.sql_select
   FROM information_schema.COLUMNS
  WHERE TABLE_SCHEMA = ''sys'' AND TABLE_NAME = ?
  GROUP BY TABLE_NAME';
 
-    SET @sys.tmp.SQL_GEN_QUERY_DELTA = 'SELECT CONCAT(
+    SET @sys.diagnostics.sql_gen_query_delta = 'SELECT CONCAT(
            ''SELECT '',
            GROUP_CONCAT(
                CASE WHEN FIND_IN_SET(COLUMN_NAME, diag.pk)
@@ -391,7 +391,7 @@ BEGIN
            ),
            ''\n  FROM tmp_'', diag.TABLE_NAME, ''_end e
        LEFT OUTER JOIN tmp_'', diag.TABLE_NAME, ''_start s USING ('', diag.pk, '')''
-       ) AS Query INTO @sys.tmp.SQL_SELECT
+       ) AS Query INTO @sys.diagnostics.sql_select
   FROM tmp_sys_views_delta diag
        INNER JOIN information_schema.COLUMNS c ON c.TABLE_NAME = CONCAT(''x$'', diag.TABLE_NAME)
  WHERE c.TABLE_SCHEMA = ''sys'' AND diag.TABLE_NAME = ?
@@ -604,12 +604,12 @@ BEGIN
 
         -- Loop over the sys views where deltas should be calculated.
         IF (@sys.diagnostics.include_raw = 'ON') THEN
-            SET @sys.tmp.SQL_GEN_QUERY = REPLACE(@sys.tmp.SQL_GEN_QUERY_TEMPLATE, '%{OUTPUT}', 'start');
+            SET @sys.diagnostics.sql = REPLACE(@sys.diagnostics.sql_gen_query_template, '%{OUTPUT}', 'start');
             IF (@sys.debug = 'ON') THEN
                 SELECT 'The following query will be used to generate the query for each sys view' AS 'Debug';
-                SELECT @sys.tmp.SQL_GEN_QUERY AS 'Debug';
+                SELECT @sys.diagnostics.sql AS 'Debug';
             END IF;
-            PREPARE stmt_gen_query FROM @sys.tmp.SQL_GEN_QUERY;
+            PREPARE stmt_gen_query FROM @sys.diagnostics.sql;
         END IF;
         SET v_done = FALSE;
         OPEN c_sysviews_w_delta;
@@ -627,18 +627,18 @@ BEGIN
             CALL sys.execute_prepared_stmt(CONCAT('CREATE TEMPORARY TABLE `tmp_', v_table_name, '_start` SELECT * FROM `sys`.`x$', v_table_name, '`'));
 
             IF (@sys.diagnostics.include_raw = 'ON') THEN
-                SET @sys.tmp.table_name = CONCAT('x$', v_table_name);
-                EXECUTE stmt_gen_query USING @sys.tmp.table_name;
+                SET @sys.diagnostics.table_name = CONCAT('x$', v_table_name);
+                EXECUTE stmt_gen_query USING @sys.diagnostics.table_name;
                 -- If necessary add ORDER BY and LIMIT
-                SELECT CONCAT(@sys.tmp.SQL_SELECT,
+                SELECT CONCAT(@sys.diagnostics.sql_select,
                               IF(order_by IS NOT NULL, CONCAT('\n ORDER BY ', REPLACE(order_by, '%{TABLE}', CONCAT('tmp_', v_table_name, '_start'))), ''),
                               IF(limit_rows IS NOT NULL, CONCAT('\n LIMIT ', limit_rows), '')
                        )
-                  INTO @sys.tmp.SQL_SELECT
+                  INTO @sys.diagnostics.sql_select
                   FROM tmp_sys_views_delta
                  WHERE TABLE_NAME = v_table_name;
                 SELECT CONCAT('Initial ', v_table_name) AS 'The following output is:';
-                CALL sys.execute_prepared_stmt(@sys.tmp.SQL_SELECT);
+                CALL sys.execute_prepared_stmt(@sys.diagnostics.sql_select);
             END IF;
         END LOOP;
         CLOSE c_sysviews_w_delta;
@@ -745,9 +745,9 @@ BEGIN
 
         -- Prepare the query to retrieve the summary
         CALL sys.execute_prepared_stmt(
-            CONCAT('(SELECT Variable_value INTO @sys.tmp.output_time FROM ', v_table_name, ' WHERE Type = ''System Time'' AND Variable_name = ''UNIX_TIMESTAMP()'')')
+            CONCAT('(SELECT Variable_value INTO @sys.diagnostics.output_time FROM ', v_table_name, ' WHERE Type = ''System Time'' AND Variable_name = ''UNIX_TIMESTAMP()'')')
         );
-        SET v_output_time = @sys.tmp.output_time;
+        SET v_output_time = @sys.diagnostics.output_time;
 
         -- Limit each value to v_status_summary_width chars (when v_has_ndb = TRUE the values can be very wide - refer to the output here for the full values)
         -- v_sql_status_summary_select, v_sql_status_summary_delta, v_sql_status_summary_from
@@ -934,12 +934,12 @@ BEGIN
         CALL statement_performance_analyzer('snapshot', NULL, NULL);
         CALL statement_performance_analyzer('overall', NULL, 'with_runtimes_in_95th_percentile');
 
-        SET @sys.tmp.SQL_GEN_QUERY = REPLACE(@sys.tmp.SQL_GEN_QUERY_TEMPLATE, '%{OUTPUT}', 'end');
+        SET @sys.diagnostics.sql = REPLACE(@sys.diagnostics.sql_gen_query_template, '%{OUTPUT}', 'end');
         IF (@sys.debug = 'ON') THEN
             SELECT 'The following query will be used to generate the query for each sys view' AS 'Debug';
-            SELECT @sys.tmp.SQL_GEN_QUERY AS 'Debug';
+            SELECT @sys.diagnostics.sql AS 'Debug';
         END IF;
-        PREPARE stmt_gen_query FROM @sys.tmp.SQL_GEN_QUERY;
+        PREPARE stmt_gen_query FROM @sys.diagnostics.sql;
 
         SET v_done = FALSE;
         OPEN c_sysviews_w_delta;
@@ -957,18 +957,18 @@ BEGIN
             CALL sys.execute_prepared_stmt(CONCAT('CREATE TEMPORARY TABLE `tmp_', v_table_name, '_end` SELECT * FROM `sys`.`x$', v_table_name, '`'));
 
             IF (@sys.diagnostics.include_raw = 'ON') THEN
-                SET @sys.tmp.table_name = CONCAT('x$', v_table_name);
-                EXECUTE stmt_gen_query USING @sys.tmp.table_name;
+                SET @sys.diagnostics.table_name = CONCAT('x$', v_table_name);
+                EXECUTE stmt_gen_query USING @sys.diagnostics.table_name;
                 -- If necessary add ORDER BY and LIMIT
-                SELECT CONCAT(@sys.tmp.SQL_SELECT,
+                SELECT CONCAT(@sys.diagnostics.sql_select,
                                 IF(order_by IS NOT NULL, CONCAT('\n ORDER BY ', REPLACE(order_by, '%{TABLE}', CONCAT('tmp_', v_table_name, '_end'))), ''),
                                 IF(limit_rows IS NOT NULL, CONCAT('\n LIMIT ', limit_rows), '')
                         )
-                    INTO @sys.tmp.SQL_SELECT
+                    INTO @sys.diagnostics.sql_select
                     FROM tmp_sys_views_delta
                     WHERE TABLE_NAME = v_table_name;
                 SELECT CONCAT('Overall ', v_table_name) AS 'The following output is:';
-                CALL sys.execute_prepared_stmt(@sys.tmp.SQL_SELECT);
+                CALL sys.execute_prepared_stmt(@sys.diagnostics.sql_select);
             END IF;
         END LOOP;
         CLOSE c_sysviews_w_delta;
@@ -991,12 +991,12 @@ BEGIN
 
         DROP TEMPORARY TABLE tmp_digests_start;
 
-        -- @sys.tmp.SQL_GEN_QUERY_DELTA is defined near the to together with @sys.tmp.SQL_GEN_QUERY_TEMPLATE
+        -- @sys.diagnostics.sql_gen_query_delta is defined near the to together with @sys.diagnostics.sql_gen_query_template
         IF (@sys.debug = 'ON') THEN
             SELECT 'The following query will be used to generate the query for each sys view delta' AS 'Debug';
-            SELECT @sys.tmp.SQL_GEN_QUERY_DELTA AS 'Debug';
+            SELECT @sys.diagnostics.sql_gen_query_delta AS 'Debug';
         END IF;
-        PREPARE stmt_gen_query_delta FROM @sys.tmp.SQL_GEN_QUERY_DELTA;
+        PREPARE stmt_gen_query_delta FROM @sys.diagnostics.sql_gen_query_delta;
 
         SET v_old_group_concat_max_len = @@session.group_concat_max_len;
         SET @@session.group_concat_max_len = 2048;
@@ -1008,20 +1008,20 @@ BEGIN
                 LEAVE c_sysviews_w_delta_loop;
             END IF;
 
-            SET @sys.tmp.table_name = v_table_name;
-            EXECUTE stmt_gen_query_delta USING @sys.tmp.table_name;
+            SET @sys.diagnostics.table_name = v_table_name;
+            EXECUTE stmt_gen_query_delta USING @sys.diagnostics.table_name;
             -- If necessary add WHERE, ORDER BY, and LIMIT
-            SELECT CONCAT(@sys.tmp.SQL_SELECT,
+            SELECT CONCAT(@sys.diagnostics.sql_select,
                             IF(where_delta IS NOT NULL, CONCAT('\n WHERE ', where_delta), ''),
                             IF(order_by_delta IS NOT NULL, CONCAT('\n ORDER BY ', order_by_delta), ''),
                             IF(limit_rows IS NOT NULL, CONCAT('\n LIMIT ', limit_rows), '')
                     )
-                INTO @sys.tmp.SQL_SELECT
+                INTO @sys.diagnostics.sql_select
                 FROM tmp_sys_views_delta
                 WHERE TABLE_NAME = v_table_name;
 
             SELECT CONCAT('Delta ', v_table_name) AS 'The following output is:';
-            CALL sys.execute_prepared_stmt(@sys.tmp.SQL_SELECT);
+            CALL sys.execute_prepared_stmt(@sys.diagnostics.sql_select);
 
             CALL sys.execute_prepared_stmt(CONCAT('DROP TEMPORARY TABLE `tmp_', v_table_name, '_end`'));
             CALL sys.execute_prepared_stmt(CONCAT('DROP TEMPORARY TABLE `tmp_', v_table_name, '_start`'));
@@ -1058,7 +1058,13 @@ BEGIN
         SET sql_log_bin = @log_bin;
     END IF;
 
-    SET @sys.diagnostics.sql = NULL;
+    -- Reset the @sys.diagnostics.% user variables internal to this procedure
+    SET @sys.diagnostics.output_time            = NULL,
+        @sys.diagnostics.sql                    = NULL,
+        @sys.diagnostics.sql_gen_query_delta    = NULL,
+        @sys.diagnostics.sql_gen_query_template = NULL,
+        @sys.diagnostics.sql_select             = NULL,
+        @sys.diagnostics.table_name             = NULL;
 
     -- Restore INSTRUMENTED for this thread
     IF (v_this_thread_enabled = 'YES') THEN
