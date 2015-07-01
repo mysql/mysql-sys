@@ -4562,7 +4562,7 @@ mysql> CALL sys.statement_performance_analyzer('overall', NULL, 'with_runtimes_i
 -- Use a custom view showing the top 10 query sorted by total execution time refreshing the view every minute using
 -- the watch command in Linux.
 
-mysql> mysql> CREATE OR REPLACE VIEW mydb.my_statements AS
+mysql> CREATE OR REPLACE VIEW mydb.my_statements AS
     -> SELECT sys.format_statement(DIGEST_TEXT) AS query,
     ->        SCHEMA_NAME AS db,
     ->        COUNT_STAR AS exec_count,
