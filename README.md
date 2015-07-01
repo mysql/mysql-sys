@@ -3644,7 +3644,7 @@ Requires the SUPER privilege for "SET sql_log_bin = 0;".
 
 Some configuration options are supported:
 
-* sys.allow_i_s_tables
+* sys.diagnostics.allow_i_s_tables
   Specifies whether it is allowed to do table scan queries on information_schema.TABLES. This can be expensive if there
   are many tables. Set to 'ON' to allow, 'OFF' to not allow.
   Default is 'OFF'.
