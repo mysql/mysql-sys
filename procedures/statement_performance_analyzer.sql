@@ -240,6 +240,7 @@ BEGIN
     DECLARE v_quoted_table, v_quoted_custom_view VARCHAR(133) DEFAULT '';
     DECLARE v_table_db, v_table_name, v_custom_db, v_custom_name VARCHAR(64);
     DECLARE v_digest_table_template, v_checksum_ref, v_checksum_table text;
+    DECLARE v_sql longtext;
     -- Maximum supported length for MESSAGE_TEXT with the SIGNAL command is 128 chars.
     DECLARE v_error_msg VARCHAR(128);
 
@@ -440,55 +441,23 @@ BEGIN
             END IF;
             DROP TEMPORARY TABLE IF EXISTS tmp_digests;
         END IF;
-        SET @sys.tmp.SQL = REPLACE(REPLACE(v_digest_table_template, '%{TEMPORARY}', 'TEMPORARY '), '%{TABLE_NAME}', 'tmp_digests');
-        IF (@sys.debug = 'ON') THEN
-            SELECT @sys.tmp.SQL AS 'Debug';
-        END IF;
-        PREPARE stmt_create_table FROM @sys.tmp.SQL;
-        EXECUTE stmt_create_table;
-        DEALLOCATE PREPARE stmt_create_table;
+        CALL sys.execute_prepared_stmt(REPLACE(REPLACE(v_digest_table_template, '%{TEMPORARY}', 'TEMPORARY '), '%{TABLE_NAME}', 'tmp_digests'));
 
-        SET @sys.tmp.SQL = CONCAT('INSERT INTO tmp_digests SELECT * FROM ',
-                                  IF(in_table IS NULL OR in_action = 'save', 'performance_schema.events_statements_summary_by_digest', v_quoted_table));
-        IF (@sys.debug = 'ON') THEN
-            SELECT @sys.tmp.SQL AS 'Debug';
-        END IF;
-        PREPARE stmt_insert FROM @sys.tmp.SQL;
-        EXECUTE stmt_insert;
-        DEALLOCATE PREPARE stmt_insert;
+        SET v_sql = CONCAT('INSERT INTO tmp_digests SELECT * FROM ',
+                           IF(in_table IS NULL OR in_action = 'save', 'performance_schema.events_statements_summary_by_digest', v_quoted_table));
+        CALL sys.execute_prepared_stmt(v_sql);
     END IF;
 
     -- Go through the remaining actions
     IF (in_action IN ('create_table', 'create_tmp')) THEN
         IF (in_action = 'create_table') THEN
-            SET @sys.tmp.SQL = REPLACE(REPLACE(v_digest_table_template, '%{TEMPORARY}', ''), '%{TABLE_NAME}', v_quoted_table);
+            CALL sys.execute_prepared_stmt(REPLACE(REPLACE(v_digest_table_template, '%{TEMPORARY}', ''), '%{TABLE_NAME}', v_quoted_table));
         ELSE
-            SET @sys.tmp.SQL = REPLACE(REPLACE(v_digest_table_template, '%{TEMPORARY}', 'TEMPORARY '), '%{TABLE_NAME}', v_quoted_table);
+            CALL sys.execute_prepared_stmt(REPLACE(REPLACE(v_digest_table_template, '%{TEMPORARY}', 'TEMPORARY '), '%{TABLE_NAME}', v_quoted_table));
         END IF;
-        IF (@sys.debug = 'ON') THEN
-            SELECT @sys.tmp.SQL AS 'Debug';
-        END IF;
-        PREPARE stmt_create_table FROM @sys.tmp.SQL;
-        EXECUTE stmt_create_table;
-        DEALLOCATE PREPARE stmt_create_table;
-
     ELSEIF (in_action = 'save') THEN
-        SET @sys.tmp.SQL = CONCAT('DELETE FROM ', v_quoted_table);
-        IF (@sys.debug = 'ON') THEN
-            SELECT @sys.tmp.SQL AS 'Debug';
-        END IF;
-        PREPARE stmt_delete FROM @sys.tmp.SQL;
-        EXECUTE stmt_delete;
-        DEALLOCATE PREPARE stmt_delete;
-        
-        SET @sys.tmp.SQL = CONCAT('INSERT INTO ', v_quoted_table, ' SELECT * FROM tmp_digests');
-        IF (@sys.debug = 'ON') THEN
-            SELECT @sys.tmp.SQL AS 'Debug';
-        END IF;
-        PREPARE stmt_insert FROM @sys.tmp.SQL;
-        EXECUTE stmt_insert;
-        DEALLOCATE PREPARE stmt_insert;
-
+        CALL sys.execute_prepared_stmt(CONCAT('DELETE FROM ', v_quoted_table));
+        CALL sys.execute_prepared_stmt(CONCAT('INSERT INTO ', v_quoted_table, ' SELECT * FROM tmp_digests'));
     ELSEIF (in_action IN ('overall', 'delta')) THEN
         -- These are almost the same - for delta calculate the delta in tmp_digests_delta and use that instead of tmp_digests.
         -- And overall allows overriding the table to use.
@@ -502,7 +471,7 @@ BEGIN
             SET v_digests_table = 'tmp_digests_delta';
             DROP TEMPORARY TABLE IF EXISTS tmp_digests_delta;
             CREATE TEMPORARY TABLE tmp_digests_delta LIKE tmp_digests;
-            SET @sys.tmp.SQL = CONCAT('INSERT INTO tmp_digests_delta
+            SET v_sql = CONCAT('INSERT INTO tmp_digests_delta
 SELECT `d_end`.`SCHEMA_NAME`, `d_end`.`DIGEST`, d_end.`DIGEST_TEXT`,
        `d_end`.`COUNT_STAR`-IFNULL(`d_start`.`COUNT_STAR`, 0) AS ''COUNT_STAR'',
        `d_end`.`SUM_TIMER_WAIT`-IFNULL(`d_start`.`SUM_TIMER_WAIT`, 0) AS ''SUM_TIMER_WAIT'',
@@ -536,12 +505,7 @@ SELECT `d_end`.`SCHEMA_NAME`, `d_end`.`DIGEST`, d_end.`DIGEST_TEXT`,
                                                           OR (`d_start`.`SCHEMA_NAME` IS NULL AND `d_end`.`SCHEMA_NAME` IS NULL)
                                                         )
  WHERE `d_end`.`COUNT_STAR`-IFNULL(`d_start`.`COUNT_STAR`, 0) > 0');
-            IF (@sys.debug = 'ON') THEN
-                SELECT @sys.tmp.SQL AS 'Debug';
-            END IF;
-            PREPARE stmt_select FROM @sys.tmp.SQL;
-            EXECUTE stmt_select;
-            DEALLOCATE PREPARE stmt_select;
+            CALL sys.execute_prepared_stmt(v_sql);
         END IF;
 
         IF (FIND_IN_SET('with_runtimes_in_95th_percentile', in_views)) THEN
@@ -557,17 +521,12 @@ SELECT `d_end`.`SCHEMA_NAME`, `d_end`.`DIGEST`, d_end.`DIGEST_TEXT`,
               PRIMARY KEY (avg_us)
             ) ENGINE=InnoDB;
 
-            SET @sys.tmp.SQL = CONCAT('INSERT INTO tmp_digest_avg_latency_distribution1
+            SET v_sql = CONCAT('INSERT INTO tmp_digest_avg_latency_distribution1
 SELECT COUNT(*) cnt, 
        ROUND(avg_timer_wait/1000000) AS avg_us
   FROM ', v_digests_table, '
  GROUP BY avg_us');
-            IF (@sys.debug = 'ON') THEN
-                SELECT @sys.tmp.SQL AS 'Debug';
-            END IF;
-            PREPARE stmt_select FROM @sys.tmp.SQL;
-            EXECUTE stmt_select;
-            DEALLOCATE PREPARE stmt_select;
+            CALL sys.execute_prepared_stmt(v_sql);
 
             CREATE TEMPORARY TABLE tmp_digest_avg_latency_distribution2 LIKE tmp_digest_avg_latency_distribution1;
             INSERT INTO tmp_digest_avg_latency_distribution2 SELECT * FROM tmp_digest_avg_latency_distribution1;
@@ -578,7 +537,7 @@ SELECT COUNT(*) cnt,
               PRIMARY KEY (avg_us)
             ) ENGINE=InnoDB;
 
-            SET @sys.tmp.SQL = CONCAT('INSERT INTO tmp_digest_95th_percentile_by_avg_us
+            SET v_sql = CONCAT('INSERT INTO tmp_digest_95th_percentile_by_avg_us
 SELECT s2.avg_us avg_us,
        IFNULL(SUM(s1.cnt)/NULLIF((SELECT COUNT(*) FROM ', v_digests_table, '), 0), 0) percentile
   FROM tmp_digest_avg_latency_distribution1 AS s1
@@ -587,31 +546,22 @@ SELECT s2.avg_us avg_us,
 HAVING percentile > 0.95
  ORDER BY percentile
  LIMIT 1');
-            IF (@sys.debug = 'ON') THEN
-                SELECT @sys.tmp.SQL AS 'Debug';
-            END IF;
-            PREPARE stmt_select FROM @sys.tmp.SQL;
-            EXECUTE stmt_select;
-            DEALLOCATE PREPARE stmt_select;
+            CALL sys.execute_prepared_stmt(v_sql);
 
-            SET @sys.tmp.SQL = REPLACE(
-                                  REPLACE(
-                                     (SELECT VIEW_DEFINITION
-                                        FROM information_schema.VIEWS
-                                       WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'statements_with_runtimes_in_95th_percentile'
-                                      ),
-                                      '`performance_schema`.`events_statements_summary_by_digest`',
-                                      v_digests_table
-                                   ),
-                                   'sys.x$ps_digest_95th_percentile_by_avg_us',
-                                   '`sys`.`x$ps_digest_95th_percentile_by_avg_us`'
-                               );
-            IF (@sys.debug = 'ON') THEN
-                SELECT @sys.tmp.SQL AS 'Debug';
-            END IF;
-            PREPARE stmt_select_view FROM @sys.tmp.SQL;
-            EXECUTE stmt_select_view;
-            DEALLOCATE PREPARE stmt_select_view;
+            SET v_sql =
+                REPLACE(
+                    REPLACE(
+                        (SELECT VIEW_DEFINITION
+                           FROM information_schema.VIEWS
+                          WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'statements_with_runtimes_in_95th_percentile'
+                        ),
+                        '`performance_schema`.`events_statements_summary_by_digest`',
+                        v_digests_table
+                    ),
+                    'sys.x$ps_digest_95th_percentile_by_avg_us',
+                    '`sys`.`x$ps_digest_95th_percentile_by_avg_us`'
+              );
+            CALL sys.execute_prepared_stmt(v_sql);
 
             DROP TEMPORARY TABLE tmp_digest_avg_latency_distribution1;
             DROP TEMPORARY TABLE tmp_digest_avg_latency_distribution2;
@@ -620,107 +570,87 @@ HAVING percentile > 0.95
 
         IF (FIND_IN_SET('analysis', in_views)) THEN
             SELECT CONCAT('Top ', @sys.statement_performance_analyzer.limit, ' Queries Ordered by Total Latency') AS 'Next Output';
-            SET @sys.tmp.SQL = REPLACE(
-                                  (SELECT VIEW_DEFINITION
-                                     FROM information_schema.VIEWS
-                                    WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'statement_analysis'
-                                  ),
-                                  '`performance_schema`.`events_statements_summary_by_digest`',
-                                  v_digests_table
-                               );
+            SET v_sql =
+                REPLACE(
+                    (SELECT VIEW_DEFINITION
+                       FROM information_schema.VIEWS
+                      WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'statement_analysis'
+                    ),
+                    '`performance_schema`.`events_statements_summary_by_digest`',
+                    v_digests_table
+                );
             IF (@sys.statement_performance_analyzer.limit > 0) THEN
-                SET @sys.tmp.SQL = CONCAT(@sys.tmp.SQL, ' LIMIT ', @sys.statement_performance_analyzer.limit);
+                SET v_sql = CONCAT(v_sql, ' LIMIT ', @sys.statement_performance_analyzer.limit);
             END IF;
-            IF (@sys.debug = 'ON') THEN
-                SELECT @sys.tmp.SQL AS 'Debug';
-            END IF;
-            PREPARE stmt_select_view FROM @sys.tmp.SQL;
-            EXECUTE stmt_select_view;
-            DEALLOCATE PREPARE stmt_select_view;
+            CALL sys.execute_prepared_stmt(v_sql);
         END IF;
 
         IF (FIND_IN_SET('with_errors_or_warnings', in_views)) THEN
             SELECT CONCAT('Top ', @sys.statement_performance_analyzer.limit, ' Queries with Errors') AS 'Next Output';
-            SET @sys.tmp.SQL = REPLACE(
-                                  (SELECT VIEW_DEFINITION
-                                     FROM information_schema.VIEWS
-                                    WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'statements_with_errors_or_warnings'
-                                  ),
-                                  '`performance_schema`.`events_statements_summary_by_digest`',
-                                  v_digests_table
-                               );
+            SET v_sql =
+                REPLACE(
+                    (SELECT VIEW_DEFINITION
+                       FROM information_schema.VIEWS
+                      WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'statements_with_errors_or_warnings'
+                    ),
+                    '`performance_schema`.`events_statements_summary_by_digest`',
+                    v_digests_table
+                );
             IF (@sys.statement_performance_analyzer.limit > 0) THEN
-                SET @sys.tmp.SQL = CONCAT(@sys.tmp.SQL, ' LIMIT ', @sys.statement_performance_analyzer.limit);
+                SET v_sql = CONCAT(v_sql, ' LIMIT ', @sys.statement_performance_analyzer.limit);
             END IF;
-            IF (@sys.debug = 'ON') THEN
-                SELECT @sys.tmp.SQL AS 'Debug';
-            END IF;
-            PREPARE stmt_select_view FROM @sys.tmp.SQL;
-            EXECUTE stmt_select_view;
-            DEALLOCATE PREPARE stmt_select_view;
+            CALL sys.execute_prepared_stmt(v_sql);
         END IF;
 
         IF (FIND_IN_SET('with_full_table_scans', in_views)) THEN
             SELECT CONCAT('Top ', @sys.statement_performance_analyzer.limit, ' Queries with Full Table Scan') AS 'Next Output';
-            SET @sys.tmp.SQL = REPLACE(
-                                  (SELECT VIEW_DEFINITION
-                                     FROM information_schema.VIEWS
-                                    WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'statements_with_full_table_scans'
-                                  ),
-                                  '`performance_schema`.`events_statements_summary_by_digest`',
-                                  v_digests_table
-                               );
+            SET v_sql =
+                REPLACE(
+                    (SELECT VIEW_DEFINITION
+                       FROM information_schema.VIEWS
+                      WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'statements_with_full_table_scans'
+                    ),
+                    '`performance_schema`.`events_statements_summary_by_digest`',
+                    v_digests_table
+                );
             IF (@sys.statement_performance_analyzer.limit > 0) THEN
-                SET @sys.tmp.SQL = CONCAT(@sys.tmp.SQL, ' LIMIT ', @sys.statement_performance_analyzer.limit);
+                SET v_sql = CONCAT(v_sql, ' LIMIT ', @sys.statement_performance_analyzer.limit);
             END IF;
-            IF (@sys.debug = 'ON') THEN
-                SELECT @sys.tmp.SQL AS 'Debug';
-            END IF;
-            PREPARE stmt_select_view FROM @sys.tmp.SQL;
-            EXECUTE stmt_select_view;
-            DEALLOCATE PREPARE stmt_select_view;
+            CALL sys.execute_prepared_stmt(v_sql);
         END IF;
 
         IF (FIND_IN_SET('with_sorting', in_views)) THEN
             SELECT CONCAT('Top ', @sys.statement_performance_analyzer.limit, ' Queries with Sorting') AS 'Next Output';
-            SET @sys.tmp.SQL = REPLACE(
-                                  (SELECT VIEW_DEFINITION
-                                     FROM information_schema.VIEWS
-                                    WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'statements_with_sorting'
-                                  ),
-                                  '`performance_schema`.`events_statements_summary_by_digest`',
-                                  v_digests_table
-                               );
+            SET v_sql =
+                REPLACE(
+                    (SELECT VIEW_DEFINITION
+                       FROM information_schema.VIEWS
+                      WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'statements_with_sorting'
+                    ),
+                    '`performance_schema`.`events_statements_summary_by_digest`',
+                    v_digests_table
+                );
             IF (@sys.statement_performance_analyzer.limit > 0) THEN
-                SET @sys.tmp.SQL = CONCAT(@sys.tmp.SQL, ' LIMIT ', @sys.statement_performance_analyzer.limit);
+                SET v_sql = CONCAT(v_sql, ' LIMIT ', @sys.statement_performance_analyzer.limit);
             END IF;
-            IF (@sys.debug = 'ON') THEN
-                SELECT @sys.tmp.SQL AS 'Debug';
-            END IF;
-            PREPARE stmt_select_view FROM @sys.tmp.SQL;
-            EXECUTE stmt_select_view;
-            DEALLOCATE PREPARE stmt_select_view;
+            CALL sys.execute_prepared_stmt(v_sql);
         END IF;
 
         IF (FIND_IN_SET('with_temp_tables', in_views)) THEN
             SELECT CONCAT('Top ', @sys.statement_performance_analyzer.limit, ' Queries with Internal Temporary Tables') AS 'Next Output';
-            SET @sys.tmp.SQL = REPLACE(
-                                  (SELECT VIEW_DEFINITION
-                                     FROM information_schema.VIEWS
-                                    WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'statements_with_temp_tables'
-                                  ),
-                                  '`performance_schema`.`events_statements_summary_by_digest`',
-                                  v_digests_table
-                               );
+            SET v_sql =
+                REPLACE(
+                    (SELECT VIEW_DEFINITION
+                       FROM information_schema.VIEWS
+                      WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'statements_with_temp_tables'
+                    ),
+                    '`performance_schema`.`events_statements_summary_by_digest`',
+                    v_digests_table
+                );
             IF (@sys.statement_performance_analyzer.limit > 0) THEN
-                SET @sys.tmp.SQL = CONCAT(@sys.tmp.SQL, ' LIMIT ', @sys.statement_performance_analyzer.limit);
+                SET v_sql = CONCAT(v_sql, ' LIMIT ', @sys.statement_performance_analyzer.limit);
             END IF;
-            IF (@sys.debug = 'ON') THEN
-                SELECT @sys.tmp.SQL AS 'Debug';
-            END IF;
-            PREPARE stmt_select_view FROM @sys.tmp.SQL;
-            EXECUTE stmt_select_view;
-            DEALLOCATE PREPARE stmt_select_view;
+            CALL sys.execute_prepared_stmt(v_sql);
         END IF;
 
         IF (FIND_IN_SET('custom', in_views)) THEN
@@ -752,32 +682,26 @@ HAVING percentile > 0.95
                        SET MESSAGE_TEXT = 'The @sys.statement_performance_analyzer.view user variable is set to use a custom view, but is neither an existing view nor a query';
                 END IF;
 
-                SET @sys.tmp.SQL = REPLACE(
-                                      (SELECT VIEW_DEFINITION
-                                         FROM information_schema.VIEWS
-                                        WHERE TABLE_SCHEMA = v_custom_db AND TABLE_NAME = v_custom_name
-                                      ),
-                                      '`performance_schema`.`events_statements_summary_by_digest`',
-                                      v_digests_table
-                                   );
+                SET v_sql =
+                    REPLACE(
+                        (SELECT VIEW_DEFINITION
+                           FROM information_schema.VIEWS
+                          WHERE TABLE_SCHEMA = v_custom_db AND TABLE_NAME = v_custom_name
+                        ),
+                        '`performance_schema`.`events_statements_summary_by_digest`',
+                        v_digests_table
+                    );
             ELSE
-                SET @sys.tmp.SQL = REPLACE(@sys.statement_performance_analyzer.view, '`performance_schema`.`events_statements_summary_by_digest`', v_digests_table);
+                SET v_sql = REPLACE(@sys.statement_performance_analyzer.view, '`performance_schema`.`events_statements_summary_by_digest`', v_digests_table);
             END IF;
 
             IF (@sys.statement_performance_analyzer.limit > 0) THEN
-                SET @sys.tmp.SQL = CONCAT(@sys.tmp.SQL, ' LIMIT ', @sys.statement_performance_analyzer.limit);
+                SET v_sql = CONCAT(v_sql, ' LIMIT ', @sys.statement_performance_analyzer.limit);
             END IF;
 
-            IF (@sys.debug = 'ON') THEN
-                SELECT @sys.tmp.SQL AS 'Debug';
-            END IF;
-
-            PREPARE stmt_select_view FROM @sys.tmp.SQL;
-            EXECUTE stmt_select_view;
-            DEALLOCATE PREPARE stmt_select_view;
+            CALL sys.execute_prepared_stmt(v_sql);
         END IF;
     END IF;
-
 
     -- Restore INSTRUMENTED for this thread
     IF (v_this_thread_enabled = 'YES') THEN
