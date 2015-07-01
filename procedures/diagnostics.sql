@@ -72,7 +72,7 @@ CREATE DEFINER='root'@'localhost' PROCEDURE diagnostics (
              Configuration Options
              ----------------------
 
-             sys.allow_i_s_tables
+             sys.diagnostics.allow_i_s_tables
                Specifies whether it is allowed to do table scan queries on information_schema.TABLES. This can be expensive if there
                are many tables. Set to ''ON'' to allow, ''OFF'' to not allow.
                Default is ''OFF''.
@@ -173,17 +173,17 @@ BEGIN
     CALL sys.ps_setup_disable_thread(CONNECTION_ID());
 
     -- Set configuration options
-    IF (@sys.allow_i_s_tables IS NULL) THEN
-        SET @sys.allow_i_s_tables          = sys.sys_get_config('allow_i_s_tables'         , 'OFF');
+    IF (@sys.diagnostics.allow_i_s_tables IS NULL) THEN
+        SET @sys.diagnostics.allow_i_s_tables = sys.sys_get_config('diagnostics.allow_i_s_tables', 'OFF');
     END IF;
     IF (@sys.diagnostics.include_raw IS NULL) THEN
-        SET @sys.diagnostics.include_raw   = sys.sys_get_config('diagnostics.include_raw'  , 'OFF');
+        SET @sys.diagnostics.include_raw      = sys.sys_get_config('diagnostics.include_raw'     , 'OFF');
     END IF;
     IF (@sys.debug IS NULL) THEN
-        SET @sys.debug                     = sys.sys_get_config('debug'                    , 'OFF');
+        SET @sys.debug                        = sys.sys_get_config('debug'                       , 'OFF');
     END IF;
     IF (@sys.statement_truncate_len IS NULL) THEN
-        SET @sys.statement_truncate_len    = sys.sys_get_config('statement_truncate_len'   , '64' );
+        SET @sys.statement_truncate_len       = sys.sys_get_config('statement_truncate_len'      , '64' );
     END IF;
 
     -- Temorary table are used - disable sql_log_bin if necessary to prevent them replicating
@@ -934,7 +934,7 @@ BEGIN
     SELECT COUNT(*) AS 'Total Number of Tables' FROM information_schema.TABLES;
 
     -- The cost of information_schema.TABLES.DATA_LENGTH depends mostly on the number of tables
-    IF (@sys.allow_i_s_tables = 'ON') THEN
+    IF (@sys.diagnostics.allow_i_s_tables = 'ON') THEN
         SELECT 'Storage Engine Usage' AS 'The following output is:';
         SELECT ENGINE, COUNT(*) AS NUM_TABLES,
                 sys.format_bytes(SUM(DATA_LENGTH)) AS DATA_LENGTH,
