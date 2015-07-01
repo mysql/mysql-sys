@@ -982,7 +982,7 @@ BEGIN
         CALL sys.ps_statement_avg_latency_histogram();
 
         CALL statement_performance_analyzer('snapshot', NULL, NULL);
-        CALL statement_performance_analyzer('overall', NULL, '95th_percentile');
+        CALL statement_performance_analyzer('overall', NULL, 'with_runtimes_in_95th_percentile');
 
         SET @sys.tmp.SQL_GEN_QUERY = REPLACE(@sys.tmp.SQL_GEN_QUERY_TEMPLATE, '%{OUTPUT}', 'end');
         IF (@sys.debug = 'ON') THEN
@@ -1054,7 +1054,7 @@ BEGIN
 
 ' AS '';
 
-        CALL statement_performance_analyzer('delta', 'tmp_digests_start', '95th_percentile');
+        CALL statement_performance_analyzer('delta', 'tmp_digests_start', 'with_runtimes_in_95th_percentile');
         CALL statement_performance_analyzer('cleanup', NULL, NULL);
 
         DROP TEMPORARY TABLE tmp_digests_start;
