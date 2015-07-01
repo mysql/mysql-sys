@@ -98,7 +98,7 @@ CREATE DEFINER='root'@'localhost' PROCEDURE diagnostics (
              To create a report and append it to the file diag.out:
 
              mysql> TEE diag.out;
-             mysql> CALL sys.status(120, 30, ''current'');
+             mysql> CALL sys.diagnostics(120, 30, ''current'');
              ...
              mysql> NOTEE;
             '

@@ -3588,24 +3588,24 @@ mysql> SHOW FULL TABLES FROM ps;
 
 Create a report of the current status of the server for diagnostics purposes. Data collected includes (some items depends on versions and settings):
 
-   * The GLOBAL VARIABLES
-   * Several sys schema views including metrics or metrics_56
-   * Queries in the 95th percentile
-   * Several ndbinfo views for MySQL Cluster
-   * Replication (both master and slave) information.
+* The GLOBAL VARIABLES
+* Several sys schema views including metrics or metrics_56
+* Queries in the 95th percentile
+* Several ndbinfo views for MySQL Cluster
+* Replication (both master and slave) information.
 
 Some of the sys schema views are calculated as initial (optional), overall, delta:
 
-   * The initial view is the content of the view at the start of this procedure.
-     This output will be the same as the the start values used for the delta view.
-     The initial view is included if @sys.diagnostics.include_raw = 'ON'.
-   * The overall view is the content of the view at the end of this procedure.
-     This output is the same as the end values used for the delta view.
-     The overall view is always included.
-   * The delta view is the difference from the beginning to the end. Note that for min and max values
-     they are simply the min or max value from the end view respectively, so does not necessarily reflect
-     the minimum/maximum value in the monitored period.
-     Note: except for the metrics/metrics_56 views the delta is only calculation beteween the first and last outputs.
+* The initial view is the content of the view at the start of this procedure.
+  This output will be the same as the the start values used for the delta view.
+  The initial view is included if @sys.diagnostics.include_raw = 'ON'.
+* The overall view is the content of the view at the end of this procedure.
+  This output is the same as the end values used for the delta view.
+  The overall view is always included.
+* The delta view is the difference from the beginning to the end. Note that for min and max values
+  they are simply the min or max value from the end view respectively, so does not necessarily reflect
+  the minimum/maximum value in the monitored period.
+  Note: except for the metrics/metrics_56 views the delta is only calculation beteween the first and last outputs.
 
 Requires the SUPER privilege for "SET sql_log_bin = 0;".
 
@@ -3651,7 +3651,7 @@ Supported values are:
 ##### Example
 ```SQL
 mysql> TEE diag.out;
-mysql> CALL sys.status(120, 30, 'current');
+mysql> CALL sys.diagnostics(120, 30, 'current');
 ...
 mysql> NOTEE;
 ```
