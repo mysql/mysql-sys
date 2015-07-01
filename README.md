@@ -3593,7 +3593,7 @@ The sys_execute_prepared_stmt prepared statement name is used for the query and 
 
 ##### Parameters
 
-* n_query (longtext CHARACTER SET UTF8):
+* in_query (longtext CHARACTER SET UTF8):
 ** The query to execute.
 
 The following configuration option is supported:
