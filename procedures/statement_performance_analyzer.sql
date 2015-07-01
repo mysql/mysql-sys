@@ -293,7 +293,7 @@ BEGIN
                SET MESSAGE_TEXT = v_error_msg;
         END IF;
 
-        CALL table_exists(v_table_db, v_table_name, v_table_exists);
+        CALL sys.table_exists(v_table_db, v_table_name, v_table_exists);
         IF (@sys.debug = 'ON') THEN
             SELECT CONCAT('v_table_exists = ', v_table_exists) AS 'Debug';
         END IF;
@@ -331,7 +331,7 @@ BEGIN
 
 
     -- Validate settings
-    CALL table_exists(DATABASE(), 'tmp_digests', v_tmp_digests_table_exists);
+    CALL sys.table_exists(DATABASE(), 'tmp_digests', v_tmp_digests_table_exists);
     IF (@sys.debug = 'ON') THEN
         SELECT CONCAT('v_tmp_digests_table_exists = ', v_tmp_digests_table_exists) AS 'Debug';
     END IF;
@@ -676,7 +676,7 @@ HAVING percentile > 0.95
                     SET v_custom_name = SUBSTRING(@sys.statement_performance_analyzer.view, CHAR_LENGTH(v_custom_db)+2);
                 END IF;
 
-                CALL table_exists(v_custom_db, v_custom_name, v_custom_view_exists);
+                CALL sys.table_exists(v_custom_db, v_custom_name, v_custom_view_exists);
                 IF (v_custom_view_exists <> 'VIEW') THEN
                     SIGNAL SQLSTATE '45000'
                        SET MESSAGE_TEXT = 'The @sys.statement_performance_analyzer.view user variable is set to use a custom view, but is neither an existing view nor a query';
