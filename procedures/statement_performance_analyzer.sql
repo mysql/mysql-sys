@@ -45,11 +45,11 @@ CREATE DEFINER='root'@'localhost' PROCEDURE statement_performance_analyzer (
                                  in_table can be NOW() to use a fresh snapshot. This will overwrite an existing snapshot.
                                  Use NULL for in_table to use the existing snapshot. If in_table IS NULL and no snapshot
                                  exists, a new will be created.
-                                 See also in_views and @sys.statement_analyzer_limit.
+                                 See also in_views and @sys.statement_performance_analyzer.limit.
                  * delta         Generate a delta analysis. The delta will be calculated between the reference table in
                                  in_table and the snapshot. An existing snapshot must exist.
                                  The action uses the sys.tmp_digests_delta temporary table.
-                                 See also in_views and @sys.statement_analyzer_limit.
+                                 See also in_views and @sys.statement_performance_analyzer.limit.
                  * create_table  Create a regular table suitable for storing the snapshot for later use, e.g. for
                                  calculating deltas.
                  * create_tmp    Create a temporary table suitable for storing the snapshot for later use, e.g. for
@@ -88,7 +88,7 @@ CREATE DEFINER='root'@'localhost' PROCEDURE statement_performance_analyzer (
                  * with_full_table_scans             Based on the sys.statements_with_full_table_scans view
                  * with_sorting                      Based on the sys.statements_with_sorting view
                  * with_temp_tables                  Based on the sys.statements_with_temp_tables view
-                 * custom                            Use a custom view. This view must be specified in @sys.statement_analyzer_view to an existing view or a query
+                 * custom                            Use a custom view. This view must be specified in @sys.statement_performance_analyzer.view to an existing view or a query
 
              Default is to include all except ''custom''.
 
@@ -96,14 +96,14 @@ CREATE DEFINER='root'@'localhost' PROCEDURE statement_performance_analyzer (
              Configuration Options
              ----------------------
 
-             sys.statement_analyzer_limit
+             sys.statement_performance_analyzer.limit
                The maximum number of rows to include for the views that does not have a built-in limit (e.g. the 95th percentile view).
                If not set the limit is 100.
 
-             sys.statement_analyzer_view
+             sys.statement_performance_analyzer.view
                Used together with the ''custom'' view. If the value contains a space, it is considered a query, otherwise it must be
                an existing view querying the performance_schema.events_statements_summary_by_digest table. There cannot be any limit
-               clause including in the query or view definition if @sys.statement_analyzer_limit > 0.
+               clause including in the query or view definition if @sys.statement_performance_analyzer.limit > 0.
                If specifying a view, use the same format as for in_table.
 
              sys.debug
@@ -166,7 +166,7 @@ CREATE DEFINER='root'@'localhost' PROCEDURE statement_performance_analyzer (
              mysql> CALL sys.statement_performance_analyzer(''snapshot'', NULL, NULL);
              Query OK, 0 rows affected (0.01 sec)                                   
 
-             mysql> SET @sys.statement_analyzer_limit = 10;
+             mysql> SET @sys.statement_performance_analyzer.limit = 10;
              Query OK, 0 rows affected (0.00 sec)          
 
              mysql> CALL sys.statement_performance_analyzer(''overall'', NULL, ''with_runtimes_in_95th_percentile,with_full_table_scans'');
@@ -210,8 +210,8 @@ CREATE DEFINER='root'@'localhost' PROCEDURE statement_performance_analyzer (
              Query OK, 0 rows affected (0.10 sec)
 
              shell$ watch -n 60 "mysql sys --table -e \"
-             > SET @sys.statement_analyzer_view = ''mydb.my_statements'';
-             > SET @sys.statement_analyzer_limit = 10;
+             > SET @sys.statement_performance_analyzer.view = ''mydb.my_statements'';
+             > SET @sys.statement_performance_analyzer.limit = 10;
              > CALL statement_performance_analyzer(''snapshot'', NULL, NULL);
              > CALL statement_performance_analyzer(''delta'', ''mydb.digests_prev'', ''custom'');
              > CALL statement_performance_analyzer(''save'', ''mydb.digests_prev'', NULL);
@@ -256,11 +256,11 @@ BEGIN
 
 
     -- Set configuration options
-    IF (@sys.statement_analyzer_limit IS NULL) THEN
-        SET @sys.statement_analyzer_limit = sys.sys_get_config('statement_analyzer_limit', '100');
+    IF (@sys.statement_performance_analyzer.limit IS NULL) THEN
+        SET @sys.statement_performance_analyzer.limit = sys.sys_get_config('statement_performance_analyzer.limit', '100');
     END IF;
     IF (@sys.debug IS NULL) THEN
-        SET @sys.debug                    = sys.sys_get_config('debug'                   , 'OFF');
+        SET @sys.debug                                = sys.sys_get_config('debug'                               , 'OFF');
     END IF;
 
 
@@ -619,7 +619,7 @@ HAVING percentile > 0.95
         END IF;
 
         IF (FIND_IN_SET('analysis', in_views)) THEN
-            SELECT CONCAT('Top ', @sys.statement_analyzer_limit, ' Queries Ordered by Total Latency') AS 'Next Output';
+            SELECT CONCAT('Top ', @sys.statement_performance_analyzer.limit, ' Queries Ordered by Total Latency') AS 'Next Output';
             SET @sys.tmp.SQL = REPLACE(
                                   (SELECT VIEW_DEFINITION
                                      FROM information_schema.VIEWS
@@ -628,8 +628,8 @@ HAVING percentile > 0.95
                                   '`performance_schema`.`events_statements_summary_by_digest`',
                                   v_digests_table
                                );
-            IF (@sys.statement_analyzer_limit > 0) THEN
-                SET @sys.tmp.SQL = CONCAT(@sys.tmp.SQL, ' LIMIT ', @sys.statement_analyzer_limit);
+            IF (@sys.statement_performance_analyzer.limit > 0) THEN
+                SET @sys.tmp.SQL = CONCAT(@sys.tmp.SQL, ' LIMIT ', @sys.statement_performance_analyzer.limit);
             END IF;
             IF (@sys.debug = 'ON') THEN
                 SELECT @sys.tmp.SQL AS 'Debug';
@@ -640,7 +640,7 @@ HAVING percentile > 0.95
         END IF;
 
         IF (FIND_IN_SET('with_errors_or_warnings', in_views)) THEN
-            SELECT CONCAT('Top ', @sys.statement_analyzer_limit, ' Queries with Errors') AS 'Next Output';
+            SELECT CONCAT('Top ', @sys.statement_performance_analyzer.limit, ' Queries with Errors') AS 'Next Output';
             SET @sys.tmp.SQL = REPLACE(
                                   (SELECT VIEW_DEFINITION
                                      FROM information_schema.VIEWS
@@ -649,8 +649,8 @@ HAVING percentile > 0.95
                                   '`performance_schema`.`events_statements_summary_by_digest`',
                                   v_digests_table
                                );
-            IF (@sys.statement_analyzer_limit > 0) THEN
-                SET @sys.tmp.SQL = CONCAT(@sys.tmp.SQL, ' LIMIT ', @sys.statement_analyzer_limit);
+            IF (@sys.statement_performance_analyzer.limit > 0) THEN
+                SET @sys.tmp.SQL = CONCAT(@sys.tmp.SQL, ' LIMIT ', @sys.statement_performance_analyzer.limit);
             END IF;
             IF (@sys.debug = 'ON') THEN
                 SELECT @sys.tmp.SQL AS 'Debug';
@@ -661,7 +661,7 @@ HAVING percentile > 0.95
         END IF;
 
         IF (FIND_IN_SET('with_full_table_scans', in_views)) THEN
-            SELECT CONCAT('Top ', @sys.statement_analyzer_limit, ' Queries with Full Table Scan') AS 'Next Output';
+            SELECT CONCAT('Top ', @sys.statement_performance_analyzer.limit, ' Queries with Full Table Scan') AS 'Next Output';
             SET @sys.tmp.SQL = REPLACE(
                                   (SELECT VIEW_DEFINITION
                                      FROM information_schema.VIEWS
@@ -670,8 +670,8 @@ HAVING percentile > 0.95
                                   '`performance_schema`.`events_statements_summary_by_digest`',
                                   v_digests_table
                                );
-            IF (@sys.statement_analyzer_limit > 0) THEN
-                SET @sys.tmp.SQL = CONCAT(@sys.tmp.SQL, ' LIMIT ', @sys.statement_analyzer_limit);
+            IF (@sys.statement_performance_analyzer.limit > 0) THEN
+                SET @sys.tmp.SQL = CONCAT(@sys.tmp.SQL, ' LIMIT ', @sys.statement_performance_analyzer.limit);
             END IF;
             IF (@sys.debug = 'ON') THEN
                 SELECT @sys.tmp.SQL AS 'Debug';
@@ -682,7 +682,7 @@ HAVING percentile > 0.95
         END IF;
 
         IF (FIND_IN_SET('with_sorting', in_views)) THEN
-            SELECT CONCAT('Top ', @sys.statement_analyzer_limit, ' Queries with Sorting') AS 'Next Output';
+            SELECT CONCAT('Top ', @sys.statement_performance_analyzer.limit, ' Queries with Sorting') AS 'Next Output';
             SET @sys.tmp.SQL = REPLACE(
                                   (SELECT VIEW_DEFINITION
                                      FROM information_schema.VIEWS
@@ -691,8 +691,8 @@ HAVING percentile > 0.95
                                   '`performance_schema`.`events_statements_summary_by_digest`',
                                   v_digests_table
                                );
-            IF (@sys.statement_analyzer_limit > 0) THEN
-                SET @sys.tmp.SQL = CONCAT(@sys.tmp.SQL, ' LIMIT ', @sys.statement_analyzer_limit);
+            IF (@sys.statement_performance_analyzer.limit > 0) THEN
+                SET @sys.tmp.SQL = CONCAT(@sys.tmp.SQL, ' LIMIT ', @sys.statement_performance_analyzer.limit);
             END IF;
             IF (@sys.debug = 'ON') THEN
                 SELECT @sys.tmp.SQL AS 'Debug';
@@ -703,7 +703,7 @@ HAVING percentile > 0.95
         END IF;
 
         IF (FIND_IN_SET('with_temp_tables', in_views)) THEN
-            SELECT CONCAT('Top ', @sys.statement_analyzer_limit, ' Queries with Internal Temporary Tables') AS 'Next Output';
+            SELECT CONCAT('Top ', @sys.statement_performance_analyzer.limit, ' Queries with Internal Temporary Tables') AS 'Next Output';
             SET @sys.tmp.SQL = REPLACE(
                                   (SELECT VIEW_DEFINITION
                                      FROM information_schema.VIEWS
@@ -712,8 +712,8 @@ HAVING percentile > 0.95
                                   '`performance_schema`.`events_statements_summary_by_digest`',
                                   v_digests_table
                                );
-            IF (@sys.statement_analyzer_limit > 0) THEN
-                SET @sys.tmp.SQL = CONCAT(@sys.tmp.SQL, ' LIMIT ', @sys.statement_analyzer_limit);
+            IF (@sys.statement_performance_analyzer.limit > 0) THEN
+                SET @sys.tmp.SQL = CONCAT(@sys.tmp.SQL, ' LIMIT ', @sys.statement_performance_analyzer.limit);
             END IF;
             IF (@sys.debug = 'ON') THEN
                 SELECT @sys.tmp.SQL AS 'Debug';
@@ -724,32 +724,32 @@ HAVING percentile > 0.95
         END IF;
 
         IF (FIND_IN_SET('custom', in_views)) THEN
-            SELECT CONCAT('Top ', @sys.statement_analyzer_limit, ' Queries Using Custom View') AS 'Next Output';
+            SELECT CONCAT('Top ', @sys.statement_performance_analyzer.limit, ' Queries Using Custom View') AS 'Next Output';
 
-            IF (@sys.statement_analyzer_view IS NULL) THEN
-                SET @sys.statement_analyzer_view = sys.sys_get_config('sys.statement_analyzer_view', NULL);
+            IF (@sys.statement_performance_analyzer.view IS NULL) THEN
+                SET @sys.statement_performance_analyzer.view = sys.sys_get_config('statement_performance_analyzer.view', NULL);
             END IF;
-            IF (@sys.statement_analyzer_view IS NULL) THEN
+            IF (@sys.statement_performance_analyzer.view IS NULL) THEN
                 SIGNAL SQLSTATE '45000'
-                   SET MESSAGE_TEXT = 'The @sys.statement_analyzer_view user variable must be set with the view or query  to use';
+                   SET MESSAGE_TEXT = 'The @sys.statement_performance_analyzer.view user variable must be set with the view or query  to use';
             END IF;
 
-            IF (NOT INSTR(@sys.statement_analyzer_view, ' ')) THEN
+            IF (NOT INSTR(@sys.statement_performance_analyzer.view, ' ')) THEN
                 -- No spaces, so can't be a query
-                IF (NOT INSTR(@sys.statement_analyzer_view, '.')) THEN
+                IF (NOT INSTR(@sys.statement_performance_analyzer.view, '.')) THEN
                     -- No . in the table name - use current database
                     -- DATABASE() will be the database of the procedure
                     SET v_custom_db   = DATABASE(),
-                        v_custom_name = @sys.statement_analyzer_view;
+                        v_custom_name = @sys.statement_performance_analyzer.view;
                 ELSE
-                    SET v_custom_db   = SUBSTRING_INDEX(@sys.statement_analyzer_view, '.', 1);
-                    SET v_custom_name = SUBSTRING(@sys.statement_analyzer_view, CHAR_LENGTH(v_custom_db)+2);
+                    SET v_custom_db   = SUBSTRING_INDEX(@sys.statement_performance_analyzer.view, '.', 1);
+                    SET v_custom_name = SUBSTRING(@sys.statement_performance_analyzer.view, CHAR_LENGTH(v_custom_db)+2);
                 END IF;
 
                 CALL table_exists(v_custom_db, v_custom_name, v_custom_view_exists);
                 IF (v_custom_view_exists <> 'VIEW') THEN
                     SIGNAL SQLSTATE '45000'
-                       SET MESSAGE_TEXT = 'The @sys.statement_analyzer_view user variable is set to use a custom view, but is neither an existing view nor a query';
+                       SET MESSAGE_TEXT = 'The @sys.statement_performance_analyzer.view user variable is set to use a custom view, but is neither an existing view nor a query';
                 END IF;
 
                 SET @sys.tmp.SQL = REPLACE(
@@ -761,11 +761,11 @@ HAVING percentile > 0.95
                                       v_digests_table
                                    );
             ELSE
-                SET @sys.tmp.SQL = REPLACE(@sys.statement_analyzer_view, '`performance_schema`.`events_statements_summary_by_digest`', v_digests_table);
+                SET @sys.tmp.SQL = REPLACE(@sys.statement_performance_analyzer.view, '`performance_schema`.`events_statements_summary_by_digest`', v_digests_table);
             END IF;
 
-            IF (@sys.statement_analyzer_limit > 0) THEN
-                SET @sys.tmp.SQL = CONCAT(@sys.tmp.SQL, ' LIMIT ', @sys.statement_analyzer_limit);
+            IF (@sys.statement_performance_analyzer.limit > 0) THEN
+                SET @sys.tmp.SQL = CONCAT(@sys.tmp.SQL, ' LIMIT ', @sys.statement_performance_analyzer.limit);
             END IF;
 
             IF (@sys.debug = 'ON') THEN
