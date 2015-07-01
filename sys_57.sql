@@ -142,6 +142,8 @@ SOURCE ./views/p_s/x_processlist_57.sql
 SOURCE ./procedures/create_synonym_db.sql
 SOURCE ./procedures/execute_prepared_stmt.sql
 
+SOURCE ./procedures/diagnostics.sql
+
 SOURCE ./procedures/ps_statement_avg_latency_histogram.sql
 SOURCE ./procedures/ps_trace_statement_digest.sql
 SOURCE ./procedures/ps_trace_thread_57.sql
