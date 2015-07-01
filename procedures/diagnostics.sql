@@ -623,21 +623,8 @@ BEGIN
                 SELECT CONCAT('The following queries are for storing the initial content of ', v_table_name) AS 'Debug';
             END IF;
 
-            SET @SQL_DROP = CONCAT('DROP TEMPORARY TABLE IF EXISTS `tmp_', v_table_name, '_start`');
-            IF (@sys.debug = 'ON') THEN
-                SELECT @SQL_DROP AS 'Debug';
-            END IF;
-            PREPARE stmt_drop_table FROM @SQL_DROP;
-            EXECUTE stmt_drop_table;
-            DEALLOCATE PREPARE stmt_drop_table;
-
-            SET @SQL_CREATE = CONCAT('CREATE TEMPORARY TABLE `tmp_', v_table_name, '_start` SELECT * FROM `sys`.`x$', v_table_name, '`');
-            IF (@sys.debug = 'ON') THEN
-                SELECT @SQL_CREATE AS 'Debug';
-            END IF;
-            PREPARE stmt_sysview FROM @SQL_CREATE;
-            EXECUTE stmt_sysview;
-            DEALLOCATE PREPARE stmt_sysview;
+            CALL sys.execute_prepared_stmt(CONCAT('DROP TEMPORARY TABLE IF EXISTS `tmp_', v_table_name, '_start`'));
+            CALL sys.execute_prepared_stmt(CONCAT('CREATE TEMPORARY TABLE `tmp_', v_table_name, '_start` SELECT * FROM `sys`.`x$', v_table_name, '`'));
 
             IF (@sys.diagnostics.include_raw = 'ON') THEN
                 SET @sys.tmp.table_name = CONCAT('x$', v_table_name);
@@ -651,12 +638,7 @@ BEGIN
                   FROM tmp_sys_views_delta
                  WHERE TABLE_NAME = v_table_name;
                 SELECT CONCAT('Initial ', v_table_name) AS 'The following output is:';
-                IF (@sys.debug = 'ON') THEN
-                    SELECT @sys.tmp.SQL_SELECT AS 'Debug';
-                END IF;
-                PREPARE stmt_select FROM @sys.tmp.SQL_SELECT;
-                EXECUTE stmt_select;
-                DEALLOCATE PREPARE stmt_select;
+                CALL sys.execute_prepared_stmt(@sys.tmp.SQL_SELECT);
             END IF;
         END LOOP;
         CLOSE c_sysviews_w_delta;
@@ -743,49 +725,28 @@ BEGIN
         -- We need one table per output as a temporary table cannot be opened twice in the same query, and we need to
         -- join the outputs in the summary at the end.
         SET v_table_name = CONCAT('tmp_metrics_', v_output_count);
-        SET @SQL = CONCAT('DROP TEMPORARY TABLE IF EXISTS ', v_table_name);
-        IF (@sys.debug = 'ON') THEN
-            SELECT @SQL AS 'Debug';
-        END IF;
-        PREPARE stmt_drop_table FROM @SQL;
-        EXECUTE stmt_drop_table;
-        DEALLOCATE PREPARE stmt_drop_table;
+        CALL sys.execute_prepared_stmt(CONCAT('DROP TEMPORARY TABLE IF EXISTS ', v_table_name));
         
         -- Currently information_schema.GLOBAL_STATUS has VARIABLE_VALUE as varchar(1024)
-        SET @SQL = CONCAT('CREATE TEMPORARY TABLE ', v_table_name, ' (
+        CALL sys.execute_prepared_stmt(CONCAT('CREATE TEMPORARY TABLE ', v_table_name, ' (
   Variable_name VARCHAR(193) NOT NULL,
   Variable_value VARCHAR(1024),
   Type VARCHAR(225) NOT NULL,
   Enabled ENUM(''YES'', ''NO'', ''PARTIAL'') NOT NULL,
   PRIMARY KEY (Type, Variable_name)
-) DEFAULT CHARSET=utf8');
-        IF (@sys.debug = 'ON') THEN
-            SELECT @SQL AS 'Debug';
-        END IF;
-        PREPARE stmt_create_table FROM @SQL;
-        EXECUTE stmt_create_table;
-        DEALLOCATE PREPARE stmt_create_table;
+) DEFAULT CHARSET=utf8'));
 
-        IF (v_has_ps_vars = 'YES') THEN
-            SET @SQL = CONCAT('INSERT INTO ', v_table_name, ' SELECT Variable_name, REPLACE(Variable_value, ''\n'', ''\\\\n'') AS Variable_value, Type, Enabled FROM sys.metrics');
-        ELSE
-            SET @SQL = CONCAT('INSERT INTO ', v_table_name, ' SELECT Variable_name, REPLACE(Variable_value, ''\n'', ''\\\\n'') AS Variable_value, Type, Enabled FROM sys.metrics_56');
-        END IF;
-        IF (@sys.debug = 'ON') THEN
-            SELECT @SQL AS 'Debug';
-        END IF;
-        PREPARE stmt_insert FROM @SQL;
-        EXECUTE stmt_insert;
-        DEALLOCATE PREPARE stmt_insert;
+        SET @sys.diagnostics.sql = CONCAT(
+                'INSERT INTO ', v_table_name,
+                ' SELECT Variable_name, REPLACE(Variable_value, ''\n'', ''\\\\n'') AS Variable_value, Type, Enabled FROM ',
+                IF(v_has_ps_vars = 'YES', 'sys.metrics', 'sys.metrics_56')
+        );
+        CALL sys.execute_prepared_stmt(@sys.diagnostics.sql);
 
         -- Prepare the query to retrieve the summary
-        SET @SQL = CONCAT('(SELECT Variable_value INTO @sys.tmp.output_time FROM ', v_table_name, ' WHERE Type = ''System Time'' AND Variable_name = ''UNIX_TIMESTAMP()'')');
-        IF (@sys.debug = 'ON') THEN
-            SELECT @SQL AS 'Debug';
-        END IF;
-        PREPARE stmt_select FROM @SQL;
-        EXECUTE stmt_select;
-        DEALLOCATE PREPARE stmt_select;
+        CALL sys.execute_prepared_stmt(
+            CONCAT('(SELECT Variable_value INTO @sys.tmp.output_time FROM ', v_table_name, ' WHERE Type = ''System Time'' AND Variable_name = ''UNIX_TIMESTAMP()'')')
+        );
         SET v_output_time = @sys.tmp.output_time;
 
         -- Limit each value to v_status_summary_width chars (when v_has_ndb = TRUE the values can be very wide - refer to the output here for the full values)
@@ -822,13 +783,7 @@ BEGIN
                 SELECT 'SELECT * FROM sys.metrics_56' AS 'The following output is:';
             END IF;
             -- Ensures that the output here is the same as the one used in the status summary at the end
-            SET @SQL = CONCAT('SELECT Type, Variable_name, Enabled, Variable_value FROM ', v_table_name, ' ORDER BY Type, Variable_name');
-            IF (@sys.debug = 'ON') THEN
-                SELECT @SQL AS 'Debug';
-            END IF;
-            PREPARE stmt_select FROM @SQL;
-            EXECUTE stmt_select;
-            DEALLOCATE PREPARE stmt_select;
+            CALL sys.execute_prepared_stmt(CONCAT('SELECT Type, Variable_name, Enabled, Variable_value FROM ', v_table_name, ' ORDER BY Type, Variable_name'));
         END IF;
 
         -- InnoDB
@@ -859,14 +814,8 @@ BEGIN
                 LEAVE c_ndbinfo_loop;
                 END IF;
 
-                SET @SQL = CONCAT('SELECT * FROM `ndbinfo`.`', v_table_name, '`');
-                IF (@sys.debug = 'ON') THEN
-                    SELECT @SQL AS 'Debug';
-                END IF;
-                PREPARE stmt_ndbinfo FROM @SQL;
                 SELECT CONCAT('SELECT * FROM ndbinfo.', v_table_name) AS 'The following output is:';
-                EXECUTE stmt_ndbinfo;
-                DEALLOCATE PREPARE stmt_ndbinfo;
+                CALL sys.execute_prepared_stmt(CONCAT('SELECT * FROM `ndbinfo`.`', v_table_name, '`'));
             END LOOP;
             CLOSE c_ndbinfo;
 
@@ -1004,21 +953,8 @@ BEGIN
                 SELECT CONCAT('The following queries are for storing the final content of ', v_table_name) AS 'Debug';
             END IF;
 
-            SET @SQL_DROP = CONCAT('DROP TEMPORARY TABLE IF EXISTS `tmp_', v_table_name, '_end`');
-            IF (@sys.debug = 'ON') THEN
-                SELECT @SQL_DROP AS 'Debug';
-            END IF;
-            PREPARE stmt_drop_table FROM @SQL_DROP;
-            EXECUTE stmt_drop_table;
-            DEALLOCATE PREPARE stmt_drop_table;
-
-            SET @SQL_CREATE = CONCAT('CREATE TEMPORARY TABLE `tmp_', v_table_name, '_end` SELECT * FROM `sys`.`x$', v_table_name, '`');
-            IF (@sys.debug = 'ON') THEN
-                SELECT @SQL_CREATE AS 'Debug';
-            END IF;
-            PREPARE stmt_sysview FROM @SQL_CREATE;
-            EXECUTE stmt_sysview;
-            DEALLOCATE PREPARE stmt_sysview;
+            CALL sys.execute_prepared_stmt(CONCAT('DROP TEMPORARY TABLE IF EXISTS `tmp_', v_table_name, '_end`'));
+            CALL sys.execute_prepared_stmt(CONCAT('CREATE TEMPORARY TABLE `tmp_', v_table_name, '_end` SELECT * FROM `sys`.`x$', v_table_name, '`'));
 
             IF (@sys.diagnostics.include_raw = 'ON') THEN
                 SET @sys.tmp.table_name = CONCAT('x$', v_table_name);
@@ -1032,12 +968,7 @@ BEGIN
                     FROM tmp_sys_views_delta
                     WHERE TABLE_NAME = v_table_name;
                 SELECT CONCAT('Overall ', v_table_name) AS 'The following output is:';
-                IF (@sys.debug = 'ON') THEN
-                    SELECT @sys.tmp.SQL_SELECT AS 'Debug';
-                END IF;
-                PREPARE stmt_select FROM @sys.tmp.SQL_SELECT;
-                EXECUTE stmt_select;
-                DEALLOCATE PREPARE stmt_select;
+                CALL sys.execute_prepared_stmt(@sys.tmp.SQL_SELECT);
             END IF;
         END LOOP;
         CLOSE c_sysviews_w_delta;
@@ -1090,27 +1021,10 @@ BEGIN
                 WHERE TABLE_NAME = v_table_name;
 
             SELECT CONCAT('Delta ', v_table_name) AS 'The following output is:';
-            IF (@sys.debug = 'ON') THEN
-                SELECT @sys.tmp.SQL_SELECT AS 'Debug';
-            END IF;
-            PREPARE stmt_select FROM @sys.tmp.SQL_SELECT;
-            EXECUTE stmt_select;
-            DEALLOCATE PREPARE stmt_select;
+            CALL sys.execute_prepared_stmt(@sys.tmp.SQL_SELECT);
 
-            SET @SQL_DROP = CONCAT('DROP TEMPORARY TABLE `tmp_', v_table_name, '_end`');
-            IF (@sys.debug = 'ON') THEN
-                SELECT @SQL_DROP AS 'Debug';
-            END IF;
-            PREPARE stmt_drop_table FROM @SQL_DROP;
-            EXECUTE stmt_drop_table;
-            DEALLOCATE PREPARE stmt_drop_table;
-            SET @SQL_DROP = CONCAT('DROP TEMPORARY TABLE `tmp_', v_table_name, '_start`');
-            IF (@sys.debug = 'ON') THEN
-                SELECT @SQL_DROP AS 'Debug';
-            END IF;
-            PREPARE stmt_drop_table FROM @SQL_DROP;
-            EXECUTE stmt_drop_table;
-            DEALLOCATE PREPARE stmt_drop_table;
+            CALL sys.execute_prepared_stmt(CONCAT('DROP TEMPORARY TABLE `tmp_', v_table_name, '_end`'));
+            CALL sys.execute_prepared_stmt(CONCAT('DROP TEMPORARY TABLE `tmp_', v_table_name, '_start`'));
         END LOOP;
         CLOSE c_sysviews_w_delta;
         SET @@session.group_concat_max_len = v_old_group_concat_max_len;
@@ -1124,35 +1038,27 @@ BEGIN
     ELSE
         SELECT 'SELECT * FROM sys.metrics_56' AS 'The following output is:';
     END IF;
-    SET @SQL_STATUS_SUMMARY = CONCAT(v_sql_status_summary_select, v_sql_status_summary_delta, ', Type, s1.Enabled', v_sql_status_summary_from);
-    SET @SQL_STATUS_SUMMARY = CONCAT(@SQL_STATUS_SUMMARY, '
- ORDER BY Type, Variable_name');
-
-    IF (@sys.debug = 'ON') THEN
-        SELECT @SQL_STATUS_SUMMARY AS 'Debug';
-    END IF;
-    PREPARE stmt_status_summary FROM @SQL_STATUS_SUMMARY;
-    EXECUTE stmt_status_summary;
-    DEALLOCATE PREPARE stmt_status_summary;
+    CALL sys.execute_prepared_stmt(
+        CONCAT(v_sql_status_summary_select, v_sql_status_summary_delta, ', Type, s1.Enabled', v_sql_status_summary_from,
+               '
+ ORDER BY Type, Variable_name'
+        )
+    );
 
     -- Remove all the metrics temporary tables again
     SET v_count = 0;
     WHILE (v_count < v_output_count) DO
         SET v_count = v_count + 1;
         SET v_table_name = CONCAT('tmp_metrics_', v_count);
-        SET @SQL = CONCAT('DROP TEMPORARY TABLE IF EXISTS ', v_table_name);
-        IF (@sys.debug = 'ON') THEN
-            SELECT @SQL AS 'Debug';
-        END IF;
-        PREPARE stmt_drop_table FROM @SQL;
-        EXECUTE stmt_drop_table;
-        DEALLOCATE PREPARE stmt_drop_table;
+        CALL sys.execute_prepared_stmt(CONCAT('DROP TEMPORARY TABLE IF EXISTS ', v_table_name));
     END WHILE;
 
     IF (in_auto_config <> 'current') THEN
         CALL sys.ps_setup_reload_saved();
         SET sql_log_bin = @log_bin;
     END IF;
+
+    SET @sys.diagnostics.sql = NULL;
 
     -- Restore INSTRUMENTED for this thread
     IF (v_this_thread_enabled = 'YES') THEN
