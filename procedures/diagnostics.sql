@@ -31,6 +31,7 @@ CREATE DEFINER='root'@'localhost' PROCEDURE diagnostics (
                 * Several sys schema views including metrics or metrics_56
                 * Queries in the 95th percentile
                 * Several ndbinfo views for MySQL Cluster
+                * Replication (both master and slave) information.
 
              Some of the sys schema views are calculated as initial (optional), overall, delta:
 
@@ -144,7 +145,7 @@ BEGIN
          ORDER BY table_name; 
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET v_done = TRUE;
 
-    -- Some metrics variables doesn't make sense in delta and rate calculations even if they are numberic
+    -- Some metrics variables doesn't make sense in delta and rate calculations even if they are numeric
     -- as they really are more like settings or "current" status.
     SET v_no_delta_names = CONCAT('s%{COUNT}.Variable_name NOT IN (',
         '''innodb_buffer_pool_pages_total'', ',

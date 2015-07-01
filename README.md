@@ -3592,6 +3592,7 @@ Create a report of the current status of the server for diagnostics purposes. Da
    * Several sys schema views including metrics or metrics_56
    * Queries in the 95th percentile
    * Several ndbinfo views for MySQL Cluster
+   * Replication (both master and slave) information.
 
 Some of the sys schema views are calculated as initial (optional), overall, delta:
 
