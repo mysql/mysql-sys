@@ -3656,6 +3656,27 @@ mysql> CALL sys.status(120, 30, 'current');
 mysql> NOTEE;
 ```
 
+#### ps_setup_disable_background_threads
+
+##### Description
+
+Disable all background thread instrumentation within Performance Schema.
+
+##### Parameters
+
+None.
+
+##### Example
+```SQL
+mysql> CALL sys.ps_setup_disable_background_threads();
++--------------------------------+
+| summary                        |
++--------------------------------+
+| Disabled 18 background threads |
++--------------------------------+
+1 row in set (0.00 sec)
+```
+
 #### ps_setup_disable_instrument
 
 ##### Description
