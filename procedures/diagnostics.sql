@@ -951,7 +951,7 @@ BEGIN
                                                                 AND STATISTICS.TABLE_NAME = TABLES.TABLE_NAME
                                                                 AND STATISTICS.INDEX_NAME = 'PRIMARY'
          WHERE STATISTICS.TABLE_NAME IS NULL
-               AND TABLES.TABLE_SCHEMA NOT IN ('mysql', 'information_schema', 'performance_schema')
+               AND TABLES.TABLE_SCHEMA NOT IN ('mysql', 'information_schema', 'performance_schema', 'sys')
                AND TABLES.TABLE_TYPE = 'BASE TABLE'
          GROUP BY TABLES.TABLE_SCHEMA, ENGINE;
     END IF;
@@ -962,7 +962,7 @@ BEGIN
           FROM performance_schema.table_io_waits_summary_by_index_usage 
          WHERE index_name IS NOT NULL
                AND count_star = 0
-               AND object_schema != 'mysql'
+               AND object_schema NOT IN ('mysql', 'sys')
                AND index_name != 'PRIMARY'
          GROUP BY object_schema;
     END IF;
