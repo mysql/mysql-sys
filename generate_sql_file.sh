@@ -146,7 +146,7 @@ then
   done
 
   # Start the output file from a non-removed copyright file
-  sed -e "/sql_log_bin/d" ../before_setup.sql > $OUTPUTFILE
+  sed -e "/sql_log_bin/d;s/'root'@'localhost'/$MYSQLUSER/g" ../before_setup.sql > $OUTPUTFILE
   echo "" >> $OUTPUTFILE
 
   # Add the files in install file order, removing new lines along the way
@@ -177,7 +177,7 @@ then
   cd $PWD
   rm -rf $SYSDIR/tmpgen/
 else
-  cat $SYSDIR/before_setup.sql > $SYSDIR/$OUTPUTFILE
+  sed -e "s/'root'@'localhost'/$MYSQLUSER/g" $SYSDIR/before_setup.sql > $SYSDIR/$OUTPUTFILE
   cat "./sys_$MYSQLVERSION.sql" | tr -d '\r' | grep 'SOURCE' | $SED_R 's .{8}  ' | sed 's/^/./' | grep -v before_setup | \
     xargs sed -e "/Copyright/,/51 Franklin St/d;s/'root'@'localhost'/$MYSQLUSER/g" >> $SYSDIR/$OUTPUTFILE
 fi
