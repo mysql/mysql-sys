@@ -16,4 +16,6 @@
 INSERT IGNORE INTO sys_config (variable, value) VALUES
     ('statement_truncate_len', 64),
     ('statement_performance_analyzer.limit', 100),
-    ('statement_performance_analyzer.view', NULL);
+    ('statement_performance_analyzer.view', NULL),
+    ('diagnostics.allow_i_s_tables', 'OFF'),
+    ('diagnostics.include_raw', 'OFF');
