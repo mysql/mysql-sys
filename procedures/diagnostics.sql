@@ -209,10 +209,6 @@ BEGIN
                 SET ENABLED = 'YES',
                     TIMED   = 'YES'
             WHERE NAME NOT LIKE 'wait/synch/%';
-
-            -- Enable all threads
-            UPDATE performance_schema.threads
-                SET INSTRUMENTED = 'YES';
         ELSEIF (in_auto_config = 'full') THEN
             UPDATE performance_schema.setup_consumers
                 SET ENABLED = 'YES';
@@ -220,10 +216,12 @@ BEGIN
             UPDATE performance_schema.setup_instruments
                 SET ENABLED = 'YES',
                     TIMED   = 'YES';
-
-            UPDATE performance_schema.threads
-                SET INSTRUMENTED = 'YES';
         END IF;
+
+        -- Enable all threads except this one
+        UPDATE performance_schema.threads
+           SET INSTRUMENTED = 'YES'
+         WHERE PROCESSLIST_ID <> CONNECTION_ID();
     END IF;
 
     SET v_start        = UNIX_TIMESTAMP(NOW(2)),
