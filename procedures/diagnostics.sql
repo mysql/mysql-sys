@@ -735,7 +735,7 @@ BEGIN
   Type VARCHAR(225) NOT NULL,
   Enabled ENUM(''YES'', ''NO'', ''PARTIAL'') NOT NULL,
   PRIMARY KEY (Type, Variable_name)
-) DEFAULT CHARSET=utf8'));
+) ENGINE = InnoDB DEFAULT CHARSET=utf8'));
 
         SET @sys.diagnostics.sql = CONCAT(
                 'INSERT INTO ', v_table_name,
