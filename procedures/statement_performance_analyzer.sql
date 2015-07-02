@@ -474,12 +474,14 @@ BEGIN
             DROP TEMPORARY TABLE IF EXISTS tmp_digests_delta;
             CREATE TEMPORARY TABLE tmp_digests_delta LIKE tmp_digests;
             SET v_sql = CONCAT('INSERT INTO tmp_digests_delta
-SELECT `d_end`.`SCHEMA_NAME`, `d_end`.`DIGEST`, d_end.`DIGEST_TEXT`,
+SELECT `d_end`.`SCHEMA_NAME`,
+       `d_end`.`DIGEST`,
+       `d_end`.`DIGEST_TEXT`,
        `d_end`.`COUNT_STAR`-IFNULL(`d_start`.`COUNT_STAR`, 0) AS ''COUNT_STAR'',
        `d_end`.`SUM_TIMER_WAIT`-IFNULL(`d_start`.`SUM_TIMER_WAIT`, 0) AS ''SUM_TIMER_WAIT'',
-       `d_end`.`MIN_TIMER_WAIT` AS ''MIN_TIMER_WAIT'', -- we don''t know MIN_TIMER_WAIT for the delta, so just use the overall value
+       `d_end`.`MIN_TIMER_WAIT` AS ''MIN_TIMER_WAIT'',
        IFNULL((`d_end`.`SUM_TIMER_WAIT`-IFNULL(`d_start`.`SUM_TIMER_WAIT`, 0))/NULLIF(`d_end`.`COUNT_STAR`-IFNULL(`d_start`.`COUNT_STAR`, 0), 0), 0) AS ''AVG_TIMER_WAIT'',
-       `d_end`.`MAX_TIMER_WAIT` AS ''MAX_TIMER_WAIT'', -- we don''t know MAX_TIMER_WAIT for the delta, so just use the overall value
+       `d_end`.`MAX_TIMER_WAIT` AS ''MAX_TIMER_WAIT'',
        `d_end`.`SUM_LOCK_TIME`-IFNULL(`d_start`.`SUM_LOCK_TIME`, 0) AS ''SUM_LOCK_TIME'',
        `d_end`.`SUM_ERRORS`-IFNULL(`d_start`.`SUM_ERRORS`, 0) AS ''SUM_ERRORS'',
        `d_end`.`SUM_WARNINGS`-IFNULL(`d_start`.`SUM_WARNINGS`, 0) AS ''SUM_WARNINGS'',
