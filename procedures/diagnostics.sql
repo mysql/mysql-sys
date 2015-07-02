@@ -599,9 +599,9 @@ BEGIN
         END IF;
 
         DROP TEMPORARY TABLE IF EXISTS tmp_digests_start;
-        CALL statement_performance_analyzer('create_tmp', 'tmp_digests_start', NULL);
-        CALL statement_performance_analyzer('snapshot', NULL, NULL);
-        CALL statement_performance_analyzer('save', 'tmp_digests_start', NULL);
+        CALL sys.statement_performance_analyzer('create_tmp', 'tmp_digests_start', NULL);
+        CALL sys.statement_performance_analyzer('snapshot', NULL, NULL);
+        CALL sys.statement_performance_analyzer('save', 'tmp_digests_start', NULL);
 
         -- Loop over the sys views where deltas should be calculated.
         IF (@sys.diagnostics.include_raw = 'ON') THEN
@@ -932,8 +932,8 @@ BEGIN
         SELECT 'CALL sys.ps_statement_avg_latency_histogram()' AS 'The following output is:';
         CALL sys.ps_statement_avg_latency_histogram();
 
-        CALL statement_performance_analyzer('snapshot', NULL, NULL);
-        CALL statement_performance_analyzer('overall', NULL, 'with_runtimes_in_95th_percentile');
+        CALL sys.statement_performance_analyzer('snapshot', NULL, NULL);
+        CALL sys.statement_performance_analyzer('overall', NULL, 'with_runtimes_in_95th_percentile');
 
         SET @sys.diagnostics.sql = REPLACE(@sys.diagnostics.sql_gen_query_template, '%{OUTPUT}', 'end');
         IF (@sys.debug = 'ON') THEN
@@ -987,8 +987,8 @@ BEGIN
 
 ' AS '';
 
-        CALL statement_performance_analyzer('delta', 'tmp_digests_start', 'with_runtimes_in_95th_percentile');
-        CALL statement_performance_analyzer('cleanup', NULL, NULL);
+        CALL sys.statement_performance_analyzer('delta', 'tmp_digests_start', 'with_runtimes_in_95th_percentile');
+        CALL sys.statement_performance_analyzer('cleanup', NULL, NULL);
 
         DROP TEMPORARY TABLE tmp_digests_start;
 
