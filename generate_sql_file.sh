@@ -136,7 +136,7 @@ then
   for file in `find . -name '*.sql'`; do
     sed -i -e "s/'root'@'localhost'/$MYSQLUSER/g" $file
     sed -i -e "/Copyright/,/51 Franklin St/d" $file
-    sed -i -e "/COMMENT/,/            '/{G;s/\n/\\\n/g;}" $file
+    sed -i -e "/^ *COMMENT/,/^ *'/{G;s/\n/\\\n/g;}" $file
     sed -i -e "s/            '\\\n/            '/g" $file
     sed -i -e "/^DELIMITER/d" $file
     sed -i -e "s/\\$\\$/;/g" $file
