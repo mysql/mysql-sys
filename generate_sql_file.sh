@@ -24,7 +24,6 @@ SYSVERSION=`echo "${SYSVERSIONTMP//\'}"`
 
 MYSQLUSER="'root'@'localhost'"
 
-# Recursive sed
 if [ $OS == "Darwin" ] ;
 then
   SED_R="sed -E"
