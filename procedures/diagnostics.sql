@@ -171,8 +171,9 @@ BEGIN
 
     -- Do not track the current thread - no reason to clutter the output
     SELECT INSTRUMENTED INTO v_this_thread_enabled FROM performance_schema.threads WHERE PROCESSLIST_ID = CONNECTION_ID();
-    CALL sys.ps_setup_disable_thread(CONNECTION_ID());
-
+    IF (v_this_thread_enabled = 'YES') THEN
+        CALL sys.ps_setup_disable_thread(CONNECTION_ID());
+    END IF;
     -- Set configuration options
     IF (@sys.diagnostics.allow_i_s_tables IS NULL) THEN
         SET @sys.diagnostics.allow_i_s_tables = sys.sys_get_config('diagnostics.allow_i_s_tables', 'OFF');
