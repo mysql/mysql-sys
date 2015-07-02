@@ -247,7 +247,9 @@ BEGIN
 
     -- Don't instrument this thread
     SELECT INSTRUMENTED INTO v_this_thread_enabled FROM performance_schema.threads WHERE PROCESSLIST_ID = CONNECTION_ID();
-    CALL sys.ps_setup_disable_thread(CONNECTION_ID());
+    IF (v_this_thread_enabled = 'YES') THEN
+        CALL sys.ps_setup_disable_thread(CONNECTION_ID());
+    END IF;
 
     -- Temporary table are used - disable sql_log_bin if necessary to prevent them replicating
     SET @log_bin := @@sql_log_bin;
