@@ -21,36 +21,39 @@
 -- 
 -- Performs less locking than the legacy sources, whilst giving extra information.
 --
--- mysql> select * from processlist where conn_id is not null\G
--- ...
--- *************************** 8. row ***************************
---                 thd_id: 31
---                conn_id: 12
---                   user: root@localhost
---                     db: information_schema
+-- mysql> select * from sys.processlist where conn_id is not null and command != 'daemon' and conn_id != connection_id()\G
+-- *************************** 1. row ***************************
+--                 thd_id: 44524
+--                conn_id: 44502
+--                   user: msandbox@localhost
+--                     db: test
 --                command: Query
---                  state: Sending data
---                   time: 0
---      current_statement: select * from processlist limit 5
---           lock_latency: 684.00 us
+--                  state: alter table (flush)
+--                   time: 18
+--      current_statement: alter table t1 add column g int
+--      statement_latency: 18.45 s
+--               progress: 98.84
+--           lock_latency: 265.43 ms
 --          rows_examined: 0
 --              rows_sent: 0
 --          rows_affected: 0
---             tmp_tables: 2
+--             tmp_tables: 0
 --        tmp_disk_tables: 0
---              full_scan: YES
---         current_memory: 1.29 MiB
+--              full_scan: NO
 --         last_statement: NULL
 -- last_statement_latency: NULL
---              last_wait: wait/synch/mutex/sql/THD::LOCK_query_plan
---      last_wait_latency: 260.13 ns
---                 source: sql_optimizer.cc:1075
+--         current_memory: 664.06 KiB
+--              last_wait: wait/io/file/innodb/innodb_data_file
+--      last_wait_latency: 1.07 us
+--                 source: fil0fil.cc:5146
+--                    pid: 4212
+--           program_name: mysql
 --
- 
+
 CREATE OR REPLACE
   ALGORITHM = TEMPTABLE
   DEFINER = 'root'@'localhost'
-  SQL SECURITY INVOKER 
+  SQL SECURITY INVOKER
 VIEW processlist (
   thd_id,
   conn_id,
@@ -60,6 +63,8 @@ VIEW processlist (
   state,
   time,
   current_statement,
+  statement_latency,
+  progress,
   lock_latency,
   rows_examined,
   rows_sent,
@@ -67,9 +72,9 @@ VIEW processlist (
   tmp_tables,
   tmp_disk_tables,
   full_scan,
-  current_memory,
   last_statement,
   last_statement_latency,
+  current_memory,
   last_wait,
   last_wait_latency,
   source,
@@ -78,38 +83,44 @@ VIEW processlist (
 ) AS
 SELECT pps.thread_id AS thd_id,
        pps.processlist_id AS conn_id,
-       IF(pps.name = 'thread/sql/one_connection', 
-          CONCAT(pps.processlist_user, '@', pps.processlist_host), 
+       IF(pps.name = 'thread/sql/one_connection',
+          CONCAT(pps.processlist_user, '@', pps.processlist_host),
           REPLACE(pps.name, 'thread/', '')) user,
        pps.processlist_db AS db,
        pps.processlist_command AS command,
        pps.processlist_state AS state,
        pps.processlist_time AS time,
        sys.format_statement(pps.processlist_info) AS current_statement,
+       IF(esc.end_event_id IS NULL,
+          sys.format_time(esc.timer_wait),
+          NULL) AS statement_latency,
+       IF(esc.end_event_id IS NULL,
+          ROUND(100 * (estc.work_completed / estc.work_estimated), 2),
+          NULL) AS progress,
        sys.format_time(esc.lock_time) AS lock_latency,
-       esc.rows_examined,
-       esc.rows_sent,
-       esc.rows_affected,
+       esc.rows_examined AS rows_examined,
+       esc.rows_sent AS rows_sent,
+       esc.rows_affected AS rows_affected,
        esc.created_tmp_tables AS tmp_tables,
        esc.created_tmp_disk_tables AS tmp_disk_tables,
-       IF(esc.no_good_index_used > 0 OR esc.no_index_used > 0, 
-          'YES', 'NO') AS full_scan,
-       sys.format_bytes(mem.current_allocated) AS current_memory,
-       IF(esc.timer_wait IS NOT NULL,
+       IF(esc.no_good_index_used > 0 OR esc.no_index_used > 0, 'YES', 'NO') AS full_scan,
+       IF(esc.end_event_id IS NOT NULL,
           sys.format_statement(esc.sql_text),
           NULL) AS last_statement,
-       IF(esc.timer_wait IS NOT NULL,
+       IF(esc.end_event_id IS NOT NULL,
           sys.format_time(esc.timer_wait),
           NULL) AS last_statement_latency,
+       sys.format_bytes(mem.current_allocated) AS current_memory,
        ewc.event_name AS last_wait,
-       IF(ewc.timer_wait IS NULL AND ewc.event_name IS NOT NULL, 
-          'Still Waiting', 
+       IF(ewc.end_event_id IS NULL AND ewc.event_name IS NOT NULL,
+          'Still Waiting',
           sys.format_time(ewc.timer_wait)) last_wait_latency,
        ewc.source,
        conattr_pid.attr_value as pid,
        conattr_progname.attr_value as program_name
   FROM performance_schema.threads AS pps
   LEFT JOIN performance_schema.events_waits_current AS ewc USING (thread_id)
+  LEFT JOIN performance_schema.events_stages_current AS estc USING (thread_id)
   LEFT JOIN performance_schema.events_statements_current AS esc USING (thread_id)
   LEFT JOIN sys.x$memory_by_thread_by_current_bytes AS mem USING (thread_id)
   LEFT JOIN performance_schema.session_connect_attrs AS conattr_pid

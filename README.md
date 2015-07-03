@@ -1397,6 +1397,8 @@ mysql> desc processlist;
 | state                  | varchar(64)         | YES  |     | NULL    |       |
 | time                   | bigint(20)          | YES  |     | NULL    |       |
 | current_statement      | longtext            | YES  |     | NULL    |       |
+| statement_latency      | text                | YES  |     | NULL    |       |
+| progress               | decimal(26,2)       | YES  |     | NULL    |       |
 | lock_latency           | text                | YES  |     | NULL    |       |
 | rows_examined          | bigint(20) unsigned | YES  |     | NULL    |       |
 | rows_sent              | bigint(20) unsigned | YES  |     | NULL    |       |
@@ -1404,14 +1406,16 @@ mysql> desc processlist;
 | tmp_tables             | bigint(20) unsigned | YES  |     | NULL    |       |
 | tmp_disk_tables        | bigint(20) unsigned | YES  |     | NULL    |       |
 | full_scan              | varchar(3)          | NO   |     |         |       |
-| current_memory         | text                | YES  |     | NULL    |       |
 | last_statement         | longtext            | YES  |     | NULL    |       |
 | last_statement_latency | text                | YES  |     | NULL    |       |
+| current_memory         | text                | YES  |     | NULL    |       |
 | last_wait              | varchar(128)        | YES  |     | NULL    |       |
 | last_wait_latency      | text                | YES  |     | NULL    |       |
 | source                 | varchar(64)         | YES  |     | NULL    |       |
+| pid                    | varchar(1024)       | YES  |     | NULL    |       |
+| program_name           | varchar(1024)       | YES  |     | NULL    |       |
 +------------------------+---------------------+------+-----+---------+-------+
-21 rows in set (0.00 sec)
+25 rows in set (0.18 sec)
 
 mysql> desc x$processlist;
 +------------------------+---------------------+------+-----+---------+-------+
@@ -1425,6 +1429,8 @@ mysql> desc x$processlist;
 | state                  | varchar(64)         | YES  |     | NULL    |       |
 | time                   | bigint(20)          | YES  |     | NULL    |       |
 | current_statement      | longtext            | YES  |     | NULL    |       |
+| statement_latency      | bigint(20) unsigned | YES  |     | NULL    |       |
+| progress               | decimal(26,2)       | YES  |     | NULL    |       |
 | lock_latency           | bigint(20) unsigned | YES  |     | NULL    |       |
 | rows_examined          | bigint(20) unsigned | YES  |     | NULL    |       |
 | rows_sent              | bigint(20) unsigned | YES  |     | NULL    |       |
@@ -1432,42 +1438,48 @@ mysql> desc x$processlist;
 | tmp_tables             | bigint(20) unsigned | YES  |     | NULL    |       |
 | tmp_disk_tables        | bigint(20) unsigned | YES  |     | NULL    |       |
 | full_scan              | varchar(3)          | NO   |     |         |       |
-| current_memory         | decimal(41,0)       | YES  |     | NULL    |       |
 | last_statement         | longtext            | YES  |     | NULL    |       |
 | last_statement_latency | bigint(20) unsigned | YES  |     | NULL    |       |
+| current_memory         | decimal(41,0)       | YES  |     | NULL    |       |
 | last_wait              | varchar(128)        | YES  |     | NULL    |       |
 | last_wait_latency      | varchar(20)         | YES  |     | NULL    |       |
 | source                 | varchar(64)         | YES  |     | NULL    |       |
+| pid                    | varchar(1024)       | YES  |     | NULL    |       |
+| program_name           | varchar(1024)       | YES  |     | NULL    |       |
 +------------------------+---------------------+------+-----+---------+-------+
-21 rows in set (0.15 sec)
+25 rows in set (0.00 sec)
 ```
 
 ##### Example
 
 ```SQL
-mysql> select * from processlist where conn_id is not null\G
+mysql> select * from sys.processlist where conn_id is not null and command != 'daemon' and conn_id != connection_id()\G
 *************************** 1. row ***************************
-                thd_id: 31
-               conn_id: 12
-                  user: root@localhost
-                    db: information_schema
+                thd_id: 44524
+               conn_id: 44502
+                  user: msandbox@localhost
+                    db: test
                command: Query
-                 state: Sending data
-                  time: 0
-     current_statement: select * from processlist limit 5
-          lock_latency: 684.00 us
+                 state: alter table (flush)
+                  time: 18
+     current_statement: alter table t1 add column g int
+     statement_latency: 18.45 s
+              progress: 98.84
+          lock_latency: 265.43 ms
          rows_examined: 0
              rows_sent: 0
          rows_affected: 0
-            tmp_tables: 2
+            tmp_tables: 0
        tmp_disk_tables: 0
-             full_scan: YES
-        current_memory: 1.29 MiB
+             full_scan: NO
         last_statement: NULL
 last_statement_latency: NULL
-             last_wait: wait/synch/mutex/sql/THD::LOCK_query_plan
-     last_wait_latency: 260.13 ns
-                source: sql_optimizer.cc:1075
+        current_memory: 664.06 KiB
+             last_wait: wait/io/file/innodb/innodb_data_file
+     last_wait_latency: 1.07 us
+                source: fil0fil.cc:5146
+                   pid: 4212
+          program_name: mysql
 ```
 
 #### ps_check_lost_instrumentation
