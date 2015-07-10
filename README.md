@@ -1382,6 +1382,9 @@ A detailed non-blocking processlist view to replace [INFORMATION_SCHEMA. | SHOW 
 
 Performs less locking than the legacy sources, whilst giving extra information.
 
+The output includes both background threads and user connections by default.  See also sessions / x$sessions 
+for a view that contains only user session information.
+
 ##### Structures (5.7)
 
 ```SQL
@@ -1926,6 +1929,144 @@ mysql> select * from schema_unused_indexes limit 5;
 | mem30__enterprise  | whats_new_entries   | entryId            |
 +--------------------+---------------------+--------------------+
 ```
+
+#### sessions / x$sessions
+
+##### Description
+
+A detailed non-blocking processlist view to replace [INFORMATION_SCHEMA. | SHOW FULL] PROCESSLIST.
+
+Performs less locking than the legacy sources, whilst giving extra information.
+
+The output of this view is restricted to threads from user sessions.  See also processlist / x$processlist which contains both user and background threads.
+
+##### Structures (5.7)
+
+```SQL
+mysql> desc sessions;
++------------------------+---------------------+------+-----+---------+-------+
+| Field                  | Type                | Null | Key | Default | Extra |
++------------------------+---------------------+------+-----+---------+-------+
+| thd_id                 | bigint(20) unsigned | NO   |     | NULL    |       |
+| conn_id                | bigint(20) unsigned | YES  |     | NULL    |       |
+| user                   | varchar(128)        | YES  |     | NULL    |       |
+| db                     | varchar(64)         | YES  |     | NULL    |       |
+| command                | varchar(16)         | YES  |     | NULL    |       |
+| state                  | varchar(64)         | YES  |     | NULL    |       |
+| time                   | bigint(20)          | YES  |     | NULL    |       |
+| current_statement      | longtext            | YES  |     | NULL    |       |
+| statement_latency      | text                | YES  |     | NULL    |       |
+| progress               | decimal(26,2)       | YES  |     | NULL    |       |
+| lock_latency           | text                | YES  |     | NULL    |       |
+| rows_examined          | bigint(20) unsigned | YES  |     | NULL    |       |
+| rows_sent              | bigint(20) unsigned | YES  |     | NULL    |       |
+| rows_affected          | bigint(20) unsigned | YES  |     | NULL    |       |
+| tmp_tables             | bigint(20) unsigned | YES  |     | NULL    |       |
+| tmp_disk_tables        | bigint(20) unsigned | YES  |     | NULL    |       |
+| full_scan              | varchar(3)          | NO   |     |         |       |
+| last_statement         | longtext            | YES  |     | NULL    |       |
+| last_statement_latency | text                | YES  |     | NULL    |       |
+| current_memory         | text                | YES  |     | NULL    |       |
+| last_wait              | varchar(128)        | YES  |     | NULL    |       |
+| last_wait_latency      | text                | YES  |     | NULL    |       |
+| source                 | varchar(64)         | YES  |     | NULL    |       |
+| pid                    | varchar(1024)       | YES  |     | NULL    |       |
+| program_name           | varchar(1024)       | YES  |     | NULL    |       |
++------------------------+---------------------+------+-----+---------+-------+
+25 rows in set (0.18 sec)
+
+mysql> desc x$sessions;
++------------------------+---------------------+------+-----+---------+-------+
+| Field                  | Type                | Null | Key | Default | Extra |
++------------------------+---------------------+------+-----+---------+-------+
+| thd_id                 | bigint(20) unsigned | NO   |     | NULL    |       |
+| conn_id                | bigint(20) unsigned | YES  |     | NULL    |       |
+| user                   | varchar(128)        | YES  |     | NULL    |       |
+| db                     | varchar(64)         | YES  |     | NULL    |       |
+| command                | varchar(16)         | YES  |     | NULL    |       |
+| state                  | varchar(64)         | YES  |     | NULL    |       |
+| time                   | bigint(20)          | YES  |     | NULL    |       |
+| current_statement      | longtext            | YES  |     | NULL    |       |
+| statement_latency      | bigint(20) unsigned | YES  |     | NULL    |       |
+| progress               | decimal(26,2)       | YES  |     | NULL    |       |
+| lock_latency           | bigint(20) unsigned | YES  |     | NULL    |       |
+| rows_examined          | bigint(20) unsigned | YES  |     | NULL    |       |
+| rows_sent              | bigint(20) unsigned | YES  |     | NULL    |       |
+| rows_affected          | bigint(20) unsigned | YES  |     | NULL    |       |
+| tmp_tables             | bigint(20) unsigned | YES  |     | NULL    |       |
+| tmp_disk_tables        | bigint(20) unsigned | YES  |     | NULL    |       |
+| full_scan              | varchar(3)          | NO   |     |         |       |
+| last_statement         | longtext            | YES  |     | NULL    |       |
+| last_statement_latency | bigint(20) unsigned | YES  |     | NULL    |       |
+| current_memory         | decimal(41,0)       | YES  |     | NULL    |       |
+| last_wait              | varchar(128)        | YES  |     | NULL    |       |
+| last_wait_latency      | varchar(20)         | YES  |     | NULL    |       |
+| source                 | varchar(64)         | YES  |     | NULL    |       |
+| pid                    | varchar(1024)       | YES  |     | NULL    |       |
+| program_name           | varchar(1024)       | YES  |     | NULL    |       |
++------------------------+---------------------+------+-----+---------+-------+
+25 rows in set (0.00 sec)
+```
+
+##### Example
+
+```SQL
+mysql> select * from sys.sessions\G
+*************************** 1. row ***************************
+                thd_id: 27
+               conn_id: 1
+                  user: sql/compress_gtid_table
+                    db: NULL
+               command: Daemon
+                 state: Suspending
+                  time: 2347
+     current_statement: NULL
+     statement_latency: NULL
+              progress: NULL
+          lock_latency: NULL
+         rows_examined: NULL
+             rows_sent: NULL
+         rows_affected: NULL
+            tmp_tables: NULL
+       tmp_disk_tables: NULL
+             full_scan: NO
+        last_statement: NULL
+last_statement_latency: NULL
+        current_memory: 0 bytes
+             last_wait: NULL
+     last_wait_latency: NULL
+                source: NULL
+                   pid: NULL
+          program_name: NULL
+*************************** 2. row ***************************
+                thd_id: 34
+               conn_id: 8
+                  user: msandbox@localhost
+                    db: sys
+               command: Query
+                 state: Sending data
+                  time: 0
+     current_statement: SELECT * FROM sessions
+     statement_latency: 12.05 ms
+              progress: NULL
+          lock_latency: 938.00 us
+         rows_examined: 0
+             rows_sent: 0
+         rows_affected: 0
+            tmp_tables: 4
+       tmp_disk_tables: 1
+             full_scan: YES
+        last_statement: NULL
+last_statement_latency: NULL
+        current_memory: 2.86 MiB
+             last_wait: NULL
+     last_wait_latency: NULL
+                source: NULL
+                   pid: 28188
+          program_name: mysql
+2 rows in set (0.05 sec)
+```
+
 
 #### statement_analysis / x$statement_analysis
 
