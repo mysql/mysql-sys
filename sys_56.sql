@@ -48,6 +48,9 @@ SOURCE ./views/p_s/ps_check_lost_instrumentation.sql
 SOURCE ./views/p_s/processlist.sql
 SOURCE ./views/p_s/x_processlist.sql
 
+SOURCE ./views/p_s/sessions.sql
+SOURCE ./views/p_s/x_sessions.sql
+
 SOURCE ./views/p_s/latest_file_io.sql
 SOURCE ./views/p_s/x_latest_file_io.sql
 SOURCE ./views/p_s/io_by_thread_by_latency.sql
