@@ -53,4 +53,4 @@ CREATE OR REPLACE
 VIEW x$sessions
  AS
 SELECT * FROM sys.x$processlist
-WHERE conn_id IS NOT NULL;
+WHERE conn_id IS NOT NULL AND command != 'Daemon';
