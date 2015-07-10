@@ -1930,7 +1930,7 @@ mysql> select * from schema_unused_indexes limit 5;
 +--------------------+---------------------+--------------------+
 ```
 
-#### session / x$session
+#### sessions / x$sessions
 
 ##### Description
 
