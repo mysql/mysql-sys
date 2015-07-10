@@ -139,6 +139,9 @@ SOURCE ./views/p_s/metrics_56.sql
 SOURCE ./views/p_s/processlist_57.sql
 SOURCE ./views/p_s/x_processlist_57.sql
 
+SOURCE ./views/p_s/sessions.sql
+SOURCE ./views/p_s/x_sessions.sql
+
 SOURCE ./procedures/create_synonym_db.sql
 SOURCE ./procedures/execute_prepared_stmt.sql
 
