@@ -1,0 +1,19 @@
+-- source include/not_embedded.inc
+# Tests for sys schema
+# Verify the sys.list_add() function perfoms as expected
+
+# Should init with a single value
+SELECT sys.list_add(NULL, 'foo');
+
+# Should init with a single value
+SELECT sys.list_add('', 'foo');
+
+# Should add to the list with a comma
+SELECT sys.list_add('bar', 'foo');
+
+# Should add to the list with a single comma
+SELECT sys.list_add('bar, ', 'foo');
+
+# Should return an error with a NULL value to add
+--error 1138
+SELECT sys.list_add('foo', NULL);
