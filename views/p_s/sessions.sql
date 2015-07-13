@@ -54,4 +54,5 @@ CREATE OR REPLACE
 VIEW sessions
  AS
 SELECT * FROM sys.processlist
-WHERE conn_id IS NOT NULL;
+WHERE conn_id IS NOT NULL AND command != 'Daemon';
+
