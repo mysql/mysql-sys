@@ -192,7 +192,7 @@ CREATE DEFINER='root'@'localhost' PROCEDURE statement_performance_analyzer (
              Use a custom view showing the top 10 query sorted by total execution time refreshing the view every minute using
              the watch command in Linux.
 
-             mysql> mysql> CREATE OR REPLACE VIEW mydb.my_statements AS
+             mysql> CREATE OR REPLACE VIEW mydb.my_statements AS
                  -> SELECT sys.format_statement(DIGEST_TEXT) AS query,
                  ->        SCHEMA_NAME AS db,
                  ->        COUNT_STAR AS exec_count,
@@ -665,7 +665,7 @@ HAVING percentile > 0.95
             END IF;
             IF (@sys.statement_performance_analyzer.view IS NULL) THEN
                 SIGNAL SQLSTATE '45000'
-                   SET MESSAGE_TEXT = 'The @sys.statement_performance_analyzer.view user variable must be set with the view or query  to use';
+                   SET MESSAGE_TEXT = 'The @sys.statement_performance_analyzer.view user variable must be set with the view or query to use';
             END IF;
 
             IF (NOT INSTR(@sys.statement_performance_analyzer.view, ' ')) THEN
