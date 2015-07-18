@@ -135,8 +135,6 @@ then
   # Remove leading spaces
   # Remove -- line comments *after removing leading spaces*
   for file in `find . -name '*.sql'`; do
-    sed -i -e "s/'root'@'localhost'/$MYSQLUSER/g" $file
-    sed -i -e "/Copyright/,/51 Franklin St/d" $file
     sed -i -e "/COMMENT/,/            '/{G;s/\n/\\\n/g;}" $file
     sed -i -e "s/            '\\\n/            '/g" $file
     sed -i -e "/^DELIMITER/d" $file
@@ -179,8 +177,10 @@ then
 else
   cat $SYSDIR/before_setup.sql > $SYSDIR/$OUTPUTFILE
   cat "./sys_$MYSQLVERSION.sql" | tr -d '\r' | grep 'SOURCE' | $SED_R 's .{8}  ' | sed 's/^/./' | grep -v before_setup | \
-    xargs sed -e "/Copyright/,/51 Franklin St/d;s/'root'@'localhost'/$MYSQLUSER/g" >> $SYSDIR/$OUTPUTFILE
+    xargs cat >> $SYSDIR/$OUTPUTFILE
 fi
+
+sed -i -e "/Copyright/,/51 Franklin St/d;s/'root'@'localhost'/$MYSQLUSER/g" $SYSDIR/$OUTPUTFILE
 
 # Check if sql_log_bin lines should be removed
 if [[ ! -z "$SKIPBINLOG" ]] ;
