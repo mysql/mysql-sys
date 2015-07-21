@@ -687,7 +687,7 @@ HAVING percentile > 0.95
                 CALL sys.table_exists(v_custom_db, v_custom_name, v_custom_view_exists);
                 IF (v_custom_view_exists <> 'VIEW') THEN
                     SIGNAL SQLSTATE '45000'
-                       SET MESSAGE_TEXT = 'The @sys.statement_performance_analyzer.view user variable is set to use a custom view, but is neither an existing view nor a query';
+                       SET MESSAGE_TEXT = 'The @sys.statement_performance_analyzer.view user variable is set but specified neither an existing view nor a query.';
                 END IF;
 
                 SET v_sql =
