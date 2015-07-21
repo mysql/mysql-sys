@@ -300,8 +300,9 @@ BEGIN
             SELECT CONCAT('v_table_exists = ', v_table_exists) AS 'Debug';
         END IF;
 
-        IF (v_table_exists IN ('BASE TABLE', 'TEMPORARY')) THEN
+        IF (v_table_exists = 'BASE TABLE') THEN
             -- Verify that the table has the correct table definition
+            -- This can only be done for base tables as temporary aren't in information_schema.COLUMNS.
             -- This also minimises the risk of using a production table.
             SET v_checksum_ref = (
                  SELECT GROUP_CONCAT(CONCAT(COLUMN_NAME, COLUMN_TYPE) ORDER BY ORDINAL_POSITION) AS Checksum
