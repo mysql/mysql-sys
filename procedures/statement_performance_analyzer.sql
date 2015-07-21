@@ -366,7 +366,7 @@ BEGIN
             
             IF (in_action = 'delta' AND v_tmp_digests_table_exists <> 'TEMPORARY') THEN
                 SIGNAL SQLSTATE '45000'
-                   SET MESSAGE_TEXT = 'An existing snapshot generated with the statement_performance_analyzer() must exist';
+                   SET MESSAGE_TEXT = 'An existing snapshot generated with the statement_performance_analyzer() must exist.';
             END IF;
         WHEN in_action = 'create_tmp' THEN
             -- in_table must not exists as a temporary table
@@ -384,7 +384,7 @@ BEGIN
                 SET v_error_msg = CONCAT('Cannot create the table ',
                                          IF(CHAR_LENGTH(v_quoted_table) > 52, CONCAT('...', SUBSTRING(v_quoted_table, -49)), v_quoted_table),
                                          ' as it already exists',
-                                         IF(v_table_exists = 'TEMPORARY', ' as a temporary table', '.'));
+                                         IF(v_table_exists = 'TEMPORARY', ' as a temporary table.', '.'));
                 SIGNAL SQLSTATE '45000'
                    SET MESSAGE_TEXT = v_error_msg;
             END IF;
@@ -669,7 +669,7 @@ HAVING percentile > 0.95
             END IF;
             IF (@sys.statement_performance_analyzer.view IS NULL) THEN
                 SIGNAL SQLSTATE '45000'
-                   SET MESSAGE_TEXT = 'The @sys.statement_performance_analyzer.view user variable must be set with the view or query to use';
+                   SET MESSAGE_TEXT = 'The @sys.statement_performance_analyzer.view user variable must be set with the view or query to use.';
             END IF;
 
             IF (NOT INSTR(@sys.statement_performance_analyzer.view, ' ')) THEN
