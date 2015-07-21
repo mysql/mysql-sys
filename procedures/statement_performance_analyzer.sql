@@ -345,9 +345,9 @@ BEGIN
             IF (in_table IS NOT NULL) THEN
                 IF (NOT v_table_exists IN ('TEMPORARY', 'BASE TABLE')) THEN
                     SET v_error_msg = CONCAT('The ', in_action, ' action requires in_table to be NULL, NOW() or specify an existing table.',
-                                             IF(in_table IS NOT NULL, CONCAT(' The table ',
-                                                 IF(CHAR_LENGTH(v_quoted_table) > 16, CONCAT('...', SUBSTRING(v_quoted_table, -13)), v_quoted_table),
-                                                 ' does not exist.'), ''));
+                                             ' The table ',
+                                             IF(CHAR_LENGTH(v_quoted_table) > 16, CONCAT('...', SUBSTRING(v_quoted_table, -13)), v_quoted_table),
+                                             ' does not exist.');
                     SIGNAL SQLSTATE '45000'
                        SET MESSAGE_TEXT = v_error_msg;
                 END IF;
