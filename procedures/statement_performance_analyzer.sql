@@ -393,9 +393,8 @@ BEGIN
             -- doesn't use any of the arguments 
             DO (SELECT 1);
         ELSE
-            SET v_error_msg = CONCAT('Unknown action: ''', in_action, '''');
             SIGNAL SQLSTATE '45000'
-               SET MESSAGE_TEXT = v_error_msg;
+               SET MESSAGE_TEXT = 'Unknown action. Supported actions are: cleanup, create_table, create_tmp, delta, overall, save, snapshot';
     END CASE;
 
     SET v_digest_table_template = 'CREATE %{TEMPORARY}TABLE %{TABLE_NAME} (
