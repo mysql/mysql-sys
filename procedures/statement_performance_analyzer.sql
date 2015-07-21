@@ -57,7 +57,7 @@ CREATE DEFINER='root'@'localhost' PROCEDURE statement_performance_analyzer (
                  * save          Save the snapshot in the table specified by in_table. The table must exists and have
                                  the correct structure.
                                  If no snapshot exists, a new is created.
-                 * cleanup       Remove the temporary table with the snapshot.
+                 * cleanup       Remove the temporary tables used for the snapshot and delta.
 
              in_table (VARCHAR(129)):
                The table argument used for some actions. Use the format ''db1.t1'' or ''t1'' without using any backticks (`)
@@ -460,6 +460,9 @@ BEGIN
     ELSEIF (in_action = 'save') THEN
         CALL sys.execute_prepared_stmt(CONCAT('DELETE FROM ', v_quoted_table));
         CALL sys.execute_prepared_stmt(CONCAT('INSERT INTO ', v_quoted_table, ' SELECT * FROM tmp_digests'));
+    ELSEIF (in_action = 'cleanup') THEN
+        DROP TEMPORARY TABLE IF EXISTS sys.tmp_digests;
+        DROP TEMPORARY TABLE IF EXISTS sys.tmp_digests_delta;
     ELSEIF (in_action IN ('overall', 'delta')) THEN
         -- These are almost the same - for delta calculate the delta in tmp_digests_delta and use that instead of tmp_digests.
         -- And overall allows overriding the table to use.
