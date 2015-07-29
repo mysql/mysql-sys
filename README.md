@@ -4790,7 +4790,7 @@ The following configuration options are supported:
     - save          Save the snapshot in the table specified by in_table. The table must exists and have
                     the correct structure.
                     If no snapshot exists, a new is created.
-    - cleanup       Remove the temporary table with the snapshot.
+    - cleanup       Remove the temporary tables used for the snapshot and delta.
 
 * in_table (VARCHAR(129)):
   The table argument used for some actions. Use the format 'db1.t1' or 't1' without using any backticks (`)

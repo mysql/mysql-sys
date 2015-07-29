@@ -57,7 +57,7 @@ CREATE DEFINER='root'@'localhost' PROCEDURE statement_performance_analyzer (
                  * save          Save the snapshot in the table specified by in_table. The table must exists and have
                                  the correct structure.
                                  If no snapshot exists, a new is created.
-                 * cleanup       Remove the temporary table with the snapshot.
+                 * cleanup       Remove the temporary tables used for the snapshot and delta.
 
              in_table (VARCHAR(129)):
                The table argument used for some actions. Use the format ''db1.t1'' or ''t1'' without using any backticks (`)
@@ -300,8 +300,9 @@ BEGIN
             SELECT CONCAT('v_table_exists = ', v_table_exists) AS 'Debug';
         END IF;
 
-        IF (v_table_exists IN ('BASE TABLE', 'TEMPORARY')) THEN
+        IF (v_table_exists = 'BASE TABLE') THEN
             -- Verify that the table has the correct table definition
+            -- This can only be done for base tables as temporary aren't in information_schema.COLUMNS.
             -- This also minimises the risk of using a production table.
             SET v_checksum_ref = (
                  SELECT GROUP_CONCAT(CONCAT(COLUMN_NAME, COLUMN_TYPE) ORDER BY ORDINAL_POSITION) AS Checksum
@@ -344,9 +345,9 @@ BEGIN
             IF (in_table IS NOT NULL) THEN
                 IF (NOT v_table_exists IN ('TEMPORARY', 'BASE TABLE')) THEN
                     SET v_error_msg = CONCAT('The ', in_action, ' action requires in_table to be NULL, NOW() or specify an existing table.',
-                                             IF(in_table IS NOT NULL, CONCAT(' The table ',
-                                                 IF(CHAR_LENGTH(v_quoted_table) > 16, CONCAT('...', SUBSTRING(v_quoted_table, -13)), v_quoted_table),
-                                                 ' does not exist.'), ''));
+                                             ' The table ',
+                                             IF(CHAR_LENGTH(v_quoted_table) > 16, CONCAT('...', SUBSTRING(v_quoted_table, -13)), v_quoted_table),
+                                             ' does not exist.');
                     SIGNAL SQLSTATE '45000'
                        SET MESSAGE_TEXT = v_error_msg;
                 END IF;
@@ -365,7 +366,7 @@ BEGIN
             
             IF (in_action = 'delta' AND v_tmp_digests_table_exists <> 'TEMPORARY') THEN
                 SIGNAL SQLSTATE '45000'
-                   SET MESSAGE_TEXT = 'An existing snapshot generated with the statement_performance_analyzer() must exist';
+                   SET MESSAGE_TEXT = 'An existing snapshot generated with the statement_performance_analyzer() must exist.';
             END IF;
         WHEN in_action = 'create_tmp' THEN
             -- in_table must not exists as a temporary table
@@ -383,7 +384,7 @@ BEGIN
                 SET v_error_msg = CONCAT('Cannot create the table ',
                                          IF(CHAR_LENGTH(v_quoted_table) > 52, CONCAT('...', SUBSTRING(v_quoted_table, -49)), v_quoted_table),
                                          ' as it already exists',
-                                         IF(v_table_exists = 'TEMPORARY', ' as a temporary table', '.'));
+                                         IF(v_table_exists = 'TEMPORARY', ' as a temporary table.', '.'));
                 SIGNAL SQLSTATE '45000'
                    SET MESSAGE_TEXT = v_error_msg;
             END IF;
@@ -392,9 +393,8 @@ BEGIN
             -- doesn't use any of the arguments 
             DO (SELECT 1);
         ELSE
-            SET v_error_msg = CONCAT('Unknown action: ''', in_action, '''');
             SIGNAL SQLSTATE '45000'
-               SET MESSAGE_TEXT = v_error_msg;
+               SET MESSAGE_TEXT = 'Unknown action. Supported actions are: cleanup, create_table, create_tmp, delta, overall, save, snapshot';
     END CASE;
 
     SET v_digest_table_template = 'CREATE %{TEMPORARY}TABLE %{TABLE_NAME} (
@@ -460,6 +460,9 @@ BEGIN
     ELSEIF (in_action = 'save') THEN
         CALL sys.execute_prepared_stmt(CONCAT('DELETE FROM ', v_quoted_table));
         CALL sys.execute_prepared_stmt(CONCAT('INSERT INTO ', v_quoted_table, ' SELECT * FROM tmp_digests'));
+    ELSEIF (in_action = 'cleanup') THEN
+        DROP TEMPORARY TABLE IF EXISTS sys.tmp_digests;
+        DROP TEMPORARY TABLE IF EXISTS sys.tmp_digests_delta;
     ELSEIF (in_action IN ('overall', 'delta')) THEN
         -- These are almost the same - for delta calculate the delta in tmp_digests_delta and use that instead of tmp_digests.
         -- And overall allows overriding the table to use.
@@ -665,7 +668,7 @@ HAVING percentile > 0.95
             END IF;
             IF (@sys.statement_performance_analyzer.view IS NULL) THEN
                 SIGNAL SQLSTATE '45000'
-                   SET MESSAGE_TEXT = 'The @sys.statement_performance_analyzer.view user variable must be set with the view or query to use';
+                   SET MESSAGE_TEXT = 'The @sys.statement_performance_analyzer.view user variable must be set with the view or query to use.';
             END IF;
 
             IF (NOT INSTR(@sys.statement_performance_analyzer.view, ' ')) THEN
@@ -683,7 +686,7 @@ HAVING percentile > 0.95
                 CALL sys.table_exists(v_custom_db, v_custom_name, v_custom_view_exists);
                 IF (v_custom_view_exists <> 'VIEW') THEN
                     SIGNAL SQLSTATE '45000'
-                       SET MESSAGE_TEXT = 'The @sys.statement_performance_analyzer.view user variable is set to use a custom view, but is neither an existing view nor a query';
+                       SET MESSAGE_TEXT = 'The @sys.statement_performance_analyzer.view user variable is set but specified neither an existing view nor a query.';
                 END IF;
 
                 SET v_sql =
