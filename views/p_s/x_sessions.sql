@@ -22,31 +22,35 @@
 -- 
 -- Performs less locking than the legacy sources, whilst giving extra information.
 --
--- mysql> select * from x$sessions\G
+-- mysql> select * from sys.x$sessions\G
 -- *************************** 1. row ***************************
---                 thd_id: 31
---                conn_id: 12
---                   user: root@localhost
---                     db: information_schema
+--                 thd_id: 720
+--                conn_id: 698
+--                   user: msandbox@localhost
+--                     db: test
 --                command: Query
---                  state: Sending data
---                   time: 0
---      current_statement: select * from processlist limit 5
---           lock_latency: 1066000000
+--                  state: alter table (read PK and internal sort)
+--                   time: 2
+--      current_statement: alter table t1 add column l int
+--      statement_latency: 2349834276374
+--               progress: 60.00
+--           lock_latency: 339707000000
 --          rows_examined: 0
 --              rows_sent: 0
 --          rows_affected: 0
---             tmp_tables: 2
---        tmp_disk_tables: 1
---              full_scan: YES
---         current_memory: 1464694
+--             tmp_tables: 0
+--        tmp_disk_tables: 0
+--              full_scan: NO
 --         last_statement: NULL
 -- last_statement_latency: NULL
---              last_wait: wait/io/file/myisam/dfile
---      last_wait_latency: 1602250
---                 source: mf_iocache.c:163
+--         current_memory: 10186821
+--              last_wait: wait/io/file/innodb/innodb_data_file
+--      last_wait_latency: Still Waiting
+--                 source: fil0fil.cc:5351
+--                    pid: 5559
+--           program_name: mysql
 --
- 
+
 CREATE OR REPLACE
   DEFINER = 'root'@'localhost'
   SQL SECURITY INVOKER 

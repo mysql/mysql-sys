@@ -22,32 +22,35 @@
 -- 
 -- Performs less locking than the legacy sources, whilst giving extra information.
 --
--- mysql> select * from sessions\G
--- ...
--- *************************** 8. row ***************************
---                 thd_id: 31
---                conn_id: 12
---                   user: root@localhost
---                     db: information_schema
+-- mysql> select * from sys.sessions\G
+-- *************************** 1. row ***************************
+--                 thd_id: 44524
+--                conn_id: 44502
+--                   user: msandbox@localhost
+--                     db: test
 --                command: Query
---                  state: Sending data
---                   time: 0
---      current_statement: select * from processlist limit 5
---           lock_latency: 684.00 us
+--                  state: alter table (flush)
+--                   time: 18
+--      current_statement: alter table t1 add column g int
+--      statement_latency: 18.45 s
+--               progress: 98.84
+--           lock_latency: 265.43 ms
 --          rows_examined: 0
 --              rows_sent: 0
 --          rows_affected: 0
---             tmp_tables: 2
+--             tmp_tables: 0
 --        tmp_disk_tables: 0
---              full_scan: YES
---         current_memory: 1.29 MiB
+--              full_scan: NO
 --         last_statement: NULL
 -- last_statement_latency: NULL
---              last_wait: wait/synch/mutex/sql/THD::LOCK_query_plan
---      last_wait_latency: 260.13 ns
---                 source: sql_optimizer.cc:1075
+--         current_memory: 664.06 KiB
+--              last_wait: wait/io/file/innodb/innodb_data_file
+--      last_wait_latency: 1.07 us
+--                 source: fil0fil.cc:5146
+--                    pid: 4212
+--           program_name: mysql
 --
- 
+
 CREATE OR REPLACE
   DEFINER = 'root'@'localhost'
   SQL SECURITY INVOKER 
