@@ -103,6 +103,8 @@ format_bytes	FUNCTION
 format_path	FUNCTION
 format_statement	FUNCTION
 format_time	FUNCTION
+list_add	FUNCTION
+list_drop	FUNCTION
 ps_is_account_enabled	FUNCTION
 ps_is_consumer_enabled	FUNCTION
 ps_is_instrument_default_enabled	FUNCTION

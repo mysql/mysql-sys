@@ -1,0 +1,14 @@
+SELECT sys.list_add(NULL, 'foo');
+sys.list_add(NULL, 'foo')
+foo
+SELECT sys.list_add('', 'foo');
+sys.list_add('', 'foo')
+foo
+SELECT sys.list_add('bar', 'foo');
+sys.list_add('bar', 'foo')
+bar,foo
+SELECT sys.list_add('bar, ', 'foo');
+sys.list_add('bar, ', 'foo')
+bar,foo
+SELECT sys.list_add('foo', NULL);
+ERROR 02200: Function sys.list_add: in_add_value input variable should not be NULL
