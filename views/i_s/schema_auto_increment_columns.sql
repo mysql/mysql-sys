@@ -42,7 +42,7 @@ VIEW schema_auto_increment_columns AS
     INFORMATION_SCHEMA.COLUMNS
     INNER JOIN INFORMATION_SCHEMA.TABLES USING (TABLE_SCHEMA, TABLE_NAME)
   WHERE 
-    TABLE_SCHEMA NOT IN ('mysql', 'INFORMATION_SCHEMA', 'performance_schema')
+    TABLE_SCHEMA NOT IN ('mysql', 'sys', 'INFORMATION_SCHEMA', 'performance_schema')
     AND TABLE_TYPE='BASE TABLE'
     AND EXTRA='auto_increment'
 ;
