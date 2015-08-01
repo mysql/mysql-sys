@@ -1,15 +1,16 @@
 
 --
--- View: x$auto_increment_columns
+-- View: schema_auto_increment_columns
 --
 -- Present current auto_increment usage/capacity in all tables.
 --
 -- Versions: 5.1+
 -- 
 CREATE OR REPLACE
-ALGORITHM = MERGE
-SQL SECURITY INVOKER
-VIEW x$auto_increment_columns AS
+  ALGORITHM = MERGE
+  DEFINER = 'root'@'localhost'
+  SQL SECURITY INVOKER
+VIEW schema_auto_increment_columns AS
   SELECT 
     TABLE_SCHEMA, 
     TABLE_NAME, 
