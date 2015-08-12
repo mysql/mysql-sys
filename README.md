@@ -1774,6 +1774,79 @@ io_write_requests: 0
   io_misc_latency: 126.88 us
 ```
 
+#### schema_redundant_indexes / x$schema_flattened_keys
+
+##### Description
+
+Shows indexes which are made redundant (or duplicate) by other (dominant) keys.
+
+Also includes the the helper view `x$schema_flattened_keys`.
+
+##### Structures
+
+```SQL
+mysql> desc sys.schema_redundant_indexes;
++----------------------------+--------------+------+-----+---------+-------+
+| Field                      | Type         | Null | Key | Default | Extra |
++----------------------------+--------------+------+-----+---------+-------+
+| table_schema               | varchar(64)  | NO   |     |         |       |
+| table_name                 | varchar(64)  | NO   |     |         |       |
+| redundant_index_name       | varchar(64)  | NO   |     |         |       |
+| redundant_index_columns    | text         | YES  |     | NULL    |       |
+| redundant_index_non_unique | bigint(1)    | YES  |     | NULL    |       |
+| dominant_index_name        | varchar(64)  | NO   |     |         |       |
+| dominant_index_columns     | text         | YES  |     | NULL    |       |
+| dominant_index_non_unique  | bigint(1)    | YES  |     | NULL    |       |
+| subpart_exists             | int(1)       | NO   |     | 0       |       |
+| sql_drop_index             | varchar(223) | YES  |     | NULL    |       |
++----------------------------+--------------+------+-----+---------+-------+
+10 rows in set (0.00 sec)
+
+mysql> desc sys.x$schema_flattened_keys;
++----------------+-------------+------+-----+---------+-------+
+| Field          | Type        | Null | Key | Default | Extra |
++----------------+-------------+------+-----+---------+-------+
+| table_schema   | varchar(64) | NO   |     |         |       |
+| table_name     | varchar(64) | NO   |     |         |       |
+| index_name     | varchar(64) | NO   |     |         |       |
+| non_unique     | bigint(1)   | YES  |     | NULL    |       |
+| subpart_exists | bigint(1)   | YES  |     | NULL    |       |
+| index_columns  | text        | YES  |     | NULL    |       |
++----------------+-------------+------+-----+---------+-------+
+6 rows in set (0.00 sec)
+```
+
+##### Example
+
+```SQL
+mysql> select * from sys.schema_redundant_indexes\G
+*************************** 1. row ***************************
+              table_schema: test
+                table_name: rkey
+      redundant_index_name: j
+   redundant_index_columns: j
+redundant_index_non_unique: 1
+       dominant_index_name: j_2
+    dominant_index_columns: j,k
+ dominant_index_non_unique: 1
+            subpart_exists: 0
+            sql_drop_index: ALTER TABLE `test`.`rkey` DROP INDEX `j`
+1 row in set (0.20 sec)
+
+mysql> SHOW CREATE TABLE test.rkey\G
+*************************** 1. row ***************************
+       Table: rkey
+Create Table: CREATE TABLE `rkey` (
+  `i` int(11) NOT NULL,
+  `j` int(11) DEFAULT NULL,
+  `k` int(11) DEFAULT NULL,
+  PRIMARY KEY (`i`),
+  KEY `j` (`j`),
+  KEY `j_2` (`j`,`k`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+1 row in set (0.06 sec)
+```
+
 #### schema_table_statistics_with_buffer / x$schema_table_statistics_with_buffer
 
 ##### Description
