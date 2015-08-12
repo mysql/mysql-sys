@@ -1516,6 +1516,47 @@ mysql> select * from ps_check_lost_instrumentation;
 +----------------------------------------+----------------+
 ```
 
+#### schema_auto_increment_columns
+
+##### Description
+
+Present current auto_increment usage/capacity in all tables.
+
+##### Structures
+
+```SQL
+mysql> desc schema_auto_increment_columns;
++----------------------+------------------------+------+-----+---------+-------+
+| Field                | Type                   | Null | Key | Default | Extra |
++----------------------+------------------------+------+-----+---------+-------+
+| table_schema         | varchar(64)            | NO   |     |         |       |
+| table_name           | varchar(64)            | NO   |     |         |       |
+| column_name          | varchar(64)            | NO   |     |         |       |
+| data_type            | varchar(64)            | NO   |     |         |       |
+| column_type          | longtext               | NO   |     | NULL    |       |
+| is_signed            | int(1)                 | NO   |     | 0       |       |
+| is_unsigned          | int(1)                 | NO   |     | 0       |       |
+| max_value            | bigint(21) unsigned    | YES  |     | NULL    |       |
+| auto_increment       | bigint(21) unsigned    | YES  |     | NULL    |       |
+| auto_increment_ratio | decimal(25,4) unsigned | YES  |     | NULL    |       |
++----------------------+------------------------+------+-----+---------+-------+
+```
+
+##### Example
+
+```SQL
+mysql> select * from schema_auto_increment_columns limit 5;
++-------------------+-------------------+-------------+-----------+-------------+-----------+-------------+---------------------+----------------+----------------------+
+| table_schema      | table_name        | column_name | data_type | column_type | is_signed | is_unsigned | max_value           | auto_increment | auto_increment_ratio |
++-------------------+-------------------+-------------+-----------+-------------+-----------+-------------+---------------------+----------------+----------------------+
+| test              | t1                | i           | tinyint   | tinyint(4)  |         1 |           0 |                 127 |             34 |               0.2677 |
+| mem__advisor_text | template_meta     | hib_id      | int       | int(11)     |         1 |           0 |          2147483647 |            516 |               0.0000 |
+| mem__advisors     | advisor_schedules | schedule_id | int       | int(11)     |         1 |           0 |          2147483647 |            249 |               0.0000 |
+| mem__advisors     | app_identity_path | hib_id      | int       | int(11)     |         1 |           0 |          2147483647 |            251 |               0.0000 |
+| mem__bean_config  | plists            | id          | bigint    | bigint(20)  |         1 |           0 | 9223372036854775807 |              1 |               0.0000 |
++-------------------+-------------------+-------------+-----------+-------------+-----------+-------------+---------------------+----------------+----------------------+
+```
+
 #### schema_index_statistics / x$schema_index_statistics
 
 ##### Description

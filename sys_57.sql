@@ -45,6 +45,7 @@ SOURCE ./views/i_s/x_innodb_buffer_stats_by_table.sql
 SOURCE ./views/i_s/innodb_lock_waits.sql
 SOURCE ./views/i_s/x_innodb_lock_waits.sql
 SOURCE ./views/i_s/schema_object_overview.sql
+SOURCE ./views/i_s/schema_auto_increment_columns.sql
 
 SOURCE ./views/p_s/ps_check_lost_instrumentation.sql
 
