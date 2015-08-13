@@ -14,7 +14,7 @@
 -- 3 rows in set (0.00 sec)
 --
 
-CREATE 
+CREATE OR REPLACE
   ALGORITHM = MERGE
   DEFINER = 'root'@'localhost'
   SQL SECURITY INVOKER
