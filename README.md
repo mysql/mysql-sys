@@ -739,7 +739,7 @@ mysql> desc io_global_by_file_by_bytes;
 +---------------+---------------------+------+-----+---------+-------+
 | Field         | Type                | Null | Key | Default | Extra |
 +---------------+---------------------+------+-----+---------+-------+
-| file          | varchar(260)        | YES  |     | NULL    |       |
+| file          | varchar(512)        | YES  |     | NULL    |       |
 | count_read    | bigint(20) unsigned | NO   |     | NULL    |       |
 | total_read    | text                | YES  |     | NULL    |       |
 | avg_read      | text                | YES  |     | NULL    |       |
@@ -796,7 +796,7 @@ mysql> desc io_global_by_file_by_latency;
 +---------------+---------------------+------+-----+---------+-------+
 | Field         | Type                | Null | Key | Default | Extra |
 +---------------+---------------------+------+-----+---------+-------+
-| file          | varchar(260)        | YES  |     | NULL    |       |
+| file          | varchar(512)        | YES  |     | NULL    |       |
 | total         | bigint(20) unsigned | NO   |     | NULL    |       |
 | total_latency | text                | YES  |     | NULL    |       |
 | count_read    | bigint(20) unsigned | NO   |     | NULL    |       |
@@ -1008,7 +1008,7 @@ mysql> desc latest_file_io;
 | Field     | Type         | Null | Key | Default | Extra |
 +-----------+--------------+------+-----+---------+-------+
 | thread    | varchar(149) | YES  |     | NULL    |       |
-| file      | varchar(260) | YES  |     | NULL    |       |
+| file      | varchar(512) | YES  |     | NULL    |       |
 | latency   | text         | YES  |     | NULL    |       |
 | operation | varchar(32)  | NO   |     | NULL    |       |
 | requested | text         | YES  |     | NULL    |       |
@@ -3446,11 +3446,11 @@ Also normalizes the paths across operating systems, so backslashes on Windows ar
 
 ##### Parameters
 
-* path (VARCHAR(260)): The raw file path value to format.
+* path (VARCHAR(512)): The raw file path value to format.
 
 ##### Returns
 
-VARCHAR(260) CHARSET UTF8
+VARCHAR(512) CHARSET UTF8
 
 ##### Example
 ```SQL
