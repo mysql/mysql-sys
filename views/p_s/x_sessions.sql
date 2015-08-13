@@ -14,7 +14,7 @@
 -- Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 --
--- View: x$sessions
+-- View: x$session
 --
 -- Filter sys.processlist to only show user sessions and not background threads.
 -- This is a non-blocking closer replacement to
@@ -22,7 +22,7 @@
 -- 
 -- Performs less locking than the legacy sources, whilst giving extra information.
 --
--- mysql> select * from sys.x$sessions\G
+-- mysql> select * from sys.x$session\G
 -- *************************** 1. row ***************************
 --                 thd_id: 720
 --                conn_id: 698
@@ -54,7 +54,7 @@
 CREATE OR REPLACE
   DEFINER = 'root'@'localhost'
   SQL SECURITY INVOKER 
-VIEW x$sessions
+VIEW x$session
  AS
 SELECT * FROM sys.x$processlist
 WHERE conn_id IS NOT NULL AND command != 'Daemon';

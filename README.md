@@ -1391,7 +1391,7 @@ A detailed non-blocking processlist view to replace [INFORMATION_SCHEMA. | SHOW 
 
 Performs less locking than the legacy sources, whilst giving extra information.
 
-The output includes both background threads and user connections by default.  See also sessions / x$sessions 
+The output includes both background threads and user connections by default.  See also `session` / `x$session`
 for a view that contains only user session information.
 
 ##### Structures (5.7)
@@ -2053,7 +2053,7 @@ mysql> select * from schema_unused_indexes limit 5;
 +--------------------+---------------------+--------------------+
 ```
 
-#### sessions / x$sessions
+#### session / x$session
 
 ##### Description
 
@@ -2066,7 +2066,7 @@ The output of this view is restricted to threads from user sessions.  See also p
 ##### Structures (5.7)
 
 ```SQL
-mysql> desc sessions;
+mysql> desc session;
 +------------------------+---------------------+------+-----+---------+-------+
 | Field                  | Type                | Null | Key | Default | Extra |
 +------------------------+---------------------+------+-----+---------+-------+
@@ -2098,7 +2098,7 @@ mysql> desc sessions;
 +------------------------+---------------------+------+-----+---------+-------+
 25 rows in set (0.18 sec)
 
-mysql> desc x$sessions;
+mysql> desc x$session;
 +------------------------+---------------------+------+-----+---------+-------+
 | Field                  | Type                | Null | Key | Default | Extra |
 +------------------------+---------------------+------+-----+---------+-------+
@@ -2134,7 +2134,7 @@ mysql> desc x$sessions;
 ##### Example
 
 ```SQL
-mysql> select * from sys.sessions\G
+mysql> select * from sys.session\G
 *************************** 1. row ***************************
                 thd_id: 27
                conn_id: 1
@@ -2169,7 +2169,7 @@ last_statement_latency: NULL
                command: Query
                  state: Sending data
                   time: 0
-     current_statement: SELECT * FROM sessions
+     current_statement: SELECT * FROM session
      statement_latency: 12.05 ms
               progress: NULL
           lock_latency: 938.00 us
@@ -2190,6 +2190,40 @@ last_statement_latency: NULL
 2 rows in set (0.05 sec)
 ```
 
+#### session_ssl_status
+
+##### Description
+
+Shows SSL version, cipher and the count of re-used SSL sessions per connection
+
+##### Structures
+
+```SQL
+mysql> desc sys.session_ssl_status;
++---------------------+---------------------+------+-----+---------+-------+
+| Field               | Type                | Null | Key | Default | Extra |
++---------------------+---------------------+------+-----+---------+-------+
+| thread_id           | bigint(20) unsigned | NO   |     | NULL    |       |
+| ssl_version         | varchar(1024)       | YES  |     | NULL    |       |
+| ssl_cipher          | varchar(1024)       | YES  |     | NULL    |       |
+| ssl_sessions_reused | varchar(1024)       | YES  |     | NULL    |       |
++---------------------+---------------------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+```
+
+##### Example
+
+```SQL
+mysql> select * from session_ssl_status;
++-----------+-------------+--------------------+---------------------+
+| thread_id | ssl_version | ssl_cipher         | ssl_sessions_reused |
++-----------+-------------+--------------------+---------------------+
+|        26 | TLSv1       | DHE-RSA-AES256-SHA | 0                   |
+|        27 | TLSv1       | DHE-RSA-AES256-SHA | 0                   |
+|        28 | TLSv1       | DHE-RSA-AES256-SHA | 0                   |
++-----------+-------------+--------------------+---------------------+
+3 rows in set (0.00 sec)
+```
 
 #### statement_analysis / x$statement_analysis
 
