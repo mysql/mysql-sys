@@ -2422,7 +2422,7 @@ no_good_index_used_count: 0
 
 ##### Description
 
-Lists all statements who's average runtime, in microseconds, is in the top 95th percentile.
+Lists all statements whose average runtime, in microseconds, is in the top 95th percentile.
 
 Also includes two helper views:
 

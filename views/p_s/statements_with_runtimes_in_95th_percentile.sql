@@ -16,7 +16,7 @@
 --
 -- View: statements_with_runtimes_in_95th_percentile
 --
--- List all statements who's average runtime, in microseconds, is in the top 95th percentile.
+-- List all statements whose average runtime, in microseconds, is in the top 95th percentile.
 -- 
 -- mysql> select * from statements_with_runtimes_in_95th_percentile limit 5;
 -- +-------------------------------------------------------------------+------+-----------+------------+-----------+------------+---------------+-------------+-------------+-----------+---------------+---------------+-------------------+---------------------+---------------------+----------------------------------+
