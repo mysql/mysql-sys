@@ -24,7 +24,7 @@ SOURCE ./triggers/sys_config_update_set_user.sql
 SOURCE ./functions/extract_schema_from_file_name.sql
 SOURCE ./functions/extract_table_from_file_name.sql
 SOURCE ./functions/format_bytes.sql
-SOURCE ./functions/format_path.sql
+SOURCE ./functions/format_path_57.sql
 SOURCE ./functions/format_statement.sql
 SOURCE ./functions/format_time.sql
 SOURCE ./functions/list_add.sql
@@ -49,7 +49,7 @@ SOURCE ./views/i_s/schema_auto_increment_columns.sql
 SOURCE ./views/i_s/x_schema_flattened_keys.sql
 SOURCE ./views/i_s/schema_redundant_indexes.sql
 
-SOURCE ./views/p_s/ps_check_lost_instrumentation.sql
+SOURCE ./views/p_s/ps_check_lost_instrumentation_57.sql
 
 SOURCE ./views/p_s/latest_file_io.sql
 SOURCE ./views/p_s/x_latest_file_io.sql
