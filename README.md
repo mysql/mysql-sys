@@ -3808,7 +3808,7 @@ Return the Performance Schema THREAD_ID for the specified connection ID.
 
 ##### Parameters
 
-* in_connection_id (BIGINT UNSIGNED): The id of the connection to return the thread id for.
+* in_connection_id (BIGINT UNSIGNED): The id of the connection to return the thread id for. If NULL, the current connection thread id is returned.
 
 ##### Returns
 
