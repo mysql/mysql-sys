@@ -70,7 +70,7 @@ BEGIN
     DEALLOCATE PREPARE reset_stmt;
 
     SET @query = 'INSERT IGNORE INTO performance_schema.setup_actors
-                  VALUES (''%'', ''%'', ''%'', ''YES'')';
+                  VALUES (''%'', ''%'', ''%'', ''YES'', ''YES'')';
 
     IF (in_verbose) THEN
         SELECT CONCAT('Resetting: setup_actors\n', REPLACE(@query, '  ', '')) AS status;
