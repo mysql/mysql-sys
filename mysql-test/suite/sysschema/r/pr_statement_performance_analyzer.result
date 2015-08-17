@@ -458,5 +458,12 @@ SET SESSION sql_mode = @@global.sql_mode;
 SET @sys.statement_performance_analyzer.limit = NULL;
 SET @sys.statement_performance_analyzer.view = NULL;
 UPDATE performance_schema.setup_consumers SET enabled = 'YES';
-UPDATE sys.sys_config SET value = 64 WHERE variable = 'statement_truncate_len';
-DELETE FROM sys.sys_config WHERE variable NOT IN ('statement_truncate_len');
+SET @sys.ignore_sys_config_triggers := true;
+DELETE FROM sys.sys_config;
+INSERT IGNORE INTO sys.sys_config (variable, value) VALUES
+('statement_truncate_len', 64),
+('statement_performance_analyzer.limit', 100),
+('statement_performance_analyzer.view', NULL),
+('diagnostics.allow_i_s_tables', 'OFF'),
+('diagnostics.include_raw', 'OFF');
+SET @sys.ignore_sys_config_triggers := NULL;
