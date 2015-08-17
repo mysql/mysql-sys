@@ -1856,6 +1856,91 @@ Create Table: CREATE TABLE `rkey` (
 1 row in set (0.06 sec)
 ```
 
+#### schema_table_lock_waits / x$schema_table_lock_waits
+
+##### Description
+
+Shows sessions that are blocked waiting on table metadata locks, and who is blocking them.
+
+##### Structures
+
+```SQL
+mysql> desc schema_table_lock_waits;
++------------------------------+---------------------+------+-----+---------+-------+
+| Field                        | Type                | Null | Key | Default | Extra |
++------------------------------+---------------------+------+-----+---------+-------+
+| object_schema                | varchar(64)         | YES  |     | NULL    |       |
+| object_name                  | varchar(64)         | YES  |     | NULL    |       |
+| waiting_thread_id            | bigint(20) unsigned | NO   |     | NULL    |       |
+| waiting_pid                  | bigint(20) unsigned | YES  |     | NULL    |       |
+| waiting_account              | text                | YES  |     | NULL    |       |
+| waiting_lock_type            | varchar(32)         | NO   |     | NULL    |       |
+| waiting_lock_duration        | varchar(32)         | NO   |     | NULL    |       |
+| waiting_query                | longtext            | YES  |     | NULL    |       |
+| waiting_query_secs           | bigint(20)          | YES  |     | NULL    |       |
+| waiting_query_rows_affected  | bigint(20) unsigned | YES  |     | NULL    |       |
+| waiting_query_rows_examined  | bigint(20) unsigned | YES  |     | NULL    |       |
+| blocking_thread_id           | bigint(20) unsigned | NO   |     | NULL    |       |
+| blocking_pid                 | bigint(20) unsigned | YES  |     | NULL    |       |
+| blocking_account             | text                | YES  |     | NULL    |       |
+| blocking_lock_type           | varchar(32)         | NO   |     | NULL    |       |
+| blocking_lock_duration       | varchar(32)         | NO   |     | NULL    |       |
+| sql_kill_blocking_query      | varchar(31)         | YES  |     | NULL    |       |
+| sql_kill_blocking_connection | varchar(25)         | YES  |     | NULL    |       |
++------------------------------+---------------------+------+-----+---------+-------+
+18 rows in set (0.15 sec)
+
+mysql> desc x$schema_table_lock_waits;
++------------------------------+---------------------+------+-----+---------+-------+
+| Field                        | Type                | Null | Key | Default | Extra |
++------------------------------+---------------------+------+-----+---------+-------+
+| object_schema                | varchar(64)         | YES  |     | NULL    |       |
+| object_name                  | varchar(64)         | YES  |     | NULL    |       |
+| waiting_thread_id            | bigint(20) unsigned | NO   |     | NULL    |       |
+| waiting_pid                  | bigint(20) unsigned | YES  |     | NULL    |       |
+| waiting_account              | text                | YES  |     | NULL    |       |
+| waiting_lock_type            | varchar(32)         | NO   |     | NULL    |       |
+| waiting_lock_duration        | varchar(32)         | NO   |     | NULL    |       |
+| waiting_query                | longtext            | YES  |     | NULL    |       |
+| waiting_query_secs           | bigint(20)          | YES  |     | NULL    |       |
+| waiting_query_rows_affected  | bigint(20) unsigned | YES  |     | NULL    |       |
+| waiting_query_rows_examined  | bigint(20) unsigned | YES  |     | NULL    |       |
+| blocking_thread_id           | bigint(20) unsigned | NO   |     | NULL    |       |
+| blocking_pid                 | bigint(20) unsigned | YES  |     | NULL    |       |
+| blocking_account             | text                | YES  |     | NULL    |       |
+| blocking_lock_type           | varchar(32)         | NO   |     | NULL    |       |
+| blocking_lock_duration       | varchar(32)         | NO   |     | NULL    |       |
+| sql_kill_blocking_query      | varchar(31)         | YES  |     | NULL    |       |
+| sql_kill_blocking_connection | varchar(25)         | YES  |     | NULL    |       |
++------------------------------+---------------------+------+-----+---------+-------+
+18 rows in set (0.03 sec)
+```
+
+##### Example
+
+```SQL
+mysql> select * from sys.schema_table_lock_waits\G
+*************************** 1. row ***************************
+               object_schema: test
+                 object_name: t
+           waiting_thread_id: 43
+                 waiting_pid: 21
+             waiting_account: msandbox@localhost
+           waiting_lock_type: SHARED_UPGRADABLE
+       waiting_lock_duration: TRANSACTION
+               waiting_query: alter table test.t add foo int
+          waiting_query_secs: 988
+ waiting_query_rows_affected: 0
+ waiting_query_rows_examined: 0
+          blocking_thread_id: 42
+                blocking_pid: 20
+            blocking_account: msandbox@localhost
+          blocking_lock_type: SHARED_NO_READ_WRITE
+      blocking_lock_duration: TRANSACTION
+     sql_kill_blocking_query: KILL QUERY 20
+sql_kill_blocking_connection: KILL 20
+```
+
 #### schema_table_statistics_with_buffer / x$schema_table_statistics_with_buffer
 
 ##### Description

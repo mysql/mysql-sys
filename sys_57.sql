@@ -86,6 +86,8 @@ SOURCE ./views/p_s/x_schema_table_statistics_with_buffer.sql
 SOURCE ./views/p_s/schema_tables_with_full_table_scans.sql
 SOURCE ./views/p_s/x_schema_tables_with_full_table_scans.sql
 SOURCE ./views/p_s/schema_unused_indexes.sql
+SOURCE ./views/p_s/schema_table_lock_waits.sql
+SOURCE ./views/p_s/x_schema_table_lock_waits.sql
 
 SOURCE ./views/p_s/statement_analysis.sql
 SOURCE ./views/p_s/x_statement_analysis.sql
