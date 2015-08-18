@@ -37,6 +37,7 @@ SOURCE ./functions/ps_is_thread_instrumented.sql
 SOURCE ./functions/ps_thread_id.sql
 SOURCE ./functions/ps_thread_account.sql
 SOURCE ./functions/ps_thread_stack.sql
+SOURCE ./functions/ps_thread_trx_info.sql
 SOURCE ./functions/sys_get_config.sql
 
 SOURCE ./views/i_s/innodb_buffer_stats_by_schema.sql
