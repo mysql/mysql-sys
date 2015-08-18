@@ -25,7 +25,7 @@ CREATE DEFINER='root'@'localhost' FUNCTION ps_thread_trx_info (
              -----------
 
              Returns a JSON object with info on the given threads current transaction, 
-             and the statements it has already exected, derived from the
+             and the statements it has already executed, derived from the
              performance_schema.events_transactions_current and
              performance_schema.events_statements_history tables (so the consumers 
              for these also have to be enabled within Performance Schema to get full

@@ -3946,7 +3946,7 @@ thread_stack: {"rankdir": "LR","nodesep": "0.10","stack_created": "2014-02-19 13
 
 ##### Description
 
-Returns a JSON object with info on the given thread's current transaction, and the statements it has already exected, derived from the `performance_schema.events_transactions_current` and `performance_schema.events_statements_history` tables (so the consumers for these also have to be enabled within Performance Schema to get full data in the object).
+Returns a JSON object with info on the given thread's current transaction, and the statements it has already executed, derived from the `performance_schema.events_transactions_current` and `performance_schema.events_statements_history` tables (so the consumers for these also have to be enabled within Performance Schema to get full data in the object).
 
 ##### Parameters
 
