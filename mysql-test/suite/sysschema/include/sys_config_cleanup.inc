@@ -1,6 +1,6 @@
 # Reset the sys.sys_config table
 
-# Note, we have to disable the triggers  to reset the set_by column back to NULL
+# Note, we have to disable the triggers to reset the set_by column back to NULL
 # as the sys.sys_config_update_set_user trigger will overwrite it to the current user
 SET @sys.ignore_sys_config_triggers := true;
 

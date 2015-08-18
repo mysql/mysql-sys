@@ -30,6 +30,7 @@ schema_index_statistics
 schema_object_overview
 schema_redundant_indexes
 schema_tables_with_full_table_scans
+schema_table_lock_waits
 schema_table_statistics
 schema_table_statistics_with_buffer
 schema_unused_indexes
@@ -81,6 +82,7 @@ x$ps_schema_table_statistics_io
 x$schema_flattened_keys
 x$schema_index_statistics
 x$schema_tables_with_full_table_scans
+x$schema_table_lock_waits
 x$schema_table_statistics
 x$schema_table_statistics_with_buffer
 x$session
@@ -116,8 +118,10 @@ ps_is_consumer_enabled	FUNCTION
 ps_is_instrument_default_enabled	FUNCTION
 ps_is_instrument_default_timed	FUNCTION
 ps_is_thread_instrumented	FUNCTION
+ps_thread_account	FUNCTION
 ps_thread_id	FUNCTION
 ps_thread_stack	FUNCTION
+ps_thread_trx_info	FUNCTION
 sys_get_config	FUNCTION
 create_synonym_db	PROCEDURE
 diagnostics	PROCEDURE
