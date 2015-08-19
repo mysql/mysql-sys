@@ -11,6 +11,7 @@ INSERT IGNORE INTO sys.sys_config (variable, value) VALUES
     ('statement_performance_analyzer.limit', 100),
     ('statement_performance_analyzer.view', NULL),
     ('diagnostics.allow_i_s_tables', 'OFF'),
-    ('diagnostics.include_raw', 'OFF');
+    ('diagnostics.include_raw', 'OFF'),
+    ('ps_thread_trx_info.max_length', 65535);
 
 SET @sys.ignore_sys_config_triggers := NULL;

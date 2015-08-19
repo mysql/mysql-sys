@@ -79,9 +79,15 @@ Note, when functions check for configuration options, they first check whether a
 
 ##### Options included
 
-| Variable               | Default Value | Description                                                                    |
-| ---------------------- | ------------- | ------------------------------------------------------------------------------ |
-| statement_truncate_len | 64            | Sets the size to truncate statements to, for the `format_statement()` function |
+| Variable                             | Default Value | Description                                                                    |
+| ------------------------------------ | ------------- | ------------------------------------------------------------------------------ |
+| statement_truncate_len               | 64            | Sets the size to truncate statements to, for the `format_statement()` function. |
+| statement_performance_analyzer.limit | 100           | The maximum number of rows to include for the views that does not have a built-in limit (e.g. the 95th percentile view). If not set the limit is 100. |
+| statement_performance_analyzer.view  | NULL          | Used together with the 'custom' view. If the value contains a space, it is considered a query, otherwise it must be
+     an existing view querying the performance_schema.events_statements_summary_by_digest table. |
+| diagnostics.allow_i_s_tables         | OFF           | Specifies whether it is allowed to do table scan queries on information_schema.TABLES for the `diagnostics` procedure. |
+| diagnostics.include_raw              | OFF           | Set to 'ON' to include the raw data (e.g. the original output of "SELECT * FROM sys.metrics") for the `diagnostics` procedure.|
+| ps_thread_trx_info.max_length        | 65535         | Sets the maximum output length for JSON object output by the `ps_thread_trx_info()` function. |
 
 ### Views
 
@@ -3947,6 +3953,14 @@ thread_stack: {"rankdir": "LR","nodesep": "0.10","stack_created": "2014-02-19 13
 ##### Description
 
 Returns a JSON object with info on the given thread's current transaction, and the statements it has already executed, derived from the `performance_schema.events_transactions_current` and `performance_schema.events_statements_history` tables (so the consumers for these also have to be enabled within Performance Schema to get full data in the object).
+
+When the output exceeds the default truncation length (65535), a JSON error object is returned, such as:
+
+`{ "error": "Trx info truncated: Row 6 was cut by GROUP_CONCAT()" }`
+
+Similar error objects are returned for other warnings/and exceptions raised when calling the function.
+
+The max length of the output of this function can be controlled with the `ps_thread_trx_info.max_length` variable set via `sys_config`, or the `@sys.ps_thread_trx_info.max_length` user variable, as appropriate.
 
 ##### Parameters
 

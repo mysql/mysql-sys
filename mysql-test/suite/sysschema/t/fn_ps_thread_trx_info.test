@@ -67,6 +67,19 @@ SELECT JSON_CONTAINS(@json_doc, '0',                                      '$[0].
 # Second statement in transaction should be a COMMIT
 SELECT JSON_CONTAINS(@json_doc, '"COMMIT"', '$[0].statements_executed[1].sql_text');
 
-disconnect con1;
+# Simulate a truncated set of output by lowering the @sys.ps_thread_trx_info.max_length user variable
+# This also tests the user variable works appropriately, incidentally
 
+SET @sys.ps_thread_trx_info.max_length = 100;
+
+# Should return an error JSON object
+SELECT sys.ps_thread_trx_info(@ps_thread_id);
+
+# Setting the user variable back to NULL should reset to 65535 from sys_config, and no truncation
+SET @sys.ps_thread_trx_info.max_length = NULL;
+SELECT JSON_VALID(sys.ps_thread_trx_info(@ps_thread_id));
+
+# Clean up
+
+disconnect con1;
 DROP DATABASE trx;

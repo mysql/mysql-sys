@@ -16,7 +16,7 @@
 SOURCE ./before_setup.sql
 
 SOURCE ./tables/sys_config.sql
-SOURCE ./tables/sys_config_data.sql
+SOURCE ./tables/sys_config_data_57.sql
 
 SOURCE ./triggers/sys_config_insert_set_user.sql
 SOURCE ./triggers/sys_config_update_set_user.sql

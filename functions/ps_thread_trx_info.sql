@@ -31,6 +31,18 @@ CREATE DEFINER='root'@'localhost' FUNCTION ps_thread_trx_info (
              for these also have to be enabled within Performance Schema to get full
              data in the object).
 
+             When the output exceeds the default truncation length (65535), a JSON error
+             object is returned, such as:
+
+             { "error": "Trx info truncated: Row 6 was cut by GROUP_CONCAT()" }
+
+             Similar error objects are returned for other warnings/and exceptions raised
+             when calling the function.
+
+             The max length of the output of this function can be controlled with the
+             ps_thread_trx_info.max_length variable set via sys_config, or the
+             @sys.ps_thread_trx_info.max_length user variable, as appropriate.
+
              Parameters
              -----------
 
@@ -119,10 +131,39 @@ CREATE DEFINER='root'@'localhost' FUNCTION ps_thread_trx_info (
     NOT DETERMINISTIC
     READS SQL DATA
 BEGIN
-    DECLARE v_output TEXT;
+    DECLARE v_output LONGTEXT DEFAULT '{}';
+    DECLARE v_msg_text TEXT DEFAULT '';
+    DECLARE v_signal_msg TEXT DEFAULT '';
+    DECLARE v_mysql_errno INT;
+    DECLARE v_max_output_len BIGINT;
+    -- Capture warnings/errors such as group_concat truncation
+    -- and report as JSON error objects
+    DECLARE EXIT HANDLER FOR SQLWARNING, SQLEXCEPTION
+    BEGIN
+        GET DIAGNOSTICS CONDITION 1
+            v_msg_text = MESSAGE_TEXT,
+            v_mysql_errno = MYSQL_ERRNO;
 
-    SET @old_ground_concat_max_len = @@session.group_concat_max_len;
-    SET SESSION group_concat_max_len = 1000000000;
+        IF v_mysql_errno = 1260 THEN
+            SET v_signal_msg = CONCAT('{ "error": "Trx info truncated: ', v_msg_text, '" }');
+        ELSE
+            SET v_signal_msg = CONCAT('{ "error": "', v_msg_text, '" }');
+        END IF;
+
+        RETURN v_signal_msg;
+    END;
+
+    -- Set configuration options
+    IF (@sys.ps_thread_trx_info.max_length IS NULL) THEN
+        SET @sys.ps_thread_trx_info.max_length = sys.sys_get_config('ps_thread_trx_info.max_length', 65535);
+    END IF;
+
+    IF (@sys.ps_thread_trx_info.max_length != @@session.group_concat_max_len) THEN
+        SET @old_group_concat_max_len = @@session.group_concat_max_len;
+        -- Convert to int value for the SET, and give some surrounding space
+        SET v_max_output_len = (@sys.ps_thread_trx_info.max_length - 5);
+        SET SESSION group_concat_max_len = v_max_output_len;
+    END IF;
 
     SET v_output = (
         SELECT CONCAT('[', IFNULL(GROUP_CONCAT(trx_info ORDER BY event_id), ''), '\n]') AS trx_info
@@ -158,7 +199,7 @@ BEGIN
                                     GROUP_CONCAT(
                                       IFNULL(
                                         CONCAT('\n      {\n',
-                                               '        "sql_text": "', IFNULL(REPLACE(sql_text, '\\', '\\\\'), ''), '",\n',
+                                               '        "sql_text": "', IFNULL(sys.format_statement(REPLACE(sql_text, '\\', '\\\\')), ''), '",\n',
                                                '        "time": "', IFNULL(sys.format_time(timer_wait), ''), '",\n',
                                                '        "schema": "', IFNULL(current_schema, ''), '",\n',
                                                '        "rows_examined": ', IFNULL(rows_examined, ''), ',\n',
@@ -182,8 +223,9 @@ BEGIN
           GROUP BY thread_id
     );
 
-    SET @old_ground_concat_max_len = @@session.group_concat_max_len;
-    SET SESSION group_concat_max_len = 1000000000;
+    IF (@old_group_concat_max_len IS NOT NULL) THEN
+        SET SESSION group_concat_max_len = @old_group_concat_max_len;
+    END IF;
 
     RETURN v_output;
 END$$
