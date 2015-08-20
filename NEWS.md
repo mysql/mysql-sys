@@ -1,5 +1,55 @@
 # Change history for the MySQL sys schema
 
+## 1.5.0 (...)
+
+### Improvements
+
+* The `format_bytes` function now shows no decimal places when outputting a simple bytes value
+* The `processlist` views where improved, changes include:
+** The `pid` and `program_name` of the connection are shown, if set within the `performance_schema.session_connect_attrs` table (Contributed by Daniël van Eeden)
+** Issue #50 - The current statement progress is reported via the new stage progress reporting within Performance Schema stages within 5.7 (such as ALTER TABLE progress reporting)
+** Issue #60 - A new `statement_latency` column was added to all versions, which reports the current statement latency with picosecond precision from the `performance_schema.events_statements_current` table, when enabled
+* New `metrics` and `metrics_56` views have been added. These provide a union view of the performance_schema.global_status, information_schema.innodb_metrics along with P_S memory and the current time, as a single metrics output. The difference between metrics and metrics_56 is whether the global status information is taken from performance_schema or information_schema (in the case of metrics_56).
+* New `session`/`x$session` views have been added, which give the same output as the `processlist` view counterparts, but filtered to only show foreground connections (Contributed by Morgan Tocker)
+* A new `session_ssl_status` view was added, which shows the SSL version, ciper and session resuse statistics for each connection (Contributed by Daniël van Eeden)
+* A new `schema_auto_increment_columns` view was added, that shows statistics on each auto_incrment within the instance, including the `auto_increment_ratio`, so you can easily monitor how full specific auto_increment columns are (Contributed by Shlomi Noach)
+* A new `schema_redundant_indexes` view was added, that shows indexes made redundant (or duplicated) by other more dominant indexes. Also includes the the helper view `x$schema_flattened_keys`. (Contributed by Shlomi Noach)
+* New `schema_table_lock_waits`/`x$schema_table_lock_waits` views have been added, which show any sessions that are waiting for table level metadata locks, and the sessions that are blocking them. Resolves Git Issue #57, inspired by the suggestion from Daniël van Eeden
+* The `innodb_lock_waits` view had the following columns added to it, following a manually merged contribution from Shlomi Noach for a similar view
+** `wait_age_secs` - the current row lock wait time in seconds
+** `sql_kill_blocking_query` - the "KILL QUERY <connection_id>" command to run to kill the blocking session current statement
+** `sql_kill_blocking_connection` - the "KILL <connection_id" command to run to kill the blocking session
+* A new `table_exists` procedure was added, which checks for the existence of table, and if it exists, returns the type (BASE TABLE, VIEW, TEMPORARY) (Contributed by Jesper Wisborg Krogh)
+* A new `execute_prepared_stmt()` procedure was added, which takes a SQL statement as an input variable and executes it as a prepared statement (Contributed by Jesper Wisborg Krogh)
+* A new `statement_performance_analyzer()` procedure was added, that allows reporting on the statements that are have been running over snapshot periods (Contributed by Jesper Wisborg Krogh)
+* A new `diagnostics()` procedure was added, which creates a large diagnostics report based upon most of the new instrumentation now available, computed over a configurable number of snapshot intervals (Contributed by Jesper Wisborg Krogh)
+* A 5.7 specific `ps_trace_thread()` procedure was added, which now shows the hierarchy of transactions and stored routines, as well as statements, stages and waits, if enabled
+* Added a new `ps_thread_account()` stored function, that returns the "user@host" account for a given Performance Schema thread id
+* Added a new `ps_thread_trx_info()` stored function which outputs, for a given thread id, the transactions, and statements that those transactions have executed, as a JSON object
+* Added new `list_add()` and `list_drop()` stored functions, that take a string csv list, and either add or remove items from that list respectively. Can be used to easily update variables that take such lists, like `sql_mode`.
+* The `ps_thread_id` stored function now returns the thread id for the current connection if NULL is passed for the in_connection_id parameter
+
+### Bug Fixes
+
+* Git Issue #51 - Fixed the `generate_sql_file.sh` script to also replace the definer in the before_setup.sql output
+* Git Issue #52 - Removed apostrophe from the `format_statement` function comment because TOAD no likey
+* Git Issue #56 - Installation failed on 5.6 with ONLY_FULL_GROUP_BY enabled
+* Git Issue #76 - Fixes for the new show_compatibility_56 variable. 5.7 versions of the `format_path()` function and `ps_check_lost_instrumentation` view were added, that use performance_schema.global_status/global_variables instead of information_schema.global_status/global_variables
+* Git Issue #79 - Fixed grammar within `statements_with_runtimes_in_95th_percentile` view descriptions
+* Oracle Bug #21484593 / Oracle Bug #21281955 - The `format_path()` function incorrectly took and returned a VARCHAR(260) instead of VARCHAR(512) (as the underlying is exposed as in Performance Schema) causing sporadic test failures
+* Oracle Bug #21550271 - Fixed the `ps_setup_reset_to_default` for 5.7 with the addition of the new `history` column on the `performance_schema.setup_actors` table
+* Oracle Bug #21550054 - It is possible that the views can show data that overflows when aggregating very large values, reset all statistics before each test to ensure no overflows
+* MySQL Bug #77848 - Added the missing ps_setup_instruments_cleanup.inc
+* Fixed the `ps_setup_reset_to_default()` procedure to also set the new `ENABLED` column within `performance_schema.setup_actors` within 5.7
+* The `user_summary_by_file_io`/`x$user_summary_by_file_io` and `host_summary_by_file_io`/`x$host_summary_by_file_io` tables were incorrectly aggregating all wait events, not just `wait/io/file/%`
+* Fixed the `ps_is_instrument_default_enabed` and `ps_is_instrument_default_timed` to take in to account the new instruments added within 5.7
+
+### Implementation Details
+
+* Tests were improved via 5.7 integration
+* Template files were added for stored procedures and functions
+* Improved the sys_config_cleanup.inc procedure in tests to be able to reset the sys_config table completely (including the set_by column to NULL). The triggers can now be set to not update the column by setting the @sys.ignore_sys_config_triggers user variable to true
+
 ## 1.4.0 (09/03/2015)
 
 ### Backwards Incompatible Changes
