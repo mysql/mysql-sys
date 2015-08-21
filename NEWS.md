@@ -39,10 +39,10 @@
 * Oracle Bug #21484593 / Oracle Bug #21281955 - The `format_path()` function incorrectly took and returned a VARCHAR(260) instead of VARCHAR(512) (as the underlying is exposed as in Performance Schema) causing sporadic test failures
 * Oracle Bug #21550271 - Fixed the `ps_setup_reset_to_default` for 5.7 with the addition of the new `history` column on the `performance_schema.setup_actors` table
 * Oracle Bug #21550054 - It is possible that the views can show data that overflows when aggregating very large values, reset all statistics before each test to ensure no overflows
+* Oracle Bug #21647101 - Fixed the `ps_is_instrument_default_enabed` and `ps_is_instrument_default_timed` to take in to account the new instruments added within 5.7
 * MySQL Bug #77848 - Added the missing ps_setup_instruments_cleanup.inc
 * Fixed the `ps_setup_reset_to_default()` procedure to also set the new `ENABLED` column within `performance_schema.setup_actors` within 5.7
 * The `user_summary_by_file_io`/`x$user_summary_by_file_io` and `host_summary_by_file_io`/`x$host_summary_by_file_io` tables were incorrectly aggregating all wait events, not just `wait/io/file/%`
-* Fixed the `ps_is_instrument_default_enabed` and `ps_is_instrument_default_timed` to take in to account the new instruments added within 5.7
 
 ### Implementation Details
 
