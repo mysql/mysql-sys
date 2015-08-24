@@ -1404,68 +1404,74 @@ for a view that contains only user session information.
 
 ```SQL
 mysql> desc processlist;
-+------------------------+---------------------+------+-----+---------+-------+
-| Field                  | Type                | Null | Key | Default | Extra |
-+------------------------+---------------------+------+-----+---------+-------+
-| thd_id                 | bigint(20) unsigned | NO   |     | NULL    |       |
-| conn_id                | bigint(20) unsigned | YES  |     | NULL    |       |
-| user                   | varchar(128)        | YES  |     | NULL    |       |
-| db                     | varchar(64)         | YES  |     | NULL    |       |
-| command                | varchar(16)         | YES  |     | NULL    |       |
-| state                  | varchar(64)         | YES  |     | NULL    |       |
-| time                   | bigint(20)          | YES  |     | NULL    |       |
-| current_statement      | longtext            | YES  |     | NULL    |       |
-| statement_latency      | text                | YES  |     | NULL    |       |
-| progress               | decimal(26,2)       | YES  |     | NULL    |       |
-| lock_latency           | text                | YES  |     | NULL    |       |
-| rows_examined          | bigint(20) unsigned | YES  |     | NULL    |       |
-| rows_sent              | bigint(20) unsigned | YES  |     | NULL    |       |
-| rows_affected          | bigint(20) unsigned | YES  |     | NULL    |       |
-| tmp_tables             | bigint(20) unsigned | YES  |     | NULL    |       |
-| tmp_disk_tables        | bigint(20) unsigned | YES  |     | NULL    |       |
-| full_scan              | varchar(3)          | NO   |     |         |       |
-| last_statement         | longtext            | YES  |     | NULL    |       |
-| last_statement_latency | text                | YES  |     | NULL    |       |
-| current_memory         | text                | YES  |     | NULL    |       |
-| last_wait              | varchar(128)        | YES  |     | NULL    |       |
-| last_wait_latency      | text                | YES  |     | NULL    |       |
-| source                 | varchar(64)         | YES  |     | NULL    |       |
-| pid                    | varchar(1024)       | YES  |     | NULL    |       |
-| program_name           | varchar(1024)       | YES  |     | NULL    |       |
-+------------------------+---------------------+------+-----+---------+-------+
-25 rows in set (0.18 sec)
++------------------------+------------------------------------------+------+-----+---------+-------+
+| Field                  | Type                                     | Null | Key | Default | Extra |
++------------------------+------------------------------------------+------+-----+---------+-------+
+| thd_id                 | bigint(20) unsigned                      | NO   |     | NULL    |       |
+| conn_id                | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| user                   | varchar(128)                             | YES  |     | NULL    |       |
+| db                     | varchar(64)                              | YES  |     | NULL    |       |
+| command                | varchar(16)                              | YES  |     | NULL    |       |
+| state                  | varchar(64)                              | YES  |     | NULL    |       |
+| time                   | bigint(20)                               | YES  |     | NULL    |       |
+| current_statement      | longtext                                 | YES  |     | NULL    |       |
+| statement_latency      | text                                     | YES  |     | NULL    |       |
+| progress               | decimal(26,2)                            | YES  |     | NULL    |       |
+| lock_latency           | text                                     | YES  |     | NULL    |       |
+| rows_examined          | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| rows_sent              | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| rows_affected          | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| tmp_tables             | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| tmp_disk_tables        | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| full_scan              | varchar(3)                               | NO   |     |         |       |
+| last_statement         | longtext                                 | YES  |     | NULL    |       |
+| last_statement_latency | text                                     | YES  |     | NULL    |       |
+| current_memory         | text                                     | YES  |     | NULL    |       |
+| last_wait              | varchar(128)                             | YES  |     | NULL    |       |
+| last_wait_latency      | text                                     | YES  |     | NULL    |       |
+| source                 | varchar(64)                              | YES  |     | NULL    |       |
+| trx_latency            | text                                     | YES  |     | NULL    |       |
+| trx_state              | enum('ACTIVE','COMMITTED','ROLLED BACK') | YES  |     | NULL    |       |
+| trx_autocommit         | enum('YES','NO')                         | YES  |     | NULL    |       |
+| pid                    | varchar(1024)                            | YES  |     | NULL    |       |
+| program_name           | varchar(1024)                            | YES  |     | NULL    |       |
++------------------------+------------------------------------------+------+-----+---------+-------+
+28 rows in set (0.04 sec)
 
 mysql> desc x$processlist;
-+------------------------+---------------------+------+-----+---------+-------+
-| Field                  | Type                | Null | Key | Default | Extra |
-+------------------------+---------------------+------+-----+---------+-------+
-| thd_id                 | bigint(20) unsigned | NO   |     | NULL    |       |
-| conn_id                | bigint(20) unsigned | YES  |     | NULL    |       |
-| user                   | varchar(128)        | YES  |     | NULL    |       |
-| db                     | varchar(64)         | YES  |     | NULL    |       |
-| command                | varchar(16)         | YES  |     | NULL    |       |
-| state                  | varchar(64)         | YES  |     | NULL    |       |
-| time                   | bigint(20)          | YES  |     | NULL    |       |
-| current_statement      | longtext            | YES  |     | NULL    |       |
-| statement_latency      | bigint(20) unsigned | YES  |     | NULL    |       |
-| progress               | decimal(26,2)       | YES  |     | NULL    |       |
-| lock_latency           | bigint(20) unsigned | YES  |     | NULL    |       |
-| rows_examined          | bigint(20) unsigned | YES  |     | NULL    |       |
-| rows_sent              | bigint(20) unsigned | YES  |     | NULL    |       |
-| rows_affected          | bigint(20) unsigned | YES  |     | NULL    |       |
-| tmp_tables             | bigint(20) unsigned | YES  |     | NULL    |       |
-| tmp_disk_tables        | bigint(20) unsigned | YES  |     | NULL    |       |
-| full_scan              | varchar(3)          | NO   |     |         |       |
-| last_statement         | longtext            | YES  |     | NULL    |       |
-| last_statement_latency | bigint(20) unsigned | YES  |     | NULL    |       |
-| current_memory         | decimal(41,0)       | YES  |     | NULL    |       |
-| last_wait              | varchar(128)        | YES  |     | NULL    |       |
-| last_wait_latency      | varchar(20)         | YES  |     | NULL    |       |
-| source                 | varchar(64)         | YES  |     | NULL    |       |
-| pid                    | varchar(1024)       | YES  |     | NULL    |       |
-| program_name           | varchar(1024)       | YES  |     | NULL    |       |
-+------------------------+---------------------+------+-----+---------+-------+
-25 rows in set (0.00 sec)
++------------------------+------------------------------------------+------+-----+---------+-------+
+| Field                  | Type                                     | Null | Key | Default | Extra |
++------------------------+------------------------------------------+------+-----+---------+-------+
+| thd_id                 | bigint(20) unsigned                      | NO   |     | NULL    |       |
+| conn_id                | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| user                   | varchar(128)                             | YES  |     | NULL    |       |
+| db                     | varchar(64)                              | YES  |     | NULL    |       |
+| command                | varchar(16)                              | YES  |     | NULL    |       |
+| state                  | varchar(64)                              | YES  |     | NULL    |       |
+| time                   | bigint(20)                               | YES  |     | NULL    |       |
+| current_statement      | longtext                                 | YES  |     | NULL    |       |
+| statement_latency      | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| progress               | decimal(26,2)                            | YES  |     | NULL    |       |
+| lock_latency           | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| rows_examined          | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| rows_sent              | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| rows_affected          | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| tmp_tables             | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| tmp_disk_tables        | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| full_scan              | varchar(3)                               | NO   |     |         |       |
+| last_statement         | longtext                                 | YES  |     | NULL    |       |
+| last_statement_latency | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| current_memory         | decimal(41,0)                            | YES  |     | NULL    |       |
+| last_wait              | varchar(128)                             | YES  |     | NULL    |       |
+| last_wait_latency      | varchar(20)                              | YES  |     | NULL    |       |
+| source                 | varchar(64)                              | YES  |     | NULL    |       |
+| trx_latency            | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| trx_state              | enum('ACTIVE','COMMITTED','ROLLED BACK') | YES  |     | NULL    |       |
+| trx_autocommit         | enum('YES','NO')                         | YES  |     | NULL    |       |
+| pid                    | varchar(1024)                            | YES  |     | NULL    |       |
+| program_name           | varchar(1024)                            | YES  |     | NULL    |       |
++------------------------+------------------------------------------+------+-----+---------+-------+
+28 rows in set (0.01 sec)
 ```
 
 ##### Example
@@ -1496,6 +1502,9 @@ last_statement_latency: NULL
              last_wait: wait/io/file/innodb/innodb_data_file
      last_wait_latency: 1.07 us
                 source: fil0fil.cc:5146
+           trx_latency: NULL
+             trx_state: NULL
+        trx_autocommit: NULL
                    pid: 4212
           program_name: mysql
 ```
@@ -2158,68 +2167,74 @@ The output of this view is restricted to threads from user sessions.  See also p
 
 ```SQL
 mysql> desc session;
-+------------------------+---------------------+------+-----+---------+-------+
-| Field                  | Type                | Null | Key | Default | Extra |
-+------------------------+---------------------+------+-----+---------+-------+
-| thd_id                 | bigint(20) unsigned | NO   |     | NULL    |       |
-| conn_id                | bigint(20) unsigned | YES  |     | NULL    |       |
-| user                   | varchar(128)        | YES  |     | NULL    |       |
-| db                     | varchar(64)         | YES  |     | NULL    |       |
-| command                | varchar(16)         | YES  |     | NULL    |       |
-| state                  | varchar(64)         | YES  |     | NULL    |       |
-| time                   | bigint(20)          | YES  |     | NULL    |       |
-| current_statement      | longtext            | YES  |     | NULL    |       |
-| statement_latency      | text                | YES  |     | NULL    |       |
-| progress               | decimal(26,2)       | YES  |     | NULL    |       |
-| lock_latency           | text                | YES  |     | NULL    |       |
-| rows_examined          | bigint(20) unsigned | YES  |     | NULL    |       |
-| rows_sent              | bigint(20) unsigned | YES  |     | NULL    |       |
-| rows_affected          | bigint(20) unsigned | YES  |     | NULL    |       |
-| tmp_tables             | bigint(20) unsigned | YES  |     | NULL    |       |
-| tmp_disk_tables        | bigint(20) unsigned | YES  |     | NULL    |       |
-| full_scan              | varchar(3)          | NO   |     |         |       |
-| last_statement         | longtext            | YES  |     | NULL    |       |
-| last_statement_latency | text                | YES  |     | NULL    |       |
-| current_memory         | text                | YES  |     | NULL    |       |
-| last_wait              | varchar(128)        | YES  |     | NULL    |       |
-| last_wait_latency      | text                | YES  |     | NULL    |       |
-| source                 | varchar(64)         | YES  |     | NULL    |       |
-| pid                    | varchar(1024)       | YES  |     | NULL    |       |
-| program_name           | varchar(1024)       | YES  |     | NULL    |       |
-+------------------------+---------------------+------+-----+---------+-------+
-25 rows in set (0.18 sec)
++------------------------+------------------------------------------+------+-----+---------+-------+
+| Field                  | Type                                     | Null | Key | Default | Extra |
++------------------------+------------------------------------------+------+-----+---------+-------+
+| thd_id                 | bigint(20) unsigned                      | NO   |     | NULL    |       |
+| conn_id                | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| user                   | varchar(128)                             | YES  |     | NULL    |       |
+| db                     | varchar(64)                              | YES  |     | NULL    |       |
+| command                | varchar(16)                              | YES  |     | NULL    |       |
+| state                  | varchar(64)                              | YES  |     | NULL    |       |
+| time                   | bigint(20)                               | YES  |     | NULL    |       |
+| current_statement      | longtext                                 | YES  |     | NULL    |       |
+| statement_latency      | text                                     | YES  |     | NULL    |       |
+| progress               | decimal(26,2)                            | YES  |     | NULL    |       |
+| lock_latency           | text                                     | YES  |     | NULL    |       |
+| rows_examined          | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| rows_sent              | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| rows_affected          | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| tmp_tables             | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| tmp_disk_tables        | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| full_scan              | varchar(3)                               | NO   |     |         |       |
+| last_statement         | longtext                                 | YES  |     | NULL    |       |
+| last_statement_latency | text                                     | YES  |     | NULL    |       |
+| current_memory         | text                                     | YES  |     | NULL    |       |
+| last_wait              | varchar(128)                             | YES  |     | NULL    |       |
+| last_wait_latency      | text                                     | YES  |     | NULL    |       |
+| source                 | varchar(64)                              | YES  |     | NULL    |       |
+| trx_latency            | text                                     | YES  |     | NULL    |       |
+| trx_state              | enum('ACTIVE','COMMITTED','ROLLED BACK') | YES  |     | NULL    |       |
+| trx_autocommit         | enum('YES','NO')                         | YES  |     | NULL    |       |
+| pid                    | varchar(1024)                            | YES  |     | NULL    |       |
+| program_name           | varchar(1024)                            | YES  |     | NULL    |       |
++------------------------+------------------------------------------+------+-----+---------+-------+
+28 rows in set (0.00 sec)
 
 mysql> desc x$session;
-+------------------------+---------------------+------+-----+---------+-------+
-| Field                  | Type                | Null | Key | Default | Extra |
-+------------------------+---------------------+------+-----+---------+-------+
-| thd_id                 | bigint(20) unsigned | NO   |     | NULL    |       |
-| conn_id                | bigint(20) unsigned | YES  |     | NULL    |       |
-| user                   | varchar(128)        | YES  |     | NULL    |       |
-| db                     | varchar(64)         | YES  |     | NULL    |       |
-| command                | varchar(16)         | YES  |     | NULL    |       |
-| state                  | varchar(64)         | YES  |     | NULL    |       |
-| time                   | bigint(20)          | YES  |     | NULL    |       |
-| current_statement      | longtext            | YES  |     | NULL    |       |
-| statement_latency      | bigint(20) unsigned | YES  |     | NULL    |       |
-| progress               | decimal(26,2)       | YES  |     | NULL    |       |
-| lock_latency           | bigint(20) unsigned | YES  |     | NULL    |       |
-| rows_examined          | bigint(20) unsigned | YES  |     | NULL    |       |
-| rows_sent              | bigint(20) unsigned | YES  |     | NULL    |       |
-| rows_affected          | bigint(20) unsigned | YES  |     | NULL    |       |
-| tmp_tables             | bigint(20) unsigned | YES  |     | NULL    |       |
-| tmp_disk_tables        | bigint(20) unsigned | YES  |     | NULL    |       |
-| full_scan              | varchar(3)          | NO   |     |         |       |
-| last_statement         | longtext            | YES  |     | NULL    |       |
-| last_statement_latency | bigint(20) unsigned | YES  |     | NULL    |       |
-| current_memory         | decimal(41,0)       | YES  |     | NULL    |       |
-| last_wait              | varchar(128)        | YES  |     | NULL    |       |
-| last_wait_latency      | varchar(20)         | YES  |     | NULL    |       |
-| source                 | varchar(64)         | YES  |     | NULL    |       |
-| pid                    | varchar(1024)       | YES  |     | NULL    |       |
-| program_name           | varchar(1024)       | YES  |     | NULL    |       |
-+------------------------+---------------------+------+-----+---------+-------+
-25 rows in set (0.00 sec)
++------------------------+------------------------------------------+------+-----+---------+-------+
+| Field                  | Type                                     | Null | Key | Default | Extra |
++------------------------+------------------------------------------+------+-----+---------+-------+
+| thd_id                 | bigint(20) unsigned                      | NO   |     | NULL    |       |
+| conn_id                | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| user                   | varchar(128)                             | YES  |     | NULL    |       |
+| db                     | varchar(64)                              | YES  |     | NULL    |       |
+| command                | varchar(16)                              | YES  |     | NULL    |       |
+| state                  | varchar(64)                              | YES  |     | NULL    |       |
+| time                   | bigint(20)                               | YES  |     | NULL    |       |
+| current_statement      | longtext                                 | YES  |     | NULL    |       |
+| statement_latency      | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| progress               | decimal(26,2)                            | YES  |     | NULL    |       |
+| lock_latency           | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| rows_examined          | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| rows_sent              | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| rows_affected          | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| tmp_tables             | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| tmp_disk_tables        | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| full_scan              | varchar(3)                               | NO   |     |         |       |
+| last_statement         | longtext                                 | YES  |     | NULL    |       |
+| last_statement_latency | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| current_memory         | decimal(41,0)                            | YES  |     | NULL    |       |
+| last_wait              | varchar(128)                             | YES  |     | NULL    |       |
+| last_wait_latency      | varchar(20)                              | YES  |     | NULL    |       |
+| source                 | varchar(64)                              | YES  |     | NULL    |       |
+| trx_latency            | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| trx_state              | enum('ACTIVE','COMMITTED','ROLLED BACK') | YES  |     | NULL    |       |
+| trx_autocommit         | enum('YES','NO')                         | YES  |     | NULL    |       |
+| pid                    | varchar(1024)                            | YES  |     | NULL    |       |
+| program_name           | varchar(1024)                            | YES  |     | NULL    |       |
++------------------------+------------------------------------------+------+-----+---------+-------+
+28 rows in set (0.00 sec)
 ```
 
 ##### Example
@@ -2227,43 +2242,17 @@ mysql> desc x$session;
 ```SQL
 mysql> select * from sys.session\G
 *************************** 1. row ***************************
-                thd_id: 27
-               conn_id: 1
-                  user: sql/compress_gtid_table
-                    db: NULL
-               command: Daemon
-                 state: Suspending
-                  time: 2347
-     current_statement: NULL
-     statement_latency: NULL
-              progress: NULL
-          lock_latency: NULL
-         rows_examined: NULL
-             rows_sent: NULL
-         rows_affected: NULL
-            tmp_tables: NULL
-       tmp_disk_tables: NULL
-             full_scan: NO
-        last_statement: NULL
-last_statement_latency: NULL
-        current_memory: 0 bytes
-             last_wait: NULL
-     last_wait_latency: NULL
-                source: NULL
-                   pid: NULL
-          program_name: NULL
-*************************** 2. row ***************************
-                thd_id: 34
-               conn_id: 8
-                  user: msandbox@localhost
+                thd_id: 24
+               conn_id: 2
+                  user: root@localhost
                     db: sys
                command: Query
                  state: Sending data
                   time: 0
-     current_statement: SELECT * FROM session
-     statement_latency: 12.05 ms
+     current_statement: select * from sys.session
+     statement_latency: 137.22 ms
               progress: NULL
-          lock_latency: 938.00 us
+          lock_latency: 33.75 ms
          rows_examined: 0
              rows_sent: 0
          rows_affected: 0
@@ -2272,13 +2261,15 @@ last_statement_latency: NULL
              full_scan: YES
         last_statement: NULL
 last_statement_latency: NULL
-        current_memory: 2.86 MiB
-             last_wait: NULL
-     last_wait_latency: NULL
-                source: NULL
-                   pid: 28188
+        current_memory: 3.26 MiB
+             last_wait: wait/synch/mutex/innodb/file_format_max_mutex
+     last_wait_latency: 64.09 ns
+                source: trx0sys.cc:778
+           trx_latency: 7.88 s
+             trx_state: ACTIVE
+        trx_autocommit: NO
+                   pid: 4212
           program_name: mysql
-2 rows in set (0.05 sec)
 ```
 
 #### session_ssl_status

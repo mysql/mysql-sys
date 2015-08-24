@@ -24,29 +24,32 @@
 --
 -- mysql> select * from sys.x$session\G
 -- *************************** 1. row ***************************
---                 thd_id: 720
---                conn_id: 698
---                   user: msandbox@localhost
---                     db: test
+--                 thd_id: 24
+--                conn_id: 2
+--                   user: root@localhost
+--                     db: sys
 --                command: Query
---                  state: alter table (read PK and internal sort)
---                   time: 2
---      current_statement: alter table t1 add column l int
---      statement_latency: 2349834276374
---               progress: 60.00
---           lock_latency: 339707000000
+--                  state: Sending data
+--                   time: 0
+--      current_statement: select * from sys.x$session
+--      statement_latency: 16285980000
+--               progress: NULL
+--           lock_latency: 15450000000
 --          rows_examined: 0
 --              rows_sent: 0
 --          rows_affected: 0
---             tmp_tables: 0
---        tmp_disk_tables: 0
---              full_scan: NO
+--             tmp_tables: 4
+--        tmp_disk_tables: 1
+--              full_scan: YES
 --         last_statement: NULL
 -- last_statement_latency: NULL
---         current_memory: 10186821
---              last_wait: wait/io/file/innodb/innodb_data_file
---      last_wait_latency: Still Waiting
---                 source: fil0fil.cc:5351
+--         current_memory: 3383772
+--              last_wait: wait/synch/mutex/innodb/trx_mutex
+--      last_wait_latency: 56550
+--                 source: trx0trx.h:1520
+--            trx_latency: 17893350207000
+--              trx_state: ACTIVE
+--         trx_autocommit: NO
 --                    pid: 5559
 --           program_name: mysql
 --

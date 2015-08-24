@@ -46,6 +46,9 @@
 --              last_wait: wait/io/file/innodb/innodb_data_file
 --      last_wait_latency: 1.07 us
 --                 source: fil0fil.cc:5146
+--            trx_latency: NULL
+--              trx_state: NULL
+--         trx_autocommit: NULL
 --                    pid: 4212
 --           program_name: mysql
 --
@@ -78,6 +81,9 @@ VIEW processlist (
   last_wait,
   last_wait_latency,
   source,
+  trx_latency,
+  trx_state,
+  trx_autocommit,
   pid,
   program_name
 ) AS
@@ -116,12 +122,16 @@ SELECT pps.thread_id AS thd_id,
           'Still Waiting',
           sys.format_time(ewc.timer_wait)) last_wait_latency,
        ewc.source,
+       sys.format_time(etc.timer_wait) AS trx_latency,
+       etc.state AS trx_state,
+       etc.autocommit AS trx_autocommit,
        conattr_pid.attr_value as pid,
        conattr_progname.attr_value as program_name
   FROM performance_schema.threads AS pps
   LEFT JOIN performance_schema.events_waits_current AS ewc USING (thread_id)
   LEFT JOIN performance_schema.events_stages_current AS estc USING (thread_id)
   LEFT JOIN performance_schema.events_statements_current AS esc USING (thread_id)
+  LEFT JOIN performance_schema.events_transactions_current AS etc USING (thread_id)
   LEFT JOIN sys.x$memory_by_thread_by_current_bytes AS mem USING (thread_id)
   LEFT JOIN performance_schema.session_connect_attrs AS conattr_pid
     ON conattr_pid.processlist_id=pps.processlist_id and conattr_pid.attr_name='_pid'
