@@ -4217,7 +4217,7 @@ Some of the sys schema views are calculated as initial (optional), overall, delt
 * The delta view is the difference from the beginning to the end. Note that for min and max values
   they are simply the min or max value from the end view respectively, so does not necessarily reflect
   the minimum/maximum value in the monitored period.
-  Note: except for the metrics/metrics_56 views the delta is only calculation beteween the first and last outputs.
+  Note: except for the metrics/metrics_56 views the delta is only calculation between the first and last outputs.
 
 Requires the SUPER privilege for "SET sql_log_bin = 0;".
 
@@ -4258,7 +4258,7 @@ Supported values are:
 ** current - use the current settings.
 ** medium - enable some settings. This requires the SUPER privilege.
 ** full - enables all settings. This will have a big impact on the
-   performance - be careful using this option. This requires the SUPER provilege.
+   performance - be careful using this option. This requires the SUPER privilege.
 
 ##### Example
 ```SQL
