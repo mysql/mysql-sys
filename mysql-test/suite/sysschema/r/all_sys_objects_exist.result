@@ -123,6 +123,9 @@ ps_thread_id	FUNCTION
 ps_thread_stack	FUNCTION
 ps_thread_trx_info	FUNCTION
 sys_get_config	FUNCTION
+version_major	FUNCTION
+version_minor	FUNCTION
+version_patch	FUNCTION
 create_synonym_db	PROCEDURE
 diagnostics	PROCEDURE
 execute_prepared_stmt	PROCEDURE
