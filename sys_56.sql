@@ -38,6 +38,9 @@ SOURCE ./functions/ps_thread_id.sql
 SOURCE ./functions/ps_thread_account.sql
 SOURCE ./functions/ps_thread_stack.sql
 SOURCE ./functions/sys_get_config.sql
+SOURCE ./functions/version_major.sql
+SOURCE ./functions/version_minor.sql
+SOURCE ./functions/version_patch.sql
 
 SOURCE ./views/i_s/innodb_buffer_stats_by_schema.sql
 SOURCE ./views/i_s/x_innodb_buffer_stats_by_schema.sql
