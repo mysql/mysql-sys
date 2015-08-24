@@ -1315,11 +1315,11 @@ Creates a union of the following information:
    *  Performance Schema global memory usage information
    *  Current time
 
-The difference betweem the metrics and the metrics_56 views are whether the global status is taken from performance_schema.global_status instead of
-from the Information Schema.Use the metrics view if the MySQL version is 5.7.6 or later and show_compatibility_56 = OFF. Otherwise use metrics_56.
+The difference between the metrics and the metrics_56 views are whether the global status is taken from performance_schema.global_status instead of
+from the Information Schema. Use the metrics view if the MySQL version is 5.6, 5.7.5 and earlier, or 5.7.6-5.7.8 with show_compatibility_56 = OFF. Otherwise use metrics_56.
 See also https://dev.mysql.com/doc/refman/5.7/en/server-system-variables.html#sysvar_show_compatibility_56
 
-In MySQL 5.7.6 and later the metrics_56 view will generate one warning that INFORMATION_SCHEMA.GLOBAL_STATUS is deprectatedd.
+In MySQL 5.7.6 and later the metrics_56 view will generate a warning that INFORMATION_SCHEMA.GLOBAL_STATUS is deprecated.
 
 For view has the following columns:
 
@@ -4208,7 +4208,7 @@ Some of the sys schema views are calculated as initial (optional), overall, delt
 * The delta view is the difference from the beginning to the end. Note that for min and max values
   they are simply the min or max value from the end view respectively, so does not necessarily reflect
   the minimum/maximum value in the monitored period.
-  Note: except for the metrics/metrics_56 views the delta is only calculation beteween the first and last outputs.
+  Note: except for the metrics/metrics_56 views the delta is only calculation between the first and last outputs.
 
 Requires the SUPER privilege for "SET sql_log_bin = 0;".
 
@@ -4249,7 +4249,7 @@ Supported values are:
 ** current - use the current settings.
 ** medium - enable some settings. This requires the SUPER privilege.
 ** full - enables all settings. This will have a big impact on the
-   performance - be careful using this option. This requires the SUPER provilege.
+   performance - be careful using this option. This requires the SUPER privilege.
 
 ##### Example
 ```SQL
