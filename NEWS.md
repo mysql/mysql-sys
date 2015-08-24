@@ -9,6 +9,7 @@
 ** The `pid` and `program_name` of the connection are shown, if set within the `performance_schema.session_connect_attrs` table (Contributed by Daniël van Eeden)
 ** Issue #50 - The current statement progress is reported via the new stage progress reporting within Performance Schema stages within 5.7 (such as ALTER TABLE progress reporting)
 ** Issue #60 - A new `statement_latency` column was added to all versions, which reports the current statement latency with picosecond precision from the `performance_schema.events_statements_current` table, when enabled
+** Some transaction information was exposed, with the `trx_latency` (for the current or last transaction depending on `trx_state`), `trx_state` (ACTIVE, COMMITTED, ROLLED BACK), and `trx_autocommit` (YES/NO) columns
 * New `metrics` and `metrics_56` views have been added. These provide a union view of the performance_schema.global_status, information_schema.innodb_metrics along with P_S memory and the current time, as a single metrics output. The difference between metrics and metrics_56 is whether the global status information is taken from performance_schema or information_schema (in the case of metrics_56).
 * New `session`/`x$session` views have been added, which give the same output as the `processlist` view counterparts, but filtered to only show foreground connections (Contributed by Morgan Tocker)
 * A new `session_ssl_status` view was added, which shows the SSL version, ciper and session resuse statistics for each connection (Contributed by Daniël van Eeden)
