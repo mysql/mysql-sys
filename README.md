@@ -83,8 +83,7 @@ Note, when functions check for configuration options, they first check whether a
 | ------------------------------------ | ------------- | ------------------------------------------------------------------------------ |
 | statement_truncate_len               | 64            | Sets the size to truncate statements to, for the `format_statement()` function. |
 | statement_performance_analyzer.limit | 100           | The maximum number of rows to include for the views that does not have a built-in limit (e.g. the 95th percentile view). If not set the limit is 100. |
-| statement_performance_analyzer.view  | NULL          | Used together with the 'custom' view. If the value contains a space, it is considered a query, otherwise it must be
-     an existing view querying the performance_schema.events_statements_summary_by_digest table. |
+| statement_performance_analyzer.view  | NULL          | Used together with the 'custom' view. If the value contains a space, it is considered a query, otherwise it must be an existing view querying the performance_schema.events_statements_summary_by_digest table. |
 | diagnostics.allow_i_s_tables         | OFF           | Specifies whether it is allowed to do table scan queries on information_schema.TABLES for the `diagnostics` procedure. |
 | diagnostics.include_raw              | OFF           | Set to 'ON' to include the raw data (e.g. the original output of "SELECT * FROM sys.metrics") for the `diagnostics` procedure.|
 | ps_thread_trx_info.max_length        | 65535         | Sets the maximum output length for JSON object output by the `ps_thread_trx_info()` function. |
