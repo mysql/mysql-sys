@@ -288,17 +288,15 @@ BEGIN
     SET v_has_innodb         = IFNULL((SELECT SUPPORT FROM information_schema.ENGINES WHERE ENGINE = 'InnoDB'), 'NO'),
         v_has_ndb            = IFNULL((SELECT SUPPORT FROM information_schema.ENGINES WHERE ENGINE = 'NDBCluster'), 'NO'),
         v_has_ps             = IFNULL((SELECT SUPPORT FROM information_schema.ENGINES WHERE ENGINE = 'PERFORMANCE_SCHEMA'), 'NO'),
-        v_has_ps_replication = IF(v_has_ps = 'YES',
-                                  IF(EXISTS(SELECT 1 FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'performance_schema' AND TABLE_NAME = 'replication_applier_status'),
-                                     'NEW',
-                                     IF(EXISTS(SELECT 1 FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'performance_schema' AND TABLE_NAME = 'replication_execute_status'),
-                                        'OLD',
-                                        'NO')),
-                                  'NO'),
-        v_has_replication    = IF(v_has_ps_replication <> 'NO', IF((SELECT COUNT(*) FROM performance_schema.replication_connection_status) > 0, 'YES', 'NO'),
+        v_has_ps_replication = IF(v_has_ps = 'YES'
+                                   AND EXISTS(SELECT 1 FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'performance_schema' AND TABLE_NAME = 'replication_applier_status'),
+                                   'YES',
+                                   'NO'
+                               ),
+        v_has_replication    = /*!50707 IF(v_has_ps_replication = 'YES', IF((SELECT COUNT(*) FROM performance_schema.replication_connection_status) > 0, 'YES', 'NO'),*/
                                   IF(@@master_info_repository = 'TABLE', IF((SELECT COUNT(*) FROM mysql.slave_master_info) > 0, 'YES', 'NO'),
                                      IF(@@relay_log_info_repository = 'TABLE', IF((SELECT COUNT(*) FROM mysql.slave_relay_log_info) > 0, 'YES', 'NO'),
-                                        'MAYBE'))),
+                                        'MAYBE'))/*!50707 )*/,
         v_has_metrics        = IF(v_has_ps = 'YES' OR (sys.version_major() = 5 AND sys.version_minor() = 6), 'YES', 'NO'),
         v_has_ps_vars        = 'NO';
 
@@ -555,17 +553,14 @@ BEGIN
         -- No guarantee that replication is actually configured, but we can't really know
         SELECT CONCAT('Replication Configured: ', v_has_replication, ' - Performance Schema Replication Tables: ', v_has_ps_replication) AS 'Replication Status';
         
-        IF (v_has_ps_replication <> 'NO') THEN
+        IF (v_has_ps_replication = 'YES') THEN
             SELECT 'Replication - Connection Configuration' AS 'The following output is:';
             SELECT * FROM performance_schema.replication_connection_configuration/*!50706 ORDER BY CHANNEL_NAME*/;
         END IF;
         
-        IF (v_has_ps_replication = 'NEW') THEN
+        IF (v_has_ps_replication = 'YES') THEN
             SELECT 'Replication - Applier Configuration' AS 'The following output is:';
             SELECT * FROM performance_schema.replication_applier_configuration ORDER BY CHANNEL_NAME;
-        ELSEIF (v_has_ps_replication = 'OLD') THEN
-            SELECT 'Replication - Execute Configuration' AS 'The following output is:';
-            SELECT * FROM performance_schema.replication_execute_configuration;
         END IF;
 
         IF (@@master_info_repository = 'TABLE') THEN
@@ -688,12 +683,10 @@ BEGIN
             SELECT 'SHOW SLAVE STATUS' AS 'The following output is:';
             SHOW SLAVE STATUS;
             
-            IF (v_has_ps_replication <> 'NO') THEN
+            IF (v_has_ps_replication = 'YES') THEN
                 SELECT 'Replication Connection Status' AS 'The following output is:';
                 SELECT * FROM performance_schema.replication_connection_status;
-            END IF;
 
-            IF (v_has_ps_replication = 'NEW') THEN
                 SELECT 'Replication Applier Status' AS 'The following output is:';
                 SELECT * FROM performance_schema.replication_applier_status ORDER BY CHANNEL_NAME;
                 
@@ -702,15 +695,6 @@ BEGIN
 
                 SELECT 'Replication Applier Status - Worker' AS 'The following output is:';
                 SELECT * FROM performance_schema.replication_applier_status_by_worker ORDER BY CHANNEL_NAME, WORKER_ID;
-            ELSEIF (v_has_ps_replication = 'NEW') THEN
-                SELECT 'Replication Execute Status' AS 'The following output is:';
-                SELECT * FROM performance_schema.replication_execute_status/*!50706 ORDER BY CHANNEL_NAME*/;
-
-                SELECT 'Replication Execute Status - Coordinator' AS 'The following output is:';
-                SELECT * FROM performance_schema.replication_execute_status_by_coordinator/*!50706 ORDER BY CHANNEL_NAME*/;
-
-                SELECT 'Replication Execute Status - Worker' AS 'The following output is:';
-                SELECT * FROM performance_schema.replication_execute_status_by_worker ORDER BY/*!50706 CHANNEL_NAME, */WORKER_ID;
             END IF;
 
             IF (@@master_info_repository = 'TABLE') THEN
