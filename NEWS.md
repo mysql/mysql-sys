@@ -5,7 +5,7 @@
 ### Improvements
 
 * The `format_bytes` function now shows no decimal places when outputting a simple bytes value
-* The `processlist` views where improved, changes include:
+* The `processlist`/`x$processlist` views where improved, changes include:
 ** The `pid` and `program_name` of the connection are shown, if set within the `performance_schema.session_connect_attrs` table (Contributed by Daniël van Eeden)
 ** Issue #50 - The current statement progress is reported via the new stage progress reporting within Performance Schema stages within 5.7 (such as ALTER TABLE progress reporting)
 ** Issue #60 - A new `statement_latency` column was added to all versions, which reports the current statement latency with picosecond precision from the `performance_schema.events_statements_current` table, when enabled
