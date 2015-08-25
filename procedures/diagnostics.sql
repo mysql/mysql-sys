@@ -28,7 +28,7 @@ CREATE DEFINER='root'@'localhost' PROCEDURE diagnostics (
              Create a report of the current status of the server for diagnostics purposes. Data collected includes (some items depends on versions and settings):
 
                 * The GLOBAL VARIABLES
-                * Several sys schema views including metrics or metrics_56
+                * Several sys schema views including metrics or equivalent (depending on version and settings)
                 * Queries in the 95th percentile
                 * Several ndbinfo views for MySQL Cluster
                 * Replication (both master and slave) information.
@@ -44,9 +44,13 @@ CREATE DEFINER='root'@'localhost' PROCEDURE diagnostics (
                 * The delta view is the difference from the beginning to the end. Note that for min and max values
                   they are simply the min or max value from the end view respectively, so does not necessarily reflect
                   the minimum/maximum value in the monitored period.
-                  Note: except for the metrics/metrics_56 views the delta is only calculation between the first and last outputs.
+                  Note: except for the metrics views the delta is only calculation between the first and last outputs.
              
              Requires the SUPER privilege for "SET sql_log_bin = 0;".
+
+             Versions supported:
+                * MySQL 5.6: 5.6.10 and later
+                * MySQL 5.7: 5.7.9 and later
 
              Parameters
              -----------
@@ -108,7 +112,7 @@ CREATE DEFINER='root'@'localhost' PROCEDURE diagnostics (
 BEGIN
     DECLARE v_start, v_runtime, v_iter_start, v_sleep DECIMAL(20,2) DEFAULT 0.0;
     DECLARE v_has_innodb, v_has_ndb, v_has_ps, v_has_replication, v_has_ps_replication VARCHAR(8) CHARSET utf8 DEFAULT 'NO';
-    DECLARE v_this_thread_enabled, v_has_ps_vars ENUM('YES', 'NO');
+    DECLARE v_this_thread_enabled, v_has_ps_vars, v_has_metrics ENUM('YES', 'NO');
     DECLARE v_table_name, v_banner VARCHAR(64) CHARSET utf8;
     DECLARE v_sql_status_summary_select, v_sql_status_summary_delta, v_sql_status_summary_from, v_no_delta_names TEXT;
     DECLARE v_output_time, v_output_time_prev DECIMAL(20,3) UNSIGNED;
@@ -295,17 +299,22 @@ BEGIN
                                   IF(@@master_info_repository = 'TABLE', IF((SELECT COUNT(*) FROM mysql.slave_master_info) > 0, 'YES', 'NO'),
                                      IF(@@relay_log_info_repository = 'TABLE', IF((SELECT COUNT(*) FROM mysql.slave_relay_log_info) > 0, 'YES', 'NO'),
                                         'MAYBE'))),
+        v_has_metrics        = IF(v_has_ps = 'YES' OR (sys.version_major() = 5 AND sys.version_minor() = 6), 'YES', 'NO'),
         v_has_ps_vars        = 'NO';
+
     -- 5.7.7 introduced the possibility to get SHOW [GLOBAL|SESSION] VARIABLES and SHOW [GLOBAL|SESSION] STATUS
     -- from the Performance Schema. But it's optional whether it's enabled.
-    -- Note that @@global.show_compatibility_56 = OFF will only actually work if the Performance Schema is enabled,
+    -- 5.7.9 changes so the Performance Schema tables always work.
+    -- Note that @@global.show_compatibility_56 = OFF will only actually work if the Performance Schema is enabled in <=5.7.8,
     -- however except overriding the global value there is nothing that can be done about it.
     -- v_has_ps_vars defaults to NO
     /*!50707 SET v_has_ps_vars = IF(@@global.show_compatibility_56, 'NO', 'YES');*/
+    /*!50709 SET v_has_ps_vars = 'YES';*/
 
     IF (@sys.debug = 'ON') THEN
        SELECT v_has_innodb AS 'Has_InnoDB', v_has_ndb AS 'Has_NDBCluster',
               v_has_ps AS 'Has_Performance_Schema', v_has_ps_vars AS 'Has_P_S_SHOW_Variables',
+              v_has_metrics AS 'Has_metrics',
               v_has_ps_replication 'AS Has_P_S_Replication', v_has_replication AS 'Has_Replication';
     END IF;
 
@@ -737,11 +746,42 @@ BEGIN
   PRIMARY KEY (Type, Variable_name)
 ) ENGINE = InnoDB DEFAULT CHARSET=utf8'));
 
-        SET @sys.diagnostics.sql = CONCAT(
+        IF (v_has_metrics) THEN
+            SET @sys.diagnostics.sql = CONCAT(
                 'INSERT INTO ', v_table_name,
-                ' SELECT Variable_name, REPLACE(Variable_value, ''\n'', ''\\\\n'') AS Variable_value, Type, Enabled FROM ',
-                IF(v_has_ps_vars = 'YES', 'sys.metrics', 'sys.metrics_56')
-        );
+                ' SELECT Variable_name, REPLACE(Variable_value, ''\n'', ''\\\\n'') AS Variable_value, Type, Enabled FROM sys.metrics'
+            );
+        ELSE
+            -- 5.7+ and the Performance Schema disabled. Use information_schema.GLOBAL_STATUS instead like in 5.6.
+            SET @sys.diagnostics.sql = CONCAT(
+                'INSERT INTO ', v_table_name,
+                '(SELECT LOWER(VARIABLE_NAME) AS Variable_name, REPLACE(VARIABLE_VALUE, ''\n'', ''\\\\n'') AS Variable_value,
+                         ''Global Status'' AS Type, ''YES'' AS Enabled
+  FROM performance_schema.global_status
+) UNION ALL (
+SELECT NAME AS Variable_name, COUNT AS Variable_value,
+       CONCAT(''InnoDB Metrics - '', SUBSYSTEM) AS Type,
+       IF(STATUS = ''enabled'', ''YES'', ''NO'') AS Enabled
+  FROM information_schema.INNODB_METRICS
+  -- Deduplication - some variables exists both in GLOBAL_STATUS and INNODB_METRICS
+  -- Keep the one from GLOBAL_STATUS as it is always enabled and it''s more likely to be used for existing tools.
+ WHERE NAME NOT IN (
+     ''lock_row_lock_time'', ''lock_row_lock_time_avg'', ''lock_row_lock_time_max'', ''lock_row_lock_waits'',
+     ''buffer_pool_reads'', ''buffer_pool_read_requests'', ''buffer_pool_write_requests'', ''buffer_pool_wait_free'',
+     ''buffer_pool_read_ahead'', ''buffer_pool_read_ahead_evicted'', ''buffer_pool_pages_total'', ''buffer_pool_pages_misc'',
+     ''buffer_pool_pages_data'', ''buffer_pool_bytes_data'', ''buffer_pool_pages_dirty'', ''buffer_pool_bytes_dirty'',
+     ''buffer_pool_pages_free'', ''buffer_pages_created'', ''buffer_pages_written'', ''buffer_pages_read'',
+     ''buffer_data_reads'', ''buffer_data_written'', ''file_num_open_files'',
+     ''os_log_bytes_written'', ''os_log_fsyncs'', ''os_log_pending_fsyncs'', ''os_log_pending_writes'',
+     ''log_waits'', ''log_write_requests'', ''log_writes'', ''innodb_dblwr_writes'', ''innodb_dblwr_pages_written'', ''innodb_page_size'')
+) UNION ALL (
+SELECT ''NOW()'' AS Variable_name, NOW(3) AS Variable_value, ''System Time'' AS Type, ''YES'' AS Enabled
+) UNION ALL (
+SELECT ''UNIX_TIMESTAMP()'' AS Variable_name, ROUND(UNIX_TIMESTAMP(NOW(3)), 3) AS Variable_value, ''System Time'' AS Type, ''YES'' AS Enabled
+)
+ ORDER BY Type, Variable_name;'
+            );
+        END IF;
         CALL sys.execute_prepared_stmt(@sys.diagnostics.sql);
 
         -- Prepare the query to retrieve the summary
@@ -778,10 +818,10 @@ BEGIN
         SET v_output_time_prev = v_output_time;
 
         IF (@sys.diagnostics.include_raw = 'ON') THEN
-            IF (v_has_ps_vars = 'YES') THEN
+            IF (v_has_metrics) THEN
                 SELECT 'SELECT * FROM sys.metrics' AS 'The following output is:';
             ELSE
-                SELECT 'SELECT * FROM sys.metrics_56' AS 'The following output is:';
+                SELECT 'sys.metrics equivalent' AS 'The following output is:';
             END IF;
             -- Ensures that the output here is the same as the one used in the status summary at the end
             CALL sys.execute_prepared_stmt(CONCAT('SELECT Type, Variable_name, Enabled, Variable_value FROM ', v_table_name, ' ORDER BY Type, Variable_name'));
@@ -1034,10 +1074,10 @@ BEGIN
         DROP TEMPORARY TABLE tmp_sys_views_delta;
     END IF;
 
-    IF (v_has_ps_vars = 'YES') THEN
+    IF (v_has_metrics) THEN
         SELECT 'SELECT * FROM sys.metrics' AS 'The following output is:';
     ELSE
-        SELECT 'SELECT * FROM sys.metrics_56' AS 'The following output is:';
+        SELECT 'sys.metrics equivalent' AS 'The following output is:';
     END IF;
     CALL sys.execute_prepared_stmt(
         CONCAT(v_sql_status_summary_select, v_sql_status_summary_delta, ', Type, s1.Enabled', v_sql_status_summary_from,
