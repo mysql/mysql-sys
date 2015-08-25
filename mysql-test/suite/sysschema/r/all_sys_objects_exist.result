@@ -22,7 +22,6 @@ memory_by_user_by_current_bytes
 memory_global_by_current_bytes
 memory_global_total
 metrics
-metrics_56
 processlist
 ps_check_lost_instrumentation
 schema_auto_increment_columns
