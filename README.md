@@ -1304,22 +1304,19 @@ mysql> select * from memory_global_total;
 +-----------------+
 ```
 
-#### metrics / metrics_56
+#### metrics
 
 ##### Description
 
 Creates a union of the following information:
 
-   *  performance_schema.global_status (information_schema.GLOBAL_STATUS for metrics_56)
+   *  performance_schema.global_status (information_schema.GLOBAL_STATUS in MySQL 5.6)
    *  information_schema.INNODB_METRICS
-   *  Performance Schema global memory usage information
+   *  Performance Schema global memory usage information (only in MySQL 5.7)
    *  Current time
 
-The difference between the metrics and the metrics_56 views are whether the global status is taken from performance_schema.global_status instead of
-from the Information Schema. Use the metrics view if the MySQL version is 5.6, 5.7.5 and earlier, or 5.7.6-5.7.8 with show_compatibility_56 = OFF. Otherwise use metrics_56.
-See also https://dev.mysql.com/doc/refman/5.7/en/server-system-variables.html#sysvar_show_compatibility_56
-
-In MySQL 5.7.6 and later the metrics_56 view will generate a warning that INFORMATION_SCHEMA.GLOBAL_STATUS is deprecated.
+In MySQL 5.7 it is required that performance_schema = ON, though there is no requirements to which
+instruments and consumers that are enabled. See also the description of the Enabled column below.
 
 For view has the following columns:
 
@@ -4255,7 +4252,7 @@ Query OK, 0 rows affected (0.00 sec)
 Create a report of the current status of the server for diagnostics purposes. Data collected includes (some items depends on versions and settings):
 
 * The GLOBAL VARIABLES
-* Several sys schema views including metrics or metrics_56
+* Several sys schema views including metrics or equivalent (depending on version and settings)
 * Queries in the 95th percentile
 * Several ndbinfo views for MySQL Cluster
 * Replication (both master and slave) information.
@@ -4271,9 +4268,13 @@ Some of the sys schema views are calculated as initial (optional), overall, delt
 * The delta view is the difference from the beginning to the end. Note that for min and max values
   they are simply the min or max value from the end view respectively, so does not necessarily reflect
   the minimum/maximum value in the monitored period.
-  Note: except for the metrics/metrics_56 views the delta is only calculation between the first and last outputs.
+  Note: except for the metrics view the delta is only calculation between the first and last outputs.
 
 Requires the SUPER privilege for "SET sql_log_bin = 0;".
+
+Versions supported:
+* MySQL 5.6: 5.6.10 and later
+* MySQL 5.7: 5.7.9 and later
 
 Some configuration options are supported:
 
