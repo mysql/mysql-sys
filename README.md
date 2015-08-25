@@ -4085,6 +4085,69 @@ IF (@sys.statement_truncate_len IS NULL) THEN
 END IF;
 ```
 
+#### version_major
+
+##### Description
+
+Returns the major version of MySQL Server.
+
+##### Returns
+
+TINYINT UNSIGNED
+
+##### Example
+```SQL
+mysql> SELECT VERSION(), sys.version_major();
++--------------------------------------+---------------------+
+| VERSION()                            | sys.version_major() |
++--------------------------------------+---------------------+
+| 5.7.9-enterprise-commercial-advanced | 5                   |
++--------------------------------------+---------------------+
+1 row in set (0.00 sec)
+```
+
+#### version_minor
+
+##### Description
+
+Returns the minor (release series) version of MySQL Server.
+
+##### Returns
+
+TINYINT UNSIGNED
+
+##### Example
+```SQL
+mysql> SELECT VERSION(), sys.server_minor();
++--------------------------------------+---------------------+
+| VERSION()                            | sys.version_minor() |
++--------------------------------------+---------------------+
+| 5.7.9-enterprise-commercial-advanced | 7                   |
++--------------------------------------+---------------------+
+1 row in set (0.00 sec)
+```
+
+#### version_patch
+
+##### Description
+
+Returns the patch release version of MySQL Server.
+
+##### Returns
+
+TINYINT UNSIGNED
+
+##### Example
+```SQL
+mysql> SELECT VERSION(), sys.version_patch();
++--------------------------------------+---------------------+
+| VERSION()                            | sys.version_patch() |
++--------------------------------------+---------------------+
+| 5.7.9-enterprise-commercial-advanced | 9                   |
++--------------------------------------+---------------------+
+1 row in set (0.00 sec)
+```
+
 
 ### Procedures
 

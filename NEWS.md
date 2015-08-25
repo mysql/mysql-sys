@@ -29,6 +29,9 @@
 * Added a new `ps_thread_trx_info()` stored function which outputs, for a given thread id, the transactions, and statements that those transactions have executed, as a JSON object
 * Added new `list_add()` and `list_drop()` stored functions, that take a string csv list, and either add or remove items from that list respectively. Can be used to easily update variables that take such lists, like `sql_mode`.
 * The `ps_thread_id` stored function now returns the thread id for the current connection if NULL is passed for the in_connection_id parameter
+* Added a new `version_major()` stored function, which returns the major version of MySQL Server
+* Added a new `version_minor()` stored function, which returns the miner (release series) version of MySQL Server
+* Added a new `version_patch()` stored function, which returns the patch release version of MySQL Server
 
 ### Bug Fixes
 
