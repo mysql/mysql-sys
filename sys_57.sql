@@ -146,7 +146,6 @@ SOURCE ./views/p_s/waits_global_by_latency.sql
 SOURCE ./views/p_s/x_waits_global_by_latency.sql
 
 SOURCE ./views/p_s/metrics.sql
-SOURCE ./views/p_s/metrics_56.sql
 
 SOURCE ./views/p_s/processlist_57.sql
 SOURCE ./views/p_s/x_processlist_57.sql

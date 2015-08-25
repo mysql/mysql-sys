@@ -14,7 +14,7 @@
 --   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA 
 
 
--- View: metrics_56
+-- View: metrics
 -- 
 -- Creates a union of the following information:
 --
@@ -70,8 +70,6 @@
 -- | trx_rw_commits                                | 0                       ...| InnoDB Metrics - transaction         | NO      |
 -- | trx_undo_slots_cached                         | 0                       ...| InnoDB Metrics - transaction         | NO      |
 -- | trx_undo_slots_used                           | 0                       ...| InnoDB Metrics - transaction         | NO      |
--- | memory_current_allocated                      | 138244216               ...| Performance Schema                   | PARTIAL |
--- | memory_total_allocated                        | 138244216               ...| Performance Schema                   | PARTIAL |
 -- | NOW()                                         | 2015-05-31 13:27:50.382 ...| System Time                          | YES     |
 -- | UNIX_TIMESTAMP()                              | 1433042870.382          ...| System Time                          | YES     |
 -- +-----------------------------------------------+-------------------------...+--------------------------------------+---------+
@@ -81,7 +79,7 @@ CREATE OR REPLACE
   ALGORITHM = TEMPTABLE
   DEFINER = 'root'@'localhost'
   SQL SECURITY INVOKER 
-VIEW metrics_56 (
+VIEW metrics (
   Variable_name,
   Variable_value,
   Type,
@@ -106,22 +104,7 @@ SELECT NAME AS Variable_name, COUNT AS Variable_value,
      'buffer_data_reads', 'buffer_data_written', 'file_num_open_files',
      'os_log_bytes_written', 'os_log_fsyncs', 'os_log_pending_fsyncs', 'os_log_pending_writes',
      'log_waits', 'log_write_requests', 'log_writes', 'innodb_dblwr_writes', 'innodb_dblwr_pages_written', 'innodb_page_size')
-) /*!50702
-  -- memory instrumentation available in 5.7.2 and later
-  UNION ALL (
-SELECT 'memory_current_allocated' AS Variable_name, SUM(CURRENT_NUMBER_OF_BYTES_USED) AS Variable_value, 'Performance Schema' AS Type,
-        IF((SELECT COUNT(*) FROM performance_schema.setup_instruments WHERE NAME LIKE 'memory/%' AND ENABLED = 'YES') = 0, 'NO',
-        IF((SELECT COUNT(*) FROM performance_schema.setup_instruments WHERE NAME LIKE 'memory/%' AND ENABLED = 'YES') = (SELECT COUNT(*) FROM performance_schema.setup_instruments WHERE NAME LIKE 'memory/%'), 'YES',
-            'PARTIAL')) AS Enabled
-  FROM performance_schema.memory_summary_global_by_event_name
 ) UNION ALL (
-SELECT 'memory_total_allocated' AS Variable_name, SUM(SUM_NUMBER_OF_BYTES_ALLOC) AS Variable_value, 'Performance Schema' AS Type,
-        IF((SELECT COUNT(*) FROM performance_schema.setup_instruments WHERE NAME LIKE 'memory/%' AND ENABLED = 'YES') = 0, 'NO',
-        IF((SELECT COUNT(*) FROM performance_schema.setup_instruments WHERE NAME LIKE 'memory/%' AND ENABLED = 'YES') = (SELECT COUNT(*) FROM performance_schema.setup_instruments WHERE NAME LIKE 'memory/%'), 'YES',
-            'PARTIAL')) AS Enabled
-  FROM performance_schema.memory_summary_global_by_event_name
-) */
-  UNION ALL (
 SELECT 'NOW()' AS Variable_name, NOW(3) AS Variable_value, 'System Time' AS Type, 'YES' AS Enabled
 ) UNION ALL (
 SELECT 'UNIX_TIMESTAMP()' AS Variable_name, ROUND(UNIX_TIMESTAMP(NOW(3)), 3) AS Variable_value, 'System Time' AS Type, 'YES' AS Enabled

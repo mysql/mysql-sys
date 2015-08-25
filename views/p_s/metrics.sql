@@ -13,6 +13,9 @@
 --   along with this program; if not, write to the Free Software
 --   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA 
 
+-- IMPORTANT
+-- If you update this view, also update the "5.7+ and the Performance Schema disabled"
+-- query in procedures/diagnostics.sql
 
 -- View: metrics
 -- 
