@@ -6,10 +6,10 @@
 
 * The `format_bytes` function now shows no decimal places when outputting a simple bytes value
 * The `processlist`/`x$processlist` views where improved, changes include:
-** The `pid` and `program_name` of the connection are shown, if set within the `performance_schema.session_connect_attrs` table (Contributed by Daniël van Eeden)
-** Issue #50 - The current statement progress is reported via the new stage progress reporting within Performance Schema stages within 5.7 (such as ALTER TABLE progress reporting)
-** Issue #60 - A new `statement_latency` column was added to all versions, which reports the current statement latency with picosecond precision from the `performance_schema.events_statements_current` table, when enabled
-** Some transaction information was exposed, with the `trx_latency` (for the current or last transaction depending on `trx_state`), `trx_state` (ACTIVE, COMMITTED, ROLLED BACK), and `trx_autocommit` (YES/NO) columns
+ * The `pid` and `program_name` of the connection are shown, if set within the `performance_schema.session_connect_attrs` table (Contributed by Daniël van Eeden)
+ * Issue #50 - The current statement progress is reported via the new stage progress reporting within Performance Schema stages within 5.7 (such as ALTER TABLE progress reporting)
+ * Issue #60 - A new `statement_latency` column was added to all versions, which reports the current statement latency with picosecond precision from the `performance_schema.events_statements_current` table, when enabled
+ * Some transaction information was exposed, with the `trx_latency` (for the current or last transaction depending on `trx_state`), `trx_state` (ACTIVE, COMMITTED, ROLLED BACK), and `trx_autocommit` (YES/NO) columns
 * A new `metrics` view has been added. On 5.7 this provides a union view of the performance_schema.global_status and information_schema.innodb_metrics tables, along with P_S memory and the current time, as a single metrics output. On 5.6 it provides a union view of the information_schema.global_status and information_schema.innodb_metrics tables, along with the current time. (Contributed by Jesper Wisborg Krogh)
 * New `session`/`x$session` views have been added, which give the same output as the `processlist` view counterparts, but filtered to only show foreground connections (Contributed by Morgan Tocker)
 * A new `session_ssl_status` view was added, which shows the SSL version, ciper and session resuse statistics for each connection (Contributed by Daniël van Eeden)
@@ -17,9 +17,9 @@
 * A new `schema_redundant_indexes` view was added, that shows indexes made redundant (or duplicated) by other more dominant indexes. Also includes the the helper view `x$schema_flattened_keys`. (Contributed by Shlomi Noach)
 * New `schema_table_lock_waits`/`x$schema_table_lock_waits` views have been added, which show any sessions that are waiting for table level metadata locks, and the sessions that are blocking them. Resolves Git Issue #57, inspired by the suggestion from Daniël van Eeden
 * The `innodb_lock_waits` view had the following columns added to it, following a manually merged contribution from Shlomi Noach for a similar view
-** `wait_age_secs` - the current row lock wait time in seconds
-** `sql_kill_blocking_query` - the "KILL QUERY <connection_id>" command to run to kill the blocking session current statement
-** `sql_kill_blocking_connection` - the "KILL <connection_id" command to run to kill the blocking session
+ * `wait_age_secs` - the current row lock wait time in seconds
+ * `sql_kill_blocking_query` - the "KILL QUERY <connection_id>" command to run to kill the blocking session current statement
+ * `sql_kill_blocking_connection` - the "KILL <connection_id" command to run to kill the blocking session
 * A new `table_exists` procedure was added, which checks for the existence of table, and if it exists, returns the type (BASE TABLE, VIEW, TEMPORARY) (Contributed by Jesper Wisborg Krogh)
 * A new `execute_prepared_stmt()` procedure was added, which takes a SQL statement as an input variable and executes it as a prepared statement (Contributed by Jesper Wisborg Krogh)
 * A new `statement_performance_analyzer()` procedure was added, that allows reporting on the statements that are have been running over snapshot periods (Contributed by Jesper Wisborg Krogh)
@@ -66,12 +66,12 @@
 
 * The beginnings of a mysql-test suite have been added
 * The `innodb_lock_waits`/`x$innodb_lock_waits` views were improved (Contributions by both Jesper Wisborg Krogh and Mark Matthews)
-** Added the `wait_started`, `wait_age`, `waiting_trx_started` `waiting_trx_age`, `waiting_trx_rows_locked` and `waiting_trx_rows_modified` columns for waiting transactions
-** Added the `blocking_trx_started`, `blocking_trx_age`, `blocking_trx_rows_locked` and `blocking_trx_rows_modified` for blocking transactions
-** Order the result set so the oldest lock waits are first
-** The `waiting_table` and `waiting_index` were always the same as the `blocking_table` and `blocking_index`. So the blocking_% columns have been removed and the waiting_% columns have been renamed to locked_%
-** The `waiting_lock_type` and `blocking_lock_type` were also always the same. So these were removed and replaced with a single `locked_type` column
-** Renamed the `waiting_thread` and `blocking_thread` to `waiting_pid` and `blocking_pid` respectively to avoid confusion with the threads from the Performance Schema.
+ * Added the `wait_started`, `wait_age`, `waiting_trx_started` `waiting_trx_age`, `waiting_trx_rows_locked` and `waiting_trx_rows_modified` columns for waiting transactions
+ * Added the `blocking_trx_started`, `blocking_trx_age`, `blocking_trx_rows_locked` and `blocking_trx_rows_modified` for blocking transactions
+ * Order the result set so the oldest lock waits are first
+ * The `waiting_table` and `waiting_index` were always the same as the `blocking_table` and `blocking_index`. So the blocking_% columns have been removed and the waiting_% columns have been renamed to locked_%
+ * The `waiting_lock_type` and `blocking_lock_type` were also always the same. So these were removed and replaced with a single `locked_type` column
+ * Renamed the `waiting_thread` and `blocking_thread` to `waiting_pid` and `blocking_pid` respectively to avoid confusion with the threads from the Performance Schema.
 * Added the `sys_get_config` function, used to get configuration parameters from the `sys_config` table - primarily from other sys objects, but can be used individually (Contributed by Jesper Wisborg Krogh)
 * Add an option to generate_sql_file.sh to generate a mysql_install_db / mysqld --initialize format friendly file
 * Added the `ps_is_thread_instrumented` function, to check whether a specified thread is instrumented within Performance Schema
@@ -92,7 +92,7 @@
 Various changes were made to allow better generation of integration sql files:
 
 * The formatting for all comments has been standardized on -- line comments. C-style /* comments */ have been removed
-** Issue #35 had one instance of this resolved in this release (contributed by Joe Grasse), but the entire code base has now been done
+ * Issue #35 had one instance of this resolved in this release (contributed by Joe Grasse), but the entire code base has now been done
 * Each object has been created within it's own file. No longer do x$ views live with their non-x$ counterparts
 * DELIMITERs were standardized to $$
 
@@ -123,7 +123,7 @@ Various changes were made to allow better generation of integration sql files:
 * Added `rows_affected` and `rows_affected_avg` stats to the `statement_analysis` views
 * The `statements_with_full_table_scans` view now ignores any SQL that starts with `SHOW`
 * Added a script, `generate_sql_file.sh`, that can be used to generate a single SQL file, also allowing substitution of the MySQL user to use, and/or whether the `SET sql_log_bin ...` statements should be omitted.
-** This is useful for those using RDS, where the root@localhost user is not accessible, and sql_log_bin is disabled (Issue #5)
+ * This is useful for those using RDS, where the root@localhost user is not accessible, and sql_log_bin is disabled (Issue #5)
 * Added a set of `memory_by_thread_by_current_bytes` views, that summarize memory usage per thread with MySQL 5.7's memory instrumentation
 * Improved each of the host specific views to return aggregate values for `background` threads, instead of ignoring them, in the same way as the user summary views
 
