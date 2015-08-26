@@ -60,7 +60,7 @@ CREATE DEFINER='root'@'localhost' FUNCTION ps_thread_account (
     READS SQL DATA
 BEGIN
     RETURN (SELECT IF(
-                      type = "FOREGROUND",
+                      type = 'FOREGROUND',
                       CONCAT(processlist_user, '@', processlist_host),
                       type
                      ) AS account
