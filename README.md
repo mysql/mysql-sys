@@ -34,7 +34,7 @@ When run, this outputs a file named such as `sys_<sys_version>_<mysql_version_id
 * v: The version of MySQL to build the sys schema for, either '56' or '57'
 * b: Whether to omit any lines that deal with sql_log_bin (useful for RDS)
 * u: The user to set as the owner of the objects (useful for RDS)
-* m: Whether to generate a mysql_install_db / mysqld --bootstrap formatted file
+* m: Whether to generate a mysql_install_db / mysqld --initialize formatted file
 
 #### Examples
 
