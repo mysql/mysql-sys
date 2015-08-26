@@ -39,7 +39,7 @@ Options:
 
     b: Whether to omit any lines that deal with sql_log_bin (useful for RDS)
 
-    m: Whether to generate a mysql_install_db / mysqld --bootstrap formatted file
+    m: Whether to generate a mysql_install_db / mysqld --initialize formatted file
 
     u: The user to set as the owner of the objects (useful for RDS)
 
