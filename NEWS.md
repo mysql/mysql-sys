@@ -6,32 +6,32 @@
 
 * The `format_bytes` function now shows no decimal places when outputting a simple bytes value
 * The `processlist`/`x$processlist` views where improved, changes include:
- * The `pid` and `program_name` of the connection are shown, if set within the `performance_schema.session_connect_attrs` table (Contributed by Daniël van Eeden)
+ * The `pid` and `program_name` of the connection are shown, if set within the `performance_schema.session_connect_attrs` table (**Contributed by Daniël van Eeden**)
  * Issue #50 - The current statement progress is reported via the new stage progress reporting within Performance Schema stages within 5.7 (such as ALTER TABLE progress reporting)
  * Issue #60 - A new `statement_latency` column was added to all versions, which reports the current statement latency with picosecond precision from the `performance_schema.events_statements_current` table, when enabled
  * Some transaction information was exposed, with the `trx_latency` (for the current or last transaction depending on `trx_state`), `trx_state` (ACTIVE, COMMITTED, ROLLED BACK), and `trx_autocommit` (YES/NO) columns
-* A new `metrics` view has been added. On 5.7 this provides a union view of the performance_schema.global_status and information_schema.innodb_metrics tables, along with P_S memory and the current time, as a single metrics output. On 5.6 it provides a union view of the information_schema.global_status and information_schema.innodb_metrics tables, along with the current time. (Contributed by Jesper Wisborg Krogh)
-* New `session`/`x$session` views have been added, which give the same output as the `processlist` view counterparts, but filtered to only show foreground connections (Contributed by Morgan Tocker)
-* A new `session_ssl_status` view was added, which shows the SSL version, ciper and session resuse statistics for each connection (Contributed by Daniël van Eeden)
-* A new `schema_auto_increment_columns` view was added, that shows statistics on each auto_incrment within the instance, including the `auto_increment_ratio`, so you can easily monitor how full specific auto_increment columns are (Contributed by Shlomi Noach)
-* A new `schema_redundant_indexes` view was added, that shows indexes made redundant (or duplicated) by other more dominant indexes. Also includes the the helper view `x$schema_flattened_keys`. (Contributed by Shlomi Noach)
+* A new `metrics` view has been added. On 5.7 this provides a union view of the performance_schema.global_status and information_schema.innodb_metrics tables, along with P_S memory and the current time, as a single metrics output. On 5.6 it provides a union view of the information_schema.global_status and information_schema.innodb_metrics tables, along with the current time. (**Contributed by Jesper Wisborg Krogh**)
+* New `session`/`x$session` views have been added, which give the same output as the `processlist` view counterparts, but filtered to only show foreground connections (**Contributed by Morgan Tocker**)
+* A new `session_ssl_status` view was added, which shows the SSL version, ciper and session resuse statistics for each connection (**Contributed by Daniël van Eeden**)
+* A new `schema_auto_increment_columns` view was added, that shows statistics on each auto_incrment within the instance, including the `auto_increment_ratio`, so you can easily monitor how full specific auto_increment columns are (**Contributed by Shlomi Noach**)
+* A new `schema_redundant_indexes` view was added, that shows indexes made redundant (or duplicated) by other more dominant indexes. Also includes the the helper view `x$schema_flattened_keys`. (**Contributed by Shlomi Noach**)
 * New `schema_table_lock_waits`/`x$schema_table_lock_waits` views have been added, which show any sessions that are waiting for table level metadata locks, and the sessions that are blocking them. Resolves Git Issue #57, inspired by the suggestion from Daniël van Eeden
 * The `innodb_lock_waits` view had the following columns added to it, following a manually merged contribution from Shlomi Noach for a similar view
  * `wait_age_secs` - the current row lock wait time in seconds
  * `sql_kill_blocking_query` - the "KILL QUERY <connection_id>" command to run to kill the blocking session current statement
  * `sql_kill_blocking_connection` - the "KILL <connection_id" command to run to kill the blocking session
-* A new `table_exists` procedure was added, which checks for the existence of table, and if it exists, returns the type (BASE TABLE, VIEW, TEMPORARY) (Contributed by Jesper Wisborg Krogh)
-* A new `execute_prepared_stmt()` procedure was added, which takes a SQL statement as an input variable and executes it as a prepared statement (Contributed by Jesper Wisborg Krogh)
-* A new `statement_performance_analyzer()` procedure was added, that allows reporting on the statements that are have been running over snapshot periods (Contributed by Jesper Wisborg Krogh)
-* A new `diagnostics()` procedure was added, which creates a large diagnostics report based upon most of the new instrumentation now available, computed over a configurable number of snapshot intervals (Contributed by Jesper Wisborg Krogh)
+* A new `table_exists` procedure was added, which checks for the existence of table, and if it exists, returns the type (BASE TABLE, VIEW, TEMPORARY) (**Contributed by Jesper Wisborg Krogh**)
+* A new `execute_prepared_stmt()` procedure was added, which takes a SQL statement as an input variable and executes it as a prepared statement (**Contributed by Jesper Wisborg Krogh**)
+* A new `statement_performance_analyzer()` procedure was added, that allows reporting on the statements that are have been running over snapshot periods (**Contributed by Jesper Wisborg Krogh**)
+* A new `diagnostics()` procedure was added, which creates a large diagnostics report based upon most of the new instrumentation now available, computed over a configurable number of snapshot intervals (**Contributed by Jesper Wisborg Krogh**)
 * A 5.7 specific `ps_trace_thread()` procedure was added, which now shows the hierarchy of transactions and stored routines, as well as statements, stages and waits, if enabled
 * Added a new `ps_thread_account()` stored function, that returns the "user@host" account for a given Performance Schema thread id
 * Added a new `ps_thread_trx_info()` stored function which outputs, for a given thread id, the transactions, and statements that those transactions have executed, as a JSON object
 * Added new `list_add()` and `list_drop()` stored functions, that take a string csv list, and either add or remove items from that list respectively. Can be used to easily update variables that take such lists, like `sql_mode`.
 * The `ps_thread_id` stored function now returns the thread id for the current connection if NULL is passed for the in_connection_id parameter
-* Added a new `version_major()` stored function, which returns the major version of MySQL Server
-* Added a new `version_minor()` stored function, which returns the miner (release series) version of MySQL Server
-* Added a new `version_patch()` stored function, which returns the patch release version of MySQL Server
+* Added a new `version_major()` stored function, which returns the major version of MySQL Server (**Contributed by Jesper Wisborg Krogh**)
+* Added a new `version_minor()` stored function, which returns the minor (release series) version of MySQL Server (**Contributed by Jesper Wisborg Krogh**)
+* Added a new `version_patch()` stored function, which returns the patch release version of MySQL Server (**Contributed by Jesper Wisborg Krogh**)
 
 ### Bug Fixes
 
@@ -65,34 +65,34 @@
 ### Improvements
 
 * The beginnings of a mysql-test suite have been added
-* The `innodb_lock_waits`/`x$innodb_lock_waits` views were improved (Contributions by both Jesper Wisborg Krogh and Mark Matthews)
+* The `innodb_lock_waits`/`x$innodb_lock_waits` views were improved (**Contributions by both Jesper Wisborg Krogh and Mark Matthews**)
  * Added the `wait_started`, `wait_age`, `waiting_trx_started` `waiting_trx_age`, `waiting_trx_rows_locked` and `waiting_trx_rows_modified` columns for waiting transactions
  * Added the `blocking_trx_started`, `blocking_trx_age`, `blocking_trx_rows_locked` and `blocking_trx_rows_modified` for blocking transactions
  * Order the result set so the oldest lock waits are first
  * The `waiting_table` and `waiting_index` were always the same as the `blocking_table` and `blocking_index`. So the blocking_% columns have been removed and the waiting_% columns have been renamed to locked_%
  * The `waiting_lock_type` and `blocking_lock_type` were also always the same. So these were removed and replaced with a single `locked_type` column
  * Renamed the `waiting_thread` and `blocking_thread` to `waiting_pid` and `blocking_pid` respectively to avoid confusion with the threads from the Performance Schema.
-* Added the `sys_get_config` function, used to get configuration parameters from the `sys_config` table - primarily from other sys objects, but can be used individually (Contributed by Jesper Wisborg Krogh)
+* Added the `sys_get_config` function, used to get configuration parameters from the `sys_config` table - primarily from other sys objects, but can be used individually (**Contributed by Jesper Wisborg Krogh**)
 * Add an option to generate_sql_file.sh to generate a mysql_install_db / mysqld --initialize format friendly file
 * Added the `ps_is_thread_instrumented` function, to check whether a specified thread is instrumented within Performance Schema
-* Added the `ps_is_consumer_enabled` function, to check whether a specified consumer is enabled within Performance Schema (Contributed by Jesper Wisborg Krogh)
+* Added the `ps_is_consumer_enabled` function, to check whether a specified consumer is enabled within Performance Schema (**Contributed by Jesper Wisborg Krogh**)
 * Added some further replacements to the `format_path` function (`slave_load_tmpdir`, `innodb_data_home_dir`, `innodb_log_group_home_dir` and `innodb_undo_directory`)
 
 ### Bug Fixes
 
-* The 5.6 `host_summary` and `x$host_summary` views incorrectly had the column with `COUNT(DISTINCT accounts.user)` named `unique_hosts` instead of `unique_users` (Contributed by Jesper Wisborg Krogh)
+* The 5.6 `host_summary` and `x$host_summary` views incorrectly had the column with `COUNT(DISTINCT accounts.user)` named `unique_hosts` instead of `unique_users` (**Contributed by Jesper Wisborg Krogh**)
 * Both the `format_time` and `format_bytes` took a BIGINT as input, and output VARCHAR, but BIGINT could be too small for aggregated values for the inputs. Now both functions both use TEXT as their input (Issue #34, Issue #38)
 * The `format_time` function displayed values in minutes incorrectly, it now rounds to minutes, and uses an 'm' suffix, like the rest of the units
 * The `sys_config` related triggers had no DEFINER clause set
-* The `ps_setup_disable_thread` procedure always disabled the current thread and was ignoring the connection id given as an argument (Contributed by Jesper Wisborg Krogh)
-* The `ps_trace_thread` procedure had an incorrect calculation of how long the procedure has been running (Contributed by Jesper Wisborg Krogh)
+* The `ps_setup_disable_thread` procedure always disabled the current thread and was ignoring the connection id given as an argument (**Contributed by Jesper Wisborg Krogh**)
+* The `ps_trace_thread` procedure had an incorrect calculation of how long the procedure has been running (**Contributed by Jesper Wisborg Krogh**)
 
 ### Implementation Details
 
 Various changes were made to allow better generation of integration sql files:
 
 * The formatting for all comments has been standardized on -- line comments. C-style /* comments */ have been removed
- * Issue #35 had one instance of this resolved in this release (contributed by Joe Grasse), but the entire code base has now been done
+ * Issue #35 had one instance of this resolved in this release (**Contributed by Joe Grasse**), but the entire code base has now been done
 * Each object has been created within it's own file. No longer do x$ views live with their non-x$ counterparts
 * DELIMITERs were standardized to $$
 
@@ -100,7 +100,7 @@ Various changes were made to allow better generation of integration sql files:
 
 ### Improvements
 
-* Added an `innodb_lock_waits` set of views, showing each thread that is waiting on a lock within InnoDB, and the blocking thread lock information (Contributed by Jesper Wisborg Krogh)
+* Added an `innodb_lock_waits` set of views, showing each thread that is waiting on a lock within InnoDB, and the blocking thread lock information (**Contributed by Jesper Wisborg Krogh**)
 
 ### Bug Fixes
 
@@ -137,7 +137,7 @@ Various changes were made to allow better generation of integration sql files:
 
 ### Improvements
 
-* Added host summary views, which have the same structure as the user summary views, but aggregated by host instead (Contributed by Arnaud Adant)
+* Added host summary views, which have the same structure as the user summary views, but aggregated by host instead (**Contributed by Arnaud Adant**)
    * `host_summary`
    * `host_summary_by_file_io_type`
    * `host_summary_by_file_io`
@@ -146,34 +146,34 @@ Various changes were made to allow better generation of integration sql files:
    * `host_summary_by_stages`
    * `waits_by_host_by_latency`
 
-* Added functions which return instruments are either enabled, or timed by default (#15) (Contributed by Jesper Wisborg Krogh)
+* Added functions which return instruments are either enabled, or timed by default (#15) (**Contributed by Jesper Wisborg Krogh**)
    * `ps_is_instrument_default_enabled`
    * `ps_is_instrument_default_timed`
 
-* Added a `ps_thread_id` function, which returns the thread_id value exposed within performance_schema for the current connection (Contributed by Jesper Wisborg Krogh)
-* Improved each of the user specific views to return aggregate values for `background` threads, instead of ignoring them (Contributed by Joe Grasse)
-* Optimized the `schema_table_statistics` and `schema_table_statistics_with_buffer` views, to use a new view that will get materialized (`x$ps_schema_table_statistics_io`), along with the changes to the RETURN types for `extract_schema_from_file_name` and `extract_table_from_file_name`, this results in a significant performance improvement - in one test changing the run time from 14 minutes to 20 seconds. (Conceived by Roy Lyseng, Mark Leith and Jesper Wisborg Krogh, implemented and contributed by Jesper Wisborg Krogh)
+* Added a `ps_thread_id` function, which returns the thread_id value exposed within performance_schema for the current connection (**Contributed by Jesper Wisborg Krogh**)
+* Improved each of the user specific views to return aggregate values for `background` threads, instead of ignoring them (**Contributed by Joe Grasse**)
+* Optimized the `schema_table_statistics` and `schema_table_statistics_with_buffer` views, to use a new view that will get materialized (`x$ps_schema_table_statistics_io`), along with the changes to the RETURN types for `extract_schema_from_file_name` and `extract_table_from_file_name`, this results in a significant performance improvement - in one test changing the run time from 14 minutes to 20 seconds. (**Conceived by Roy Lyseng, Mark Leith and Jesper Wisborg Krogh, implemented and contributed by Jesper Wisborg Krogh**)
 
 ### Bug Fixes
 
 * Removed unintentially committed sys_56_rds.sql file (See Issue #5, which is still outstanding)
-* Fixed the `ps_trace_statement_digest` and `ps_trace_thread` procedures to properly set sql_log_bin, and reset the thread INSTRUMENTED value correctly (Contributed by Jesper Wisborg Krogh)
-* Removed various sql_log_bin disabling from other procedures that no longer require it - DML against the performance_schema data is no longer replicated (Contributed by Jesper Wisborg Krogh)
-* Fixed EXPLAIN within `ps_trace_statement_digest` procedure (Contributed by Jesper Wisborg Krogh)
-* Fixed the datatype for the `thd_id` variable within the `ps_thread_stack` procedure (Contributed by Jesper Wisborg Krogh)
-* Fixed datatypes used for temporary tables within the `ps_trace_statement_digest` procedure (Contributed by Jesper Wisborg Krogh)
-* Fixed the RETURN datatype `extract_schema_from_file_name` and `extract_table_from_file_name` to return a VARCHAR(64) (Contributed by Jesper Wisborg Krogh)
+* Fixed the `ps_trace_statement_digest` and `ps_trace_thread` procedures to properly set sql_log_bin, and reset the thread INSTRUMENTED value correctly (**Contributed by Jesper Wisborg Krogh**)
+* Removed various sql_log_bin disabling from other procedures that no longer require it - DML against the performance_schema data is no longer replicated (**Contributed by Jesper Wisborg Krogh**)
+* Fixed EXPLAIN within `ps_trace_statement_digest` procedure (**Contributed by Jesper Wisborg Krogh**)
+* Fixed the datatype for the `thd_id` variable within the `ps_thread_stack` procedure (**Contributed by Jesper Wisborg Krogh**)
+* Fixed datatypes used for temporary tables within the `ps_trace_statement_digest` procedure (**Contributed by Jesper Wisborg Krogh**)
+* Fixed the RETURN datatype `extract_schema_from_file_name` and `extract_table_from_file_name` to return a VARCHAR(64) (**Contributed by Jesper Wisborg Krogh**)
 * Added events_transactions_current to the default enabled consumers in 5.7 (#25)
 
 ## 1.0.1 (23/05/2014)
 
 ### Improvements
 
-* Added procedures to enable / disable Performance Schema consumers. (Contributed by the MySQL QA Team)
+* Added procedures to enable / disable Performance Schema consumers. (**Contributed by the MySQL QA Team**)
    * `ps_setup_disable_consumers(<LIKE string>)` allows disabling any consumers matching the LIKE string.
    * `ps_setup_enable_consumers(<LIKE string>)` allows enabling any consumers matching the LIKE string.
 
-* Added procedures to show both enabled and disbled consumers or instruments individually, these are more useful for tooling than the `ps_setup_show_enabled`/`ps_setup_show_disabled` procedures which show all configuration in multiple result sets.  (Contributed by the MySQL QA Team)
+* Added procedures to show both enabled and disbled consumers or instruments individually, these are more useful for tooling than the `ps_setup_show_enabled`/`ps_setup_show_disabled` procedures which show all configuration in multiple result sets.  (**Contributed by the MySQL QA Team**)
    * `ps_setup_show_disabled_consumers` shows only disabled consumers.
    * `ps_setup_show_disabled_instruments` shows only disabled instruments.
    * `ps_setup_show_enabled_consumers` shows only enabled consumers.
@@ -181,8 +181,8 @@ Various changes were made to allow better generation of integration sql files:
 
 ### Bug Fixes
 
-* Running the installation scripts sometimes failed because of the comment format. (#1) (Contributed by Joe Grasse)
-* Some views did not work with the ERROR_FOR_DIVISION_BY_ZERO SQL mode. (#6) (Contributed by Joe Grasse)
+* Running the installation scripts sometimes failed because of the comment format. (#1) (**Contributed by Joe Grasse**)
+* Some views did not work with the ERROR_FOR_DIVISION_BY_ZERO SQL mode. (#6) (**Contributed by Joe Grasse**)
 * On Windows the `ps_thread_stack()` stored function failed to escape file path backslashes correctly within the JSON output.
 
 ## 1.0.0 (11/04/2014)
