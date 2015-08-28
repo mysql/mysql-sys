@@ -13,10 +13,25 @@
 -- along with this program; if not, write to the Free Software
 -- Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-SET NAMES utf8;
-SET @sql_log_bin = @@sql_log_bin;
-SET sql_log_bin = 0;
+--
+-- View: version
+--
+-- Shows the sys schema and mysql versions
+--
+-- mysql> select * from sys.version;
+-- +-------------+---------------+
+-- | sys_version | mysql_version |
+-- +-------------+---------------+
+-- | 1.5.0       | 5.7.8-rc      |
+-- +-------------+---------------+
+-- 
 
-CREATE DATABASE IF NOT EXISTS sys DEFAULT CHARACTER SET utf8;
-
-USE sys;
+CREATE OR REPLACE
+  DEFINER = 'root'@'localhost'
+  SQL SECURITY INVOKER 
+VIEW version (
+  sys_version,
+  mysql_version
+) AS 
+SELECT '1.5.0' AS sys_version, 
+        version() AS mysql_version;

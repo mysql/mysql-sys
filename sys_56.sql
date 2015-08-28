@@ -15,6 +15,8 @@
 
 SOURCE ./before_setup.sql
 
+SOURCE ./views/version.sql
+
 SOURCE ./tables/sys_config.sql
 SOURCE ./tables/sys_config_data.sql
 
