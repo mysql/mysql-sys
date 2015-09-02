@@ -1177,7 +1177,7 @@ mysql> desc memory_by_user_by_current_bytes;
 +--------------------+---------------+------+-----+---------+-------+
 | Field              | Type          | Null | Key | Default | Extra |
 +--------------------+---------------+------+-----+---------+-------+
-| user               | varchar(16)   | YES  |     | NULL    |       |
+| user               | varchar(32)   | YES  |     | NULL    |       |
 | current_count_used | decimal(41,0) | YES  |     | NULL    |       |
 | current_allocated  | text          | YES  |     | NULL    |       |
 | current_avg_alloc  | text          | YES  |     | NULL    |       |
@@ -1190,7 +1190,7 @@ mysql> desc x$memory_by_user_by_current_bytes;
 +--------------------+---------------+------+-----+---------+-------+
 | Field              | Type          | Null | Key | Default | Extra |
 +--------------------+---------------+------+-----+---------+-------+
-| user               | varchar(16)   | YES  |     | NULL    |       |
+| user               | varchar(32)   | YES  |     | NULL    |       |
 | current_count_used | decimal(41,0) | YES  |     | NULL    |       |
 | current_allocated  | decimal(41,0) | YES  |     | NULL    |       |
 | current_avg_alloc  | decimal(45,4) | NO   |     | 0.0000  |       |
@@ -2790,7 +2790,7 @@ mysql> desc user_summary;
 +------------------------+---------------+------+-----+---------+-------+
 | Field                  | Type          | Null | Key | Default | Extra |
 +------------------------+---------------+------+-----+---------+-------+
-| user                   | varchar(16)   | YES  |     | NULL    |       |
+| user                   | varchar(32)   | YES  |     | NULL    |       |
 | statements             | decimal(64,0) | YES  |     | NULL    |       |
 | statement_latency      | text          | YES  |     | NULL    |       |
 | statement_avg_latency  | text          | YES  |     | NULL    |       |
@@ -2809,7 +2809,7 @@ mysql> desc x$user_summary;
 +------------------------+---------------+------+-----+---------+-------+
 | Field                  | Type          | Null | Key | Default | Extra |
 +------------------------+---------------+------+-----+---------+-------+
-| user                   | varchar(16)   | YES  |     | NULL    |       |
+| user                   | varchar(32)   | YES  |     | NULL    |       |
 | statements             | decimal(64,0) | YES  |     | NULL    |       |
 | statement_latency      | decimal(64,0) | YES  |     | NULL    |       |
 | statement_avg_latency  | decimal(65,4) | NO   |     | 0.0000  |       |
@@ -2872,7 +2872,7 @@ mysql> desc user_summary_by_file_io;
 +------------+---------------+------+-----+---------+-------+
 | Field      | Type          | Null | Key | Default | Extra |
 +------------+---------------+------+-----+---------+-------+
-| user       | varchar(16)   | YES  |     | NULL    |       |
+| user       | varchar(32)   | YES  |     | NULL    |       |
 | ios        | decimal(42,0) | YES  |     | NULL    |       |
 | io_latency | text          | YES  |     | NULL    |       |
 +------------+---------------+------+-----+---------+-------+
@@ -2882,7 +2882,7 @@ mysql> desc x$user_summary_by_file_io;
 +------------+---------------+------+-----+---------+-------+
 | Field      | Type          | Null | Key | Default | Extra |
 +------------+---------------+------+-----+---------+-------+
-| user       | varchar(16)   | YES  |     | NULL    |       |
+| user       | varchar(32)   | YES  |     | NULL    |       |
 | ios        | decimal(42,0) | YES  |     | NULL    |       |
 | io_latency | decimal(42,0) | YES  |     | NULL    |       |
 +------------+---------------+------+-----+---------+-------+
@@ -2916,7 +2916,7 @@ mysql> desc user_summary_by_file_io_type;
 +-------------+---------------------+------+-----+---------+-------+
 | Field       | Type                | Null | Key | Default | Extra |
 +-------------+---------------------+------+-----+---------+-------+
-| user        | varchar(16)         | YES  |     | NULL    |       |
+| user        | varchar(32)         | YES  |     | NULL    |       |
 | event_name  | varchar(128)        | NO   |     | NULL    |       |
 | total       | bigint(20) unsigned | NO   |     | NULL    |       |
 | latency     | text                | YES  |     | NULL    |       |
@@ -2928,7 +2928,7 @@ mysql> desc x$user_summary_by_file_io_type;
 +-------------+---------------------+------+-----+---------+-------+
 | Field       | Type                | Null | Key | Default | Extra |
 +-------------+---------------------+------+-----+---------+-------+
-| user        | varchar(16)         | YES  |     | NULL    |       |
+| user        | varchar(32)         | YES  |     | NULL    |       |
 | event_name  | varchar(128)        | NO   |     | NULL    |       |
 | total       | bigint(20) unsigned | NO   |     | NULL    |       |
 | latency     | bigint(20) unsigned | NO   |     | NULL    |       |
@@ -2988,7 +2988,7 @@ mysql> desc user_summary_by_stages;
 +---------------+---------------------+------+-----+---------+-------+
 | Field         | Type                | Null | Key | Default | Extra |
 +---------------+---------------------+------+-----+---------+-------+
-| user          | varchar(16)         | YES  |     | NULL    |       |
+| user          | varchar(32)         | YES  |     | NULL    |       |
 | event_name    | varchar(128)        | NO   |     | NULL    |       |
 | total         | bigint(20) unsigned | NO   |     | NULL    |       |
 | total_latency | text                | YES  |     | NULL    |       |
@@ -3050,7 +3050,7 @@ mysql> desc user_summary_by_statement_latency;
 +---------------+---------------+------+-----+---------+-------+
 | Field         | Type          | Null | Key | Default | Extra |
 +---------------+---------------+------+-----+---------+-------+
-| user          | varchar(16)   | YES  |     | NULL    |       |
+| user          | varchar(32)   | YES  |     | NULL    |       |
 | total         | decimal(42,0) | YES  |     | NULL    |       |
 | total_latency | text          | YES  |     | NULL    |       |
 | max_latency   | text          | YES  |     | NULL    |       |
@@ -3066,7 +3066,7 @@ mysql> desc x$user_summary_by_statement_latency;
 +---------------+---------------+------+-----+---------+-------+
 | Field         | Type          | Null | Key | Default | Extra |
 +---------------+---------------+------+-----+---------+-------+
-| user          | varchar(16)   | YES  |     | NULL    |       |
+| user          | varchar(32)   | YES  |     | NULL    |       |
 | total         | decimal(42,0) | YES  |     | NULL    |       |
 | total_latency | decimal(42,0) | YES  |     | NULL    |       |
 | max_latency   | decimal(42,0) | YES  |     | NULL    |       |
@@ -3105,7 +3105,7 @@ mysql> desc user_summary_by_statement_type;
 +---------------+---------------------+------+-----+---------+-------+
 | Field         | Type                | Null | Key | Default | Extra |
 +---------------+---------------------+------+-----+---------+-------+
-| user          | varchar(16)         | YES  |     | NULL    |       |
+| user          | varchar(32)         | YES  |     | NULL    |       |
 | statement     | varchar(128)        | YES  |     | NULL    |       |
 | total         | bigint(20) unsigned | NO   |     | NULL    |       |
 | total_latency | text                | YES  |     | NULL    |       |
@@ -3122,7 +3122,7 @@ mysql> desc x$user_summary_by_statement_type;
 +---------------+---------------------+------+-----+---------+-------+
 | Field         | Type                | Null | Key | Default | Extra |
 +---------------+---------------------+------+-----+---------+-------+
-| user          | varchar(16)         | YES  |     | NULL    |       |
+| user          | varchar(32)         | YES  |     | NULL    |       |
 | statement     | varchar(128)        | YES  |     | NULL    |       |
 | total         | bigint(20) unsigned | NO   |     | NULL    |       |
 | total_latency | bigint(20) unsigned | NO   |     | NULL    |       |
@@ -3280,7 +3280,7 @@ mysql> desc waits_by_user_by_latency;
 +---------------+---------------------+------+-----+---------+-------+
 | Field         | Type                | Null | Key | Default | Extra |
 +---------------+---------------------+------+-----+---------+-------+
-| user          | varchar(16)         | YES  |     | NULL    |       |
+| user          | varchar(32)         | YES  |     | NULL    |       |
 | event         | varchar(128)        | NO   |     | NULL    |       |
 | total         | bigint(20) unsigned | NO   |     | NULL    |       |
 | total_latency | text                | YES  |     | NULL    |       |
@@ -3293,7 +3293,7 @@ mysql> desc x$waits_by_user_by_latency;
 +---------------+---------------------+------+-----+---------+-------+
 | Field         | Type                | Null | Key | Default | Extra |
 +---------------+---------------------+------+-----+---------+-------+
-| user          | varchar(16)         | YES  |     | NULL    |       |
+| user          | varchar(32)         | YES  |     | NULL    |       |
 | event         | varchar(128)        | NO   |     | NULL    |       |
 | total         | bigint(20) unsigned | NO   |     | NULL    |       |
 | total_latency | bigint(20) unsigned | NO   |     | NULL    |       |
@@ -3761,7 +3761,7 @@ Determines whether instrumentation of an account is enabled within Performance S
 ##### Parameters
 
 * in_host VARCHAR(60): The hostname of the account to check.
-* in_user (VARCHAR(16)): The username of the account to check.
+* in_user VARCHAR(32): The username of the account to check.
 
 ##### Returns
 

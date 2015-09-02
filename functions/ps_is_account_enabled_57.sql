@@ -19,7 +19,7 @@ DELIMITER $$
 
 CREATE DEFINER='root'@'localhost' FUNCTION ps_is_account_enabled (
         in_host VARCHAR(60), 
-        in_user VARCHAR(16)
+        in_user VARCHAR(32)
     ) 
     RETURNS ENUM('YES', 'NO')
     COMMENT '
@@ -34,7 +34,7 @@ CREATE DEFINER='root'@'localhost' FUNCTION ps_is_account_enabled (
 
              in_host VARCHAR(60): 
                The hostname of the account to check.
-             in_user (VARCHAR(16)):
+             in_user (VARCHAR(32)):
                The username of the account to check.
 
              Returns
