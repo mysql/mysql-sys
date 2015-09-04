@@ -32,6 +32,12 @@
 * Added a new `version_major()` stored function, which returns the major version of MySQL Server (**Contributed by Jesper Wisborg Krogh**)
 * Added a new `version_minor()` stored function, which returns the minor (release series) version of MySQL Server (**Contributed by Jesper Wisborg Krogh**)
 * Added a new `version_patch()` stored function, which returns the patch release version of MySQL Server (**Contributed by Jesper Wisborg Krogh**)
+* The `ps_is_account_enabled` function was updated to take a VARCHAR(32) user input on 5.7, as a part of WL#2284
+* The generate_sql_file.sh script had a number of improvements:
+ * Generated files are now output in to a "gen" directory, that is ignored by git
+ * Added using a new default user (that has the account locked) for the MySQL 5.7+ integration as the DEFINER for all objects
+ * Added a warning to the top of the generated integration file to also submit changes to the sys project
+ * Improved the the option of skipping binary logs, so that all routines can load as well - those that used SET sql_log_bin will now select a warning when being used instead of setting the option
 
 ### Bug Fixes
 
