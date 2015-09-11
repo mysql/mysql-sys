@@ -167,7 +167,7 @@ then
 
   # Add the expected user
   # Note this currently only works with 5.7 mysql.user structure
-  echo "REPLACE INTO mysql.user VALUES ('localhost','mysql.sys','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','Y','N','','','','',0,0,0,0,'mysql_native_password',PASSWORD(UUID()),'N',CURRENT_TIMESTAMP,NULL,'Y');" >> $OUTPUTFILE
+  echo "REPLACE INTO mysql.user VALUES ('localhost','mysql.sys','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','Y','N','','','','',0,0,0,0,'mysql_native_password','*THISISNOTAVALIDPASSWORDTHATCANBEUSEDHERE','N',CURRENT_TIMESTAMP,NULL,'Y');" >> $OUTPUTFILE
   echo "" >> $OUTPUTFILE
   echo "REPLACE INTO mysql.tables_priv VALUES ('localhost','sys','mysql.sys','sys_config','root@localhost', CURRENT_TIMESTAMP, 'Select', '');" >> $OUTPUTFILE
   echo "" >> $OUTPUTFILE
