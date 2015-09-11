@@ -19,3 +19,17 @@ SELECT sys.list_drop('1, 2, 3, 4, 5', '5');
 # Should return an error with a NULL value to drop
 --error 1138
 SELECT sys.list_drop('1,2,3,4,5', NULL);
+
+# Test the sql mode update use case
+# save old mode to restore
+SET @sqlmode := @@sql_mode;
+
+SELECT @@sql_mode;
+
+SET SESSION sql_mode = sys.list_drop(@@sql_mode, 'STRICT_TRANS_TABLES');
+
+SELECT @@sql_mode;
+
+# restore old mode
+SET SESSION sql_mode = @sqlmode;
+SET @sqlmode := NULL;
