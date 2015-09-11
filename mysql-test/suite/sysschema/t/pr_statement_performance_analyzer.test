@@ -9,6 +9,10 @@
 ##################################################################################
 
 -- source include/not_embedded.inc
+# Performance schema tracks prepared statements separately, and does not
+# yet have a summary view that we can use for this view.
+# Until then, we disable this test with --ps-protocol
+-- source include/no_protocol.inc
 
 use test;
 --disable_warnings
@@ -248,6 +252,10 @@ CALL sys.statement_performance_analyzer('delta', 'test.tmp_digests_ini', 'analys
 -- error ER_BAD_TABLE_ERROR
 DROP TEMPORARY TABLE sys.tmp_digests_delta;
 
+# Try and use a table.db name > 129
+SET @identifier := REPEAT('a', 65);
+-- error 1406
+CALL sys.statement_performance_analyzer('snapshot', CONCAT(@identifier, '.', @identifier), NULL);
 
 # Clean up
 DROP TEMPORARY TABLE test.tmp_digests_ini;
@@ -255,6 +263,7 @@ DROP TEMPORARY TABLE test.tmp_digests;
 DROP TABLE test.tmp_unsupported;
 DROP TABLE test.t1;
 DROP VIEW view_digests;
+SET @identifier := NULL;
 
 SET SESSION sql_mode = @@global.sql_mode;
 SET @sys.statement_performance_analyzer.limit = NULL;

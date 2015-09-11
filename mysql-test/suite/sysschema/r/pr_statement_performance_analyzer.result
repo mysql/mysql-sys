@@ -449,11 +449,15 @@ CALL sys.statement_performance_analyzer('delta', 'test.tmp_digests_ini', 'analys
 ERROR 45000: An existing snapshot generated with the statement_performance_analyzer() must exist.
 DROP TEMPORARY TABLE sys.tmp_digests_delta;
 ERROR 42S02: Unknown table 'sys.tmp_digests_delta'
+SET @identifier := REPEAT('a', 65);
+CALL sys.statement_performance_analyzer('snapshot', CONCAT(@identifier, '.', @identifier), NULL);
+ERROR 22001: Data too long for column 'in_table' at row 1
 DROP TEMPORARY TABLE test.tmp_digests_ini;
 DROP TEMPORARY TABLE test.tmp_digests;
 DROP TABLE test.tmp_unsupported;
 DROP TABLE test.t1;
 DROP VIEW view_digests;
+SET @identifier := NULL;
 SET SESSION sql_mode = @@global.sql_mode;
 SET @sys.statement_performance_analyzer.limit = NULL;
 SET @sys.statement_performance_analyzer.view = NULL;
@@ -465,5 +469,6 @@ INSERT IGNORE INTO sys.sys_config (variable, value) VALUES
 ('statement_performance_analyzer.limit', 100),
 ('statement_performance_analyzer.view', NULL),
 ('diagnostics.allow_i_s_tables', 'OFF'),
-('diagnostics.include_raw', 'OFF');
+('diagnostics.include_raw', 'OFF'),
+('ps_thread_trx_info.max_length', 65535);
 SET @sys.ignore_sys_config_triggers := NULL;

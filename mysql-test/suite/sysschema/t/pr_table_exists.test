@@ -25,7 +25,17 @@ SELECT @exists;
 CALL sys.table_exists('test', 't2', @exists);
 SELECT @exists;
 
+# Try variables longer than expected
+SET @identifier := REPEAT('a', 65);
+
+-- error 1406
+CALL sys.table_exists(@identifier, 't1', @exists);
+
+-- error 1406
+CALL sys.table_exists('test', @identifier, @exists);
+
 # Clean up
 DROP TEMPORARY TABLE t1;
 DROP TABLE t1;
 DROP VIEW v_t1;
+SET @identifier := NULL;
