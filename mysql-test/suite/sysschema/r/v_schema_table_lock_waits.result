@@ -43,12 +43,18 @@ SELECT * FROM sys.x$schema_table_lock_waits;
 CREATE TABLE test.lock_waits (i INT PRIMARY KEY, j INT) ENGINE = InnoDB;
 LOCK TABLE lock_waits WRITE;
 ALTER TABLE test.lock_waits ADD k VARCHAR(20);
+SELECT SLEEP(1);
+SLEEP(1)
+0
 SELECT object_schema, object_name,
 waiting_account, waiting_lock_type, waiting_query,
 blocking_account, blocking_lock_type, blocking_lock_duration
 FROM sys.schema_table_lock_waits;
 object_schema	object_name	waiting_account	waiting_lock_type	waiting_query	blocking_account	blocking_lock_type	blocking_lock_duration
 test	lock_waits	root@localhost	SHARED_UPGRADABLE	ALTER TABLE test.lock_waits ADD k VARCHAR(20)	root@localhost	SHARED_NO_READ_WRITE	TRANSACTION
+SELECT SLEEP(1);
+SLEEP(1)
+0
 SELECT object_schema, object_name,
 waiting_account, waiting_lock_type, waiting_query,
 blocking_account, blocking_lock_type, blocking_lock_duration

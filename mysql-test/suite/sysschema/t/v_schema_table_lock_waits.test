@@ -32,6 +32,7 @@ connection con2;
 send ALTER TABLE test.lock_waits ADD k VARCHAR(20);
 
 connection default;
+SELECT SLEEP(1);
 SELECT object_schema, object_name,
        waiting_account, waiting_lock_type, waiting_query,
        blocking_account, blocking_lock_type, blocking_lock_duration
@@ -40,7 +41,7 @@ SELECT object_schema, object_name,
 disconnect con1;
 
 connection default;
-
+SELECT SLEEP(1);
 SELECT object_schema, object_name,
        waiting_account, waiting_lock_type, waiting_query,
        blocking_account, blocking_lock_type, blocking_lock_duration
