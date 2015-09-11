@@ -4216,7 +4216,7 @@ mysql> SHOW FULL TABLES FROM ps;
 ##### Description
 
 Takes the query in the argument and executes it using a prepared statement. The prepared statement is deallocated,
-so the procdure is mainly useful for executing one off dynamically created queries.
+so the procedure is mainly useful for executing one off dynamically created queries.
 
 The sys_execute_prepared_stmt prepared statement name is used for the query and is required not to exist.
 
@@ -4299,10 +4299,10 @@ Some configuration options are supported:
 
 * in_max_runtime (INT UNSIGNED):
 The maximum time to keep collecting data.
-Use NULL to get the default which is 60 seconds.
+Use NULL to get the default which is 60 seconds, otherwise enter a value greater than 0.
 * in_interval (INT UNSIGNED):
 How long to sleep between data collections.
-Use NULL to get the default which is 30 seconds.
+Use NULL to get the default which is 30 seconds, otherwise enter a value greater than 0.
 * in_auto_config (ENUM('current', 'medium', 'full'))
 Automatically enable Performance Schema instruments and consumers.
 NOTE: The more that are enabled, the more impact on the performance.

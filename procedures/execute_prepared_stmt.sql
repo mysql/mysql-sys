@@ -25,7 +25,7 @@ CREATE DEFINER='root'@'localhost' PROCEDURE execute_prepared_stmt (
              -----------
 
              Takes the query in the argument and executes it using a prepared statement. The prepared statement is deallocated,
-             so the procdure is mainly useful for executing one off dynamically created queries.
+             so the procedure is mainly useful for executing one off dynamically created queries.
 
              The sys_execute_prepared_stmt prepared statement name is used for the query and is required not to exist.
 
