@@ -8,6 +8,7 @@ SELECT variable, value, set_by FROM sys.sys_config;
 variable	value	set_by
 diagnostics.allow_i_s_tables	OFF	NULL
 diagnostics.include_raw	OFF	NULL
+ps_thread_trx_info.max_length	65535	NULL
 statement_performance_analyzer.limit	100	NULL
 statement_performance_analyzer.view	NULL	NULL
 statement_truncate_len	64	NULL
@@ -16,6 +17,7 @@ SELECT variable, value, set_by FROM sys.sys_config;
 variable	value	set_by
 diagnostics.allow_i_s_tables	OFF	NULL
 diagnostics.include_raw	OFF	NULL
+ps_thread_trx_info.max_length	65535	NULL
 statement_performance_analyzer.limit	100	NULL
 statement_performance_analyzer.view	NULL	NULL
 statement_truncate_len	128	NULL
@@ -25,6 +27,7 @@ variable	value	set_by
 diagnostics.allow_i_s_tables	OFF	NULL
 diagnostics.include_raw	OFF	NULL
 foo	bar	NULL
+ps_thread_trx_info.max_length	65535	NULL
 statement_performance_analyzer.limit	100	NULL
 statement_performance_analyzer.view	NULL	NULL
 statement_truncate_len	128	NULL
@@ -35,5 +38,6 @@ INSERT IGNORE INTO sys.sys_config (variable, value) VALUES
 ('statement_performance_analyzer.limit', 100),
 ('statement_performance_analyzer.view', NULL),
 ('diagnostics.allow_i_s_tables', 'OFF'),
-('diagnostics.include_raw', 'OFF');
+('diagnostics.include_raw', 'OFF'),
+('ps_thread_trx_info.max_length', 65535);
 SET @sys.ignore_sys_config_triggers := NULL;
