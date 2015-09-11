@@ -35,3 +35,11 @@ SET @sys.debug                        = 'OFF',
     @sys.diagnostics.allow_i_s_tables = 'OFF',
     @sys.diagnostics.include_raw      = 'OFF';
 --enable_result_log
+
+# Check input variable validation
+-- error S45000
+CALL sys.diagnostics(0, 0, 'full');
+-- error S45000
+CALL sys.diagnostics(2, 0, 'full');
+-- error S45000
+CALL sys.diagnostics(1, 2, 'full');

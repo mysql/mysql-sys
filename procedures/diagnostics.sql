@@ -57,10 +57,10 @@ CREATE DEFINER='root'@'localhost' PROCEDURE diagnostics (
 
              in_max_runtime (INT UNSIGNED):
                The maximum time to keep collecting data.
-               Use NULL to get the default which is 60 seconds.
+               Use NULL to get the default which is 60 seconds, otherwise enter a value greater than 0.
              in_interval (INT UNSIGNED):
                How long to sleep between data collections.
-               Use NULL to get the default which is 30 seconds.
+               Use NULL to get the default which is 30 seconds, otherwise enter a value greater than 0.
              in_auto_config (ENUM(''current'', ''medium'', ''full''))
                Automatically enable Performance Schema instruments and consumers.
                NOTE: The more that are enabled, the more impact on the performance.
@@ -149,6 +149,46 @@ BEGIN
          ORDER BY table_name; 
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET v_done = TRUE;
 
+    -- Do not track the current thread - no reason to clutter the output
+    SELECT INSTRUMENTED INTO v_this_thread_enabled FROM performance_schema.threads WHERE PROCESSLIST_ID = CONNECTION_ID();
+    IF (v_this_thread_enabled = 'YES') THEN
+        CALL sys.ps_setup_disable_thread(CONNECTION_ID());
+    END IF;
+
+    -- Check options are sane
+    IF (in_max_runtime < in_interval) THEN
+        SIGNAL SQLSTATE '45000'
+           SET MESSAGE_TEXT = 'in_max_runtime must be greater than or equal to in_interval';
+    END IF;
+    IF (in_max_runtime = 0) THEN
+        SIGNAL SQLSTATE '45000'
+           SET MESSAGE_TEXT = 'in_max_runtime must be greater than 0';
+    END IF;
+    IF (in_interval = 0) THEN
+        SIGNAL SQLSTATE '45000'
+           SET MESSAGE_TEXT = 'in_interval must be greater than 0';
+    END IF;
+
+    -- Set configuration options
+    IF (@sys.diagnostics.allow_i_s_tables IS NULL) THEN
+        SET @sys.diagnostics.allow_i_s_tables = sys.sys_get_config('diagnostics.allow_i_s_tables', 'OFF');
+    END IF;
+    IF (@sys.diagnostics.include_raw IS NULL) THEN
+        SET @sys.diagnostics.include_raw      = sys.sys_get_config('diagnostics.include_raw'     , 'OFF');
+    END IF;
+    IF (@sys.debug IS NULL) THEN
+        SET @sys.debug                        = sys.sys_get_config('debug'                       , 'OFF');
+    END IF;
+    IF (@sys.statement_truncate_len IS NULL) THEN
+        SET @sys.statement_truncate_len       = sys.sys_get_config('statement_truncate_len'      , '64' );
+    END IF;
+
+    -- Temorary table are used - disable sql_log_bin if necessary to prevent them replicating
+    SET @log_bin := @@sql_log_bin;
+    IF (@log_bin = 1) THEN
+        SET sql_log_bin = 0;
+    END IF;
+
     -- Some metrics variables doesn't make sense in delta and rate calculations even if they are numeric
     -- as they really are more like settings or "current" status.
     SET v_no_delta_names = CONCAT('s%{COUNT}.Variable_name NOT IN (',
@@ -172,31 +212,6 @@ BEGIN
         '''lock_row_lock_time_max'', ',
         '''innodb_page_size''',
     ')');
-
-    -- Do not track the current thread - no reason to clutter the output
-    SELECT INSTRUMENTED INTO v_this_thread_enabled FROM performance_schema.threads WHERE PROCESSLIST_ID = CONNECTION_ID();
-    IF (v_this_thread_enabled = 'YES') THEN
-        CALL sys.ps_setup_disable_thread(CONNECTION_ID());
-    END IF;
-    -- Set configuration options
-    IF (@sys.diagnostics.allow_i_s_tables IS NULL) THEN
-        SET @sys.diagnostics.allow_i_s_tables = sys.sys_get_config('diagnostics.allow_i_s_tables', 'OFF');
-    END IF;
-    IF (@sys.diagnostics.include_raw IS NULL) THEN
-        SET @sys.diagnostics.include_raw      = sys.sys_get_config('diagnostics.include_raw'     , 'OFF');
-    END IF;
-    IF (@sys.debug IS NULL) THEN
-        SET @sys.debug                        = sys.sys_get_config('debug'                       , 'OFF');
-    END IF;
-    IF (@sys.statement_truncate_len IS NULL) THEN
-        SET @sys.statement_truncate_len       = sys.sys_get_config('statement_truncate_len'      , '64' );
-    END IF;
-
-    -- Temorary table are used - disable sql_log_bin if necessary to prevent them replicating
-    SET @log_bin := @@sql_log_bin;
-    IF (@log_bin = 1) THEN
-        SET sql_log_bin = 0;
-    END IF;
 
     IF (in_auto_config <> 'current') THEN
         IF (@sys.debug = 'ON') THEN
