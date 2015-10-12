@@ -146,7 +146,11 @@ then
   # Remove leading spaces
   # Remove -- line comments *after removing leading spaces*
   for file in `find . -name '*.sql'`; do
-    sed -i -e "s/'root'@'localhost'/$MYSQLUSER/g" $file
+    # The 5.6 MEM/WB integration should still use the root@localhost user
+    if [ ! $MYSQLVERSION == "56" ] ;
+    then
+      sed -i -e "s/'root'@'localhost'/$MYSQLUSER/g" $file
+    fi
     sed -i -e "/Copyright/,/51 Franklin St/d" $file
     sed -i -e "/^ *COMMENT/,/^ *'/{G;s/\n/\\\n/g;}" $file
     sed -i -e "s/            '\\\n/            '/g" $file
@@ -167,10 +171,17 @@ then
 
   # Add the expected user
   # Note this currently only works with 5.7 mysql.user structure
-  echo "REPLACE INTO mysql.user VALUES ('localhost','mysql.sys','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','Y','N','','','','',0,0,0,0,'mysql_native_password','*THISISNOTAVALIDPASSWORDTHATCANBEUSEDHERE','N',CURRENT_TIMESTAMP,NULL,'Y');" >> $OUTPUTFILE
-  echo "" >> $OUTPUTFILE
-  echo "REPLACE INTO mysql.tables_priv VALUES ('localhost','sys','mysql.sys','sys_config','root@localhost', CURRENT_TIMESTAMP, 'Select', '');" >> $OUTPUTFILE
-  echo "" >> $OUTPUTFILE
+  if [ ! $MYSQLVERSION == "56" ] ;
+  then
+    echo "REPLACE INTO mysql.user VALUES ('localhost','mysql.sys','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','','','','',0,0,0,0,'mysql_native_password','*THISISNOTAVALIDPASSWORDTHATCANBEUSEDHERE','N',CURRENT_TIMESTAMP,NULL,'Y');" >> $OUTPUTFILE
+    echo "" >> $OUTPUTFILE
+    echo "REPLACE INTO mysql.db VALUES ('localhost','sys','mysql.sys','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','Y');" >> $OUTPUTFILE
+    echo "" >> $OUTPUTFILE
+    echo "REPLACE INTO mysql.tables_priv VALUES ('localhost','sys','mysql.sys','sys_config','root@localhost', CURRENT_TIMESTAMP, 'Select', '');" >> $OUTPUTFILE
+    echo "" >> $OUTPUTFILE
+    echo "FLUSH PRIVILEGES;" >> $OUTPUTFILE
+    echo "" >> $OUTPUTFILE
+  fi
 
   # Put in the contents of before_setup.sql, though don't collapse lines
   sed -e "/sql_log_bin/d;s/'root'@'localhost'/$MYSQLUSER/g;/Copyright/,/51 Franklin St/d" $SYSDIR/before_setup.sql >> $OUTPUTFILE
