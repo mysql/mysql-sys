@@ -4365,7 +4365,7 @@ mysql> CALL sys.ps_setup_disable_instrument('wait/synch/mutex');
 +--------------------------+
 1 row in set (0.02 sec)
 ```
-To disable just a the scpecific TCP/IP based network IO instrument:
+To disable just a specific TCP/IP based network IO instrument:
 ```SQL
 mysql> CALL sys.ps_setup_disable_instrument('wait/io/socket/sql/server_tcpip_socket');
 +------------------------+
@@ -4529,7 +4529,7 @@ mysql> CALL sys.ps_setup_enable_instrument('wait/synch/mutex');
 +-------------------------+
 1 row in set (0.02 sec)
 ```
-To enable just a the scpecific TCP/IP based network IO instrument:
+To enable just a specific TCP/IP based network IO instrument:
 ```SQL
 mysql> CALL sys.ps_setup_enable_instrument('wait/io/socket/sql/server_tcpip_socket');
 +-----------------------+
