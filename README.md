@@ -4375,7 +4375,7 @@ mysql> CALL sys.ps_setup_disable_instrument('wait/io/socket/sql/server_tcpip_soc
 +------------------------+
 1 row in set (0.00 sec)
 ```
-To enable all instruments:
+To disable all instruments:
 ```SQL
 mysql> CALL sys.ps_setup_disable_instrument('');
 +--------------------------+

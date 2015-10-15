@@ -56,7 +56,7 @@ CREATE DEFINER='root'@'localhost' PROCEDURE ps_setup_disable_instrument (
              +------------------------+
              1 row in set (0.00 sec)
 
-             To enable all instruments:
+             To disable all instruments:
 
              mysql> CALL sys.ps_setup_disable_instrument(\'\');
              +--------------------------+
