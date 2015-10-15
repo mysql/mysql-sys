@@ -4055,7 +4055,7 @@ Notes for using sys_get_config():
 ##### Parameters
 
 * in_variable_name (VARCHAR(128)): The name of the config option to return the value for.
-* in_default_value (VARCHAR(128)): The default value to return if neither a use variable exists nor the variable exists in sys.sys_config.
+* in_default_value (VARCHAR(128)): The default value to return if the variable does not exist in sys.sys_config.
 
 ##### Returns
 
