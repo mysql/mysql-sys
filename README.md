@@ -4233,7 +4233,7 @@ The following configuration option is supported:
 
 ##### Example
 ```SQL
-mysql> CALL sys.execute_prepared_stmt(''SELECT * FROM sys.sys_config'');
+mysql> CALL sys.execute_prepared_stmt('SELECT * FROM sys.sys_config');
 +------------------------+-------+---------------------+--------+
 | variable               | value | set_time            | set_by |
 +------------------------+-------+---------------------+--------+
