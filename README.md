@@ -4211,39 +4211,6 @@ mysql> SHOW FULL TABLES FROM ps;
 ...
 ```
 
-#### execute_prepared_stmt
-
-##### Description
-
-Takes the query in the argument and executes it using a prepared statement. The prepared statement is deallocated,
-so the procedure is mainly useful for executing one off dynamically created queries.
-
-The sys_execute_prepared_stmt prepared statement name is used for the query and is required not to exist.
-
-##### Parameters
-
-* in_query (longtext CHARACTER SET UTF8):
-** The query to execute.
-
-The following configuration option is supported:
-
-   * sys.debug
-     Whether to provide debugging output.
-     Default is 'OFF'. Set to 'ON' to include.
-
-##### Example
-```SQL
-mysql> CALL sys.execute_prepared_stmt('SELECT * FROM sys.sys_config');
-+------------------------+-------+---------------------+--------+
-| variable               | value | set_time            | set_by |
-+------------------------+-------+---------------------+--------+
-| statement_truncate_len | 64    | 2015-06-30 13:06:00 | NULL   |
-+------------------------+-------+---------------------+--------+
-1 row in set (0.00 sec)
-
-Query OK, 0 rows affected (0.00 sec)
-```
-
 #### diagnostics
 
 ##### Description
@@ -4343,6 +4310,73 @@ mysql> CALL sys.ps_setup_disable_background_threads();
 1 row in set (0.00 sec)
 ```
 
+#### execute_prepared_stmt
+
+##### Description
+
+Takes the query in the argument and executes it using a prepared statement. The prepared statement is deallocated,
+so the procedure is mainly useful for executing one off dynamically created queries.
+
+The sys_execute_prepared_stmt prepared statement name is used for the query and is required not to exist.
+
+##### Parameters
+
+* in_query (longtext CHARACTER SET UTF8):
+** The query to execute.
+
+The following configuration option is supported:
+
+   * sys.debug
+     Whether to provide debugging output.
+     Default is 'OFF'. Set to 'ON' to include.
+
+##### Example
+```SQL
+mysql> CALL sys.execute_prepared_stmt('SELECT * FROM sys.sys_config');
++------------------------+-------+---------------------+--------+
+| variable               | value | set_time            | set_by |
++------------------------+-------+---------------------+--------+
+| statement_truncate_len | 64    | 2015-06-30 13:06:00 | NULL   |
++------------------------+-------+---------------------+--------+
+1 row in set (0.00 sec)
+
+Query OK, 0 rows affected (0.00 sec)
+```
+
+#### ps_setup_disable_consumer
+
+##### Description
+
+Disables consumers within Performance Schema matching the input pattern.
+
+##### Parameters
+
+* consumer (VARCHAR(128)): A LIKE pattern match (using "%consumer%") of consumers to disable
+
+##### Example
+
+To disable all consumers:
+```SQL
+mysql> CALL sys.ps_setup_disable_consumer('');
++--------------------------+
+| summary                  |
++--------------------------+
+| Disabled 15 consumers    |
++--------------------------+
+1 row in set (0.02 sec)
+```
+
+To disable just the event_stage consumers:
+```SQL
+mysql> CALL sys.ps_setup_disable_consumer('stage');
++------------------------+
+| summary                |
++------------------------+
+| Disabled 3 consumers   |
++------------------------+
+1 row in set (0.00 sec)
+```
+
 #### ps_setup_disable_instrument
 
 ##### Description
@@ -4384,40 +4418,6 @@ mysql> CALL sys.ps_setup_disable_instrument('');
 | Disabled 547 instruments |
 +--------------------------+
 1 row in set (0.01 sec)
-```
-
-#### ps_setup_disable_consumer
-
-##### Description
-
-Disables consumers within Performance Schema matching the input pattern.
-
-##### Parameters
-
-* consumer (VARCHAR(128)): A LIKE pattern match (using "%consumer%") of consumers to disable
-
-##### Example
-
-To disable all consumers:
-```SQL
-mysql> CALL sys.ps_setup_disable_consumer('');
-+--------------------------+
-| summary                  |
-+--------------------------+
-| Disabled 15 consumers    |
-+--------------------------+
-1 row in set (0.02 sec)
-```
-
-To disable just the event_stage consumers:
-```SQL
-mysql> CALL sys.ps_setup_disable_consumer('stage');
-+------------------------+
-| summary                |
-+------------------------+
-| Disabled 3 consumers   |
-+------------------------+
-1 row in set (0.00 sec)
 ```
 
 #### ps_setup_disable_thread
