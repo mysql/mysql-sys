@@ -4680,8 +4680,8 @@ Shows all currently disable Performance Schema configuration.
 
 ##### Parameters
 
-* in_in_show_instruments (BOOLEAN): Whether to print disabled instruments (can print many items)
-* in_in_show_threads (BOOLEAN): Whether to print disabled threads
+* in_show_instruments (BOOLEAN): Whether to print disabled instruments (can print many items)
+* in_show_threads (BOOLEAN): Whether to print disabled threads
 
 ##### Example
 ```SQL

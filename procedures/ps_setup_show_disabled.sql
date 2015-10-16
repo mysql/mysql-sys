@@ -30,10 +30,10 @@ CREATE DEFINER='root'@'localhost' PROCEDURE ps_setup_show_disabled (
              Parameters
              -----------
 
-             in_in_show_instruments (BOOLEAN):
+             in_show_instruments (BOOLEAN):
                Whether to print disabled instruments (can print many items)
 
-             in_in_show_threads (BOOLEAN):
+             in_show_threads (BOOLEAN):
                Whether to print disabled threads
 
              Example
