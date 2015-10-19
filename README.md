@@ -3608,7 +3608,7 @@ Useful for printing statement related data from Performance Schema from the comm
 
 ##### Returns
 
-VARCHAR(65)
+LONGTEXT
 
 ##### Example
 ```SQL
@@ -4638,7 +4638,7 @@ VALUES ('%', '%', '%')
 1 row in set (0.00 sec)
 ...
 
-mysql> CALL sys.ps_setup_reset_to_default(false)G
+mysql> CALL sys.ps_setup_reset_to_default(false)\G
 Query OK, 0 rows affected (0.00 sec)
 ```
 
@@ -4650,15 +4650,17 @@ Saves the current configuration of Performance Schema, so that you can alter the
 
 Use the companion procedure - ps_setup_reload_saved(), to restore the saved config.
 
-Requires the SUPER privilege for "SET sql_log_bin = 0;".
+The named lock "sys.ps_setup_save" is taken before the current configuration is saved. If the attempt to get the named lock times out, an error occurs.
+
+The lock is released after the settings have been restored by calling ps_setup_reload_saved().Requires the SUPER privilege for "SET sql_log_bin = 0;".
 
 ##### Parameters
 
-None.
+* in_timeout (INT): The timeout in seconds used when trying to obtain the lock. A negative timeout means infinite timeout.
 
 ##### Example
 ```SQL
-mysql> CALL sys.ps_setup_save();
+mysql> CALL sys.ps_setup_save(-1);
 Query OK, 0 rows affected (0.08 sec)
 
 mysql> UPDATE performance_schema.setup_instruments 
@@ -4927,7 +4929,7 @@ None.
 
 ##### Example
 ```SQL
-mysql> CALL sys.ps_statement_avg_latency_histogram()G
+mysql> CALL sys.ps_statement_avg_latency_histogram()\G
 *************************** 1. row ***************************
 Performance Schema Statement Digest Average Latency Histogram:
 
@@ -4972,10 +4974,10 @@ Requires the SUPER privilege for "SET sql_log_bin = 0;".
 ##### Parameters
 
 * in_digest VARCHAR(32): The statement digest identifier you would like to analyze
-* in_runtime (INT): The number of seconds to run analysis for (defaults to a minute)
-* in_interval (DECIMAL(2,2)): The interval (in seconds, may be fractional) at which to try and take snapshots (defaults to a second)
-* in_start_fresh (BOOLEAN): Whether to TRUNCATE the events_statements_history_long and events_stages_history_long tables before starting (default false)
-* in_auto_enable (BOOLEAN): Whether to automatically turn on required consumers (default false)
+* in_runtime (INT): The number of seconds to run analysis for
+* in_interval (DECIMAL(2,2)): The interval (in seconds, may be fractional) at which to try and take snapshots
+* in_start_fresh (BOOLEAN): Whether to TRUNCATE the events_statements_history_long and events_stages_history_long tables before starting
+* in_auto_enable (BOOLEAN): Whether to automatically turn on required consumers
 
 ##### Example
 ```SQL
