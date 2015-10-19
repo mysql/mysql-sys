@@ -4972,10 +4972,10 @@ Requires the SUPER privilege for "SET sql_log_bin = 0;".
 ##### Parameters
 
 * in_digest VARCHAR(32): The statement digest identifier you would like to analyze
-* in_runtime (INT): The number of seconds to run analysis for (defaults to a minute)
-* in_interval (DECIMAL(2,2)): The interval (in seconds, may be fractional) at which to try and take snapshots (defaults to a second)
-* in_start_fresh (BOOLEAN): Whether to TRUNCATE the events_statements_history_long and events_stages_history_long tables before starting (default false)
-* in_auto_enable (BOOLEAN): Whether to automatically turn on required consumers (default false)
+* in_runtime (INT): The number of seconds to run analysis for
+* in_interval (DECIMAL(2,2)): The interval (in seconds, may be fractional) at which to try and take snapshots
+* in_start_fresh (BOOLEAN): Whether to TRUNCATE the events_statements_history_long and events_stages_history_long tables before starting
+* in_auto_enable (BOOLEAN): Whether to automatically turn on required consumers
 
 ##### Example
 ```SQL
