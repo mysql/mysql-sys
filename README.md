@@ -3608,7 +3608,7 @@ Useful for printing statement related data from Performance Schema from the comm
 
 ##### Returns
 
-VARCHAR(65)
+LONGTEXT
 
 ##### Example
 ```SQL

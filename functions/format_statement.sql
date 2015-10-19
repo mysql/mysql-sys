@@ -43,7 +43,7 @@ CREATE DEFINER='root'@'localhost' FUNCTION format_statement (
              Returns
              -----------
 
-             VARCHAR(65)
+             LONGTEXT
 
              Example
              -----------
