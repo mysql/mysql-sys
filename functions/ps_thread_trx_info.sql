@@ -52,7 +52,7 @@ CREATE DEFINER='root'@'localhost' FUNCTION ps_thread_trx_info (
              Example
              -----------
 
-             SELECT sys.ps_thread_trx_info(48)\G
+             SELECT sys.ps_thread_trx_info(48)\\G
              *************************** 1. row ***************************
              sys.ps_thread_trx_info(48): [
                {

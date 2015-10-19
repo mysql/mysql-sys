@@ -4638,7 +4638,7 @@ VALUES ('%', '%', '%')
 1 row in set (0.00 sec)
 ...
 
-mysql> CALL sys.ps_setup_reset_to_default(false)G
+mysql> CALL sys.ps_setup_reset_to_default(false)\G
 Query OK, 0 rows affected (0.00 sec)
 ```
 
@@ -4929,7 +4929,7 @@ None.
 
 ##### Example
 ```SQL
-mysql> CALL sys.ps_statement_avg_latency_histogram()G
+mysql> CALL sys.ps_statement_avg_latency_histogram()\G
 *************************** 1. row ***************************
 Performance Schema Statement Digest Average Latency Histogram:
 

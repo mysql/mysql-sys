@@ -37,7 +37,7 @@ CREATE DEFINER='root'@'localhost' PROCEDURE ps_statement_avg_latency_histogram (
              Example
              -----------
 
-             mysql> CALL sys.ps_statement_avg_latency_histogram()\G
+             mysql> CALL sys.ps_statement_avg_latency_histogram()\\G
              *************************** 1. row ***************************
              Performance Schema Statement Digest Average Latency Histogram:
 
