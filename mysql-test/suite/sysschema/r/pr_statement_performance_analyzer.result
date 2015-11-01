@@ -4,7 +4,7 @@ DROP TEMPORARY TABLE IF EXISTS tmp_digests_ini;
 DROP VIEW IF EXISTS view_digests;
 CREATE TABLE t1 (id INT PRIMARY KEY, val int);
 use test;
-CALL sys.ps_setup_disable_thread(CONNECTION_ID());
+UPDATE performance_schema.threads SET INSTRUMENTED = IF(THREAD_ID = CON1_THREAD_ID, 'YES', 'NO');
 CALL sys.ps_setup_enable_consumer('events_statements_history_long');
 CALL sys.ps_truncate_all_tables(FALSE);
 INSERT INTO t1 VALUES (1, 0);
