@@ -4277,9 +4277,9 @@ If another setting the 'current' is chosen, the current settings
 are restored at the end of the procedure.
 Supported values are:
 ** current - use the current settings.
-** medium - enable some settings. This requires the SUPER privilege.
+** medium - enable some settings.
 ** full - enables all settings. This will have a big impact on the
-   performance - be careful using this option. This requires the SUPER privilege.
+   performance - be careful using this option.
 
 ##### Example
 ```SQL
