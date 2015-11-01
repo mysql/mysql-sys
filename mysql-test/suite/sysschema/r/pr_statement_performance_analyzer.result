@@ -188,6 +188,7 @@ SET SESSION sql_mode = @@global.sql_mode;
 SET @sys.statement_performance_analyzer.limit = NULL;
 SET @sys.statement_performance_analyzer.view = NULL;
 UPDATE performance_schema.setup_consumers SET enabled = 'YES';
+UPDATE performance_schema.threads SET instrumented = 'YES';
 SET @sys.ignore_sys_config_triggers := true;
 DELETE FROM sys.sys_config;
 INSERT IGNORE INTO sys.sys_config (variable, value) VALUES

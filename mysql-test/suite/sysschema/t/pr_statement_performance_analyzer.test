@@ -292,4 +292,5 @@ SET SESSION sql_mode = @@global.sql_mode;
 SET @sys.statement_performance_analyzer.limit = NULL;
 SET @sys.statement_performance_analyzer.view = NULL;
 --source ../include/ps_setup_consumers_cleanup.inc
+--source ../include/ps_threads_cleanup.inc
 --source ../include/sys_config_cleanup.inc
