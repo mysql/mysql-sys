@@ -66,10 +66,9 @@ CREATE DEFINER='root'@'localhost' PROCEDURE diagnostics (
                NOTE: The more that are enabled, the more impact on the performance.
                Supported values are:
                   * current - use the current settings.
-                  * medium - enable some settings. This requires the SUPER privilege.
+                  * medium - enable some settings.
                   * full - enables all settings. This will have a big impact on the
-                           performance - be careful using this option. This requires
-                           the SUPER privilege.
+                           performance - be careful using this option.
                If another setting the ''current'' is chosen, the current settings
                are restored at the end of the procedure.
 
@@ -183,7 +182,7 @@ BEGIN
         SET @sys.statement_truncate_len       = sys.sys_get_config('statement_truncate_len'      , '64' );
     END IF;
 
-    -- Temorary table are used - disable sql_log_bin if necessary to prevent them replicating
+    -- Temporary table are used - disable sql_log_bin if necessary to prevent them replicating
     SET @log_bin := @@sql_log_bin;
     IF (@log_bin = 1) THEN
         SET sql_log_bin = 0;
