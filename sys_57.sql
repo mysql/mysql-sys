@@ -15,8 +15,10 @@
 
 SOURCE ./before_setup.sql
 
+SOURCE ./views/version.sql
+
 SOURCE ./tables/sys_config.sql
-SOURCE ./tables/sys_config_data.sql
+SOURCE ./tables/sys_config_data_57.sql
 
 SOURCE ./triggers/sys_config_insert_set_user.sql
 SOURCE ./triggers/sys_config_update_set_user.sql
@@ -24,17 +26,24 @@ SOURCE ./triggers/sys_config_update_set_user.sql
 SOURCE ./functions/extract_schema_from_file_name.sql
 SOURCE ./functions/extract_table_from_file_name.sql
 SOURCE ./functions/format_bytes.sql
-SOURCE ./functions/format_path.sql
+SOURCE ./functions/format_path_57.sql
 SOURCE ./functions/format_statement.sql
 SOURCE ./functions/format_time.sql
+SOURCE ./functions/list_add.sql
+SOURCE ./functions/list_drop.sql
 SOURCE ./functions/ps_is_account_enabled_57.sql
 SOURCE ./functions/ps_is_consumer_enabled.sql
 SOURCE ./functions/ps_is_instrument_default_enabled.sql
 SOURCE ./functions/ps_is_instrument_default_timed.sql
 SOURCE ./functions/ps_is_thread_instrumented.sql
 SOURCE ./functions/ps_thread_id.sql
+SOURCE ./functions/ps_thread_account.sql
 SOURCE ./functions/ps_thread_stack.sql
+SOURCE ./functions/ps_thread_trx_info.sql
 SOURCE ./functions/sys_get_config.sql
+SOURCE ./functions/version_major.sql
+SOURCE ./functions/version_minor.sql
+SOURCE ./functions/version_patch.sql
 
 SOURCE ./views/i_s/innodb_buffer_stats_by_schema.sql
 SOURCE ./views/i_s/x_innodb_buffer_stats_by_schema.sql
@@ -43,8 +52,11 @@ SOURCE ./views/i_s/x_innodb_buffer_stats_by_table.sql
 SOURCE ./views/i_s/innodb_lock_waits.sql
 SOURCE ./views/i_s/x_innodb_lock_waits.sql
 SOURCE ./views/i_s/schema_object_overview.sql
+SOURCE ./views/i_s/schema_auto_increment_columns.sql
+SOURCE ./views/i_s/x_schema_flattened_keys.sql
+SOURCE ./views/i_s/schema_redundant_indexes.sql
 
-SOURCE ./views/p_s/ps_check_lost_instrumentation.sql
+SOURCE ./views/p_s/ps_check_lost_instrumentation_57.sql
 
 SOURCE ./views/p_s/latest_file_io.sql
 SOURCE ./views/p_s/x_latest_file_io.sql
@@ -80,6 +92,8 @@ SOURCE ./views/p_s/x_schema_table_statistics_with_buffer.sql
 SOURCE ./views/p_s/schema_tables_with_full_table_scans.sql
 SOURCE ./views/p_s/x_schema_tables_with_full_table_scans.sql
 SOURCE ./views/p_s/schema_unused_indexes.sql
+SOURCE ./views/p_s/schema_table_lock_waits.sql
+SOURCE ./views/p_s/x_schema_table_lock_waits.sql
 
 SOURCE ./views/p_s/statement_analysis.sql
 SOURCE ./views/p_s/x_statement_analysis.sql
@@ -133,14 +147,23 @@ SOURCE ./views/p_s/x_waits_by_host_by_latency.sql
 SOURCE ./views/p_s/waits_global_by_latency.sql
 SOURCE ./views/p_s/x_waits_global_by_latency.sql
 
+SOURCE ./views/p_s/metrics.sql
+
 SOURCE ./views/p_s/processlist_57.sql
 SOURCE ./views/p_s/x_processlist_57.sql
 
+SOURCE ./views/p_s/sessions.sql
+SOURCE ./views/p_s/x_sessions.sql
+SOURCE ./views/p_s/session_ssl_status.sql
+
 SOURCE ./procedures/create_synonym_db.sql
+SOURCE ./procedures/execute_prepared_stmt.sql
+
+SOURCE ./procedures/diagnostics.sql
 
 SOURCE ./procedures/ps_statement_avg_latency_histogram.sql
 SOURCE ./procedures/ps_trace_statement_digest.sql
-SOURCE ./procedures/ps_trace_thread.sql
+SOURCE ./procedures/ps_trace_thread_57.sql
 
 SOURCE ./procedures/ps_setup_disable_background_threads.sql
 SOURCE ./procedures/ps_setup_disable_consumer.sql
@@ -164,5 +187,8 @@ SOURCE ./procedures/ps_setup_show_enabled.sql
 SOURCE ./procedures/ps_setup_show_enabled_consumers.sql
 SOURCE ./procedures/ps_setup_show_enabled_instruments.sql
 SOURCE ./procedures/ps_truncate_all_tables.sql
+
+SOURCE ./procedures/statement_performance_analyzer.sql
+SOURCE ./procedures/table_exists.sql
 
 SOURCE ./after_setup.sql

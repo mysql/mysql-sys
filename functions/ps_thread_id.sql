@@ -30,7 +30,8 @@ CREATE DEFINER='root'@'localhost' FUNCTION ps_thread_id (
              -----------
 
              in_connection_id (BIGINT UNSIGNED):
-               The id of the connection to return the thread id for.
+               The id of the connection to return the thread id for. If NULL, the current
+               connection thread id is returned.
 
              Example
              -----------
@@ -58,7 +59,7 @@ CREATE DEFINER='root'@'localhost' FUNCTION ps_thread_id (
 BEGIN
     RETURN (SELECT THREAD_ID
               FROM `performance_schema`.`threads`
-             WHERE PROCESSLIST_ID = in_connection_id
+             WHERE PROCESSLIST_ID = IFNULL(in_connection_id, CONNECTION_ID())
            );
 END$$
 

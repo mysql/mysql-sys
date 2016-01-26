@@ -20,5 +20,3 @@ SET sql_log_bin = 0;
 CREATE DATABASE IF NOT EXISTS sys DEFAULT CHARACTER SET utf8;
 
 USE sys;
-
-CREATE OR REPLACE ALGORITHM = MERGE DEFINER = 'root'@'localhost' SQL SECURITY INVOKER VIEW version AS SELECT '1.4.0' AS sys_version, version() AS mysql_version;

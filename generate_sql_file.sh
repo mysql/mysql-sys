@@ -16,15 +16,15 @@
 
 OS=`uname`
 SYSDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+GENDIR=$SYSDIR/gen
 PWD=$( pwd )
 
 # Grab the current sys version
-SYSVERSIONTMP=`cat $SYSDIR/before_setup.sql | grep sys_version | awk '{print $17}'`
+SYSVERSIONTMP=`cat views/version.sql | grep 'AS sys_version' | awk '{print $2}'`
 SYSVERSION=`echo "${SYSVERSIONTMP//\'}"`
 
 MYSQLUSER="'root'@'localhost'"
 
-# Recursive sed
 if [ $OS == "Darwin" ] ;
 then
   SED_R="sed -E"
@@ -40,7 +40,7 @@ Options:
 
     b: Whether to omit any lines that deal with sql_log_bin (useful for RDS)
 
-    m: Whether to generate a mysql_install_db / mysqld --bootstrap formatted file
+    m: Whether to generate a mysql_install_db / mysqld --initialize formatted file
 
     u: The user to set as the owner of the objects (useful for RDS)
 
@@ -55,7 +55,7 @@ Generate a MySQL 5.6 SQL file for RDS:
 
     $0 -v 56 -b -u CURRENT_USER
 
-Generate a MySQL 5.7 bootstrap file:
+Generate a MySQL 5.7 initialize / bootstrap file:
 
     $0 -v 57 -m
 "
@@ -72,9 +72,14 @@ while getopts ":v:bhmu:" opt; do
       ;;
     m)
       MYSQLCOMPAT=true
+      # Bundled mysql expects the mysql.sys user to be used
+      MYSQLUSER="'mysql.sys'@'localhost'"
       ;;
     u)
-      MYSQLUSER="${OPTARG}"
+      if [ -z "$MYSQLCOMPAT" ] ;
+      then
+        MYSQLUSER="${OPTARG}"
+      fi
       ;;
     v)
       if [ $OPTARG == "56" ] || [ $OPTARG == "57" ] ;
@@ -106,6 +111,12 @@ then
   exit 1
 fi
 
+# Create the gen directory
+if [[ ! -d $GENDIR ]] ;
+then
+  mkdir $GENDIR
+fi
+
 # Create output file name
 if [[ ! -z "$MYSQLCOMPAT" ]] ;
 then
@@ -118,13 +129,13 @@ fi
 if [[ ! -z "$MYSQLCOMPAT" ]] ;
 then
   # Pre-process all the files in a copied temp directory
-  if [[ ! -d $SYSDIR/tmpgen ]] ;
+  if [[ ! -d $GENDIR/tmpgen ]] ;
   then
-    mkdir $SYSDIR/tmpgen
+    mkdir $GENDIR/tmpgen
   fi
-  cd $SYSDIR/tmpgen
+  cd $GENDIR/tmpgen
   rm -rf *
-  cp -r ../after_setup.sql ../tables ../triggers ../functions ../views ../procedures .
+  cp -r $SYSDIR/after_setup.sql $SYSDIR/tables $SYSDIR/triggers $SYSDIR/functions $SYSDIR/views $SYSDIR/procedures .
 
   # Switch user if requested
   # Remove individual copyrights
@@ -137,7 +148,7 @@ then
   for file in `find . -name '*.sql'`; do
     sed -i -e "s/'root'@'localhost'/$MYSQLUSER/g" $file
     sed -i -e "/Copyright/,/51 Franklin St/d" $file
-    sed -i -e "/COMMENT/,/            '/{G;s/\n/\\\n/g;}" $file
+    sed -i -e "/^ *COMMENT/,/^ *'/{G;s/\n/\\\n/g;}" $file
     sed -i -e "s/            '\\\n/            '/g" $file
     sed -i -e "/^DELIMITER/d" $file
     sed -i -e "s/\\$\\$/;/g" $file
@@ -146,11 +157,26 @@ then
   done
 
   # Start the output file from a non-removed copyright file
-  sed -e "/sql_log_bin/d" ../before_setup.sql > $OUTPUTFILE
+  sed -e "s/^/-- /" $SYSDIR/LICENSE > $OUTPUTFILE
+  echo "" >> $OUTPUTFILE
+  echo "--" >> $OUTPUTFILE
+  echo "-- WARNING: THIS IS A GENERATED FILE, CHANGES NEED TO BE MADE ON THE UPSTREAM MYSQL-SYS REPOSITORY AS WELL" >> $OUTPUTFILE
+  echo "-- PLEASE SUBMIT A PULL REQUEST TO https://github.com/MarkLeith/mysql-sys" >> $OUTPUTFILE
+  echo "--" >> $OUTPUTFILE
   echo "" >> $OUTPUTFILE
 
-  # Add the files in install file order, removing new lines along the way
-  cat "../sys_$MYSQLVERSION.sql" | tr -d '\r' | grep 'SOURCE' | grep -v before_setup | grep -v after_setup | $SED_R 's .{8}  ' | sed 's/^/./' >  "./sys_$MYSQLVERSION.sql"
+  # Add the expected user
+  # Note this currently only works with 5.7 mysql.user structure
+  echo "REPLACE INTO mysql.user VALUES ('localhost','mysql.sys','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','Y','N','','','','',0,0,0,0,'mysql_native_password','*THISISNOTAVALIDPASSWORDTHATCANBEUSEDHERE','N',CURRENT_TIMESTAMP,NULL,'Y');" >> $OUTPUTFILE
+  echo "" >> $OUTPUTFILE
+  echo "REPLACE INTO mysql.tables_priv VALUES ('localhost','sys','mysql.sys','sys_config','root@localhost', CURRENT_TIMESTAMP, 'Select', '');" >> $OUTPUTFILE
+  echo "" >> $OUTPUTFILE
+
+  # Put in the contents of before_setup.sql, though don't collapse lines
+  sed -e "/sql_log_bin/d;s/'root'@'localhost'/$MYSQLUSER/g;/Copyright/,/51 Franklin St/d" $SYSDIR/before_setup.sql >> $OUTPUTFILE
+
+  # Add the rest of the files in install file order, removing new lines along the way
+  cat "$SYSDIR/sys_$MYSQLVERSION.sql" | tr -d '\r' | grep 'SOURCE' | grep -v before_setup | grep -v after_setup | $SED_R 's .{8}  ' | sed 's/^/./' >  "./sys_$MYSQLVERSION.sql"
   while read file; do
       # First try and get a DROP command
       grep -E '(^DROP PROCEDURE|^DROP FUNCTION|^DROP TRIGGER)' $file >> $OUTPUTFILE
@@ -164,36 +190,39 @@ then
   done < "./sys_$MYSQLVERSION.sql"
 
   # Does essentially nothing right now, but may in future
-  sed -e "/sql_log_bin/d" ./after_setup.sql >> $OUTPUTFILE
+  sed -e "/Copyright/,/51 Franklin St/d;/sql_log_bin/d" $SYSDIR/after_setup.sql >> $OUTPUTFILE
 
   # Remove final leading and trailing spaces
-  sed -i -e "s/^ *//g" $OUTPUTFILE
-  sed -i -e "s/[ \t]*$//g" $OUTPUTFILE
+  sed -i '' -e "s/^ *//g" $OUTPUTFILE
+  sed -i '' -e "s/[ \t]*$//g" $OUTPUTFILE
   # Remove more than one empty line
-  sed -i -e "/^$/N;/^\n$/D" $OUTPUTFILE
+  sed -i '' -e "/^$/N;/^\n$/D" $OUTPUTFILE
 
-  # Move the generated file to root and clean up
-  mv $OUTPUTFILE $SYSDIR/
-  cd $PWD
-  rm -rf $SYSDIR/tmpgen/
+  mv $OUTPUTFILE $GENDIR/
+  cd $GENDIR/
+  rm -rf $GENDIR/tmpgen
 else
-  cat $SYSDIR/before_setup.sql > $SYSDIR/$OUTPUTFILE
-  cat "./sys_$MYSQLVERSION.sql" | tr -d '\r' | grep 'SOURCE' | $SED_R 's .{8}  ' | sed 's/^/./' | grep -v before_setup | \
-    xargs sed -e "/Copyright/,/51 Franklin St/d;s/'root'@'localhost'/$MYSQLUSER/g" >> $SYSDIR/$OUTPUTFILE
+  sed -e "s/^/-- /" $SYSDIR/LICENSE > $GENDIR/$OUTPUTFILE
+  cat "$SYSDIR/sys_$MYSQLVERSION.sql" | tr -d '\r' | grep 'SOURCE' | $SED_R 's .{8}  ' | sed "s/^/$(echo $SYSDIR | sed -e 's/[]\/$*.^|[]/\\&/g')/g" \
+    | xargs sed -e "/Copyright/,/51 Franklin St/d;s/'root'@'localhost'/$MYSQLUSER/g" >> $GENDIR/$OUTPUTFILE
 fi
 
 # Check if sql_log_bin lines should be removed
 if [[ ! -z "$SKIPBINLOG" ]] ;
 then
-  sed -i -e "/sql_log_bin/d" $SYSDIR/$OUTPUTFILE
+  LOGWARNING="WARNING: Using a routine that could cause binary log events, but disabling of binary logging has been removed"
+  sed -i '' -e "s/^[ \s]*SET sql_log_bin = 0/SELECT \"$LOGWARNING\"/g" $GENDIR/$OUTPUTFILE
+  sed -i '' -e "s/\sSET sql_log_bin = @log_bin;/SET @log_bin = NULL;/g" $GENDIR/$OUTPUTFILE
   SKIPBINLOG="disabled"
 else
   SKIPBINLOG="enabled"
 fi
 
+cd $PWD
+
 # Print summary
 echo $"
-    Wrote file: $SYSDIR/$OUTPUTFILE
+    Wrote file: $GENDIR/$OUTPUTFILE
 Object Definer: $MYSQLUSER
    sql_log_bin: $SKIPBINLOG
  "

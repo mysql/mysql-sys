@@ -42,5 +42,6 @@ SELECT IF(user IS NULL, 'background', user) AS user,
        SUM(count_star) AS ios,
        sys.format_time(SUM(sum_timer_wait)) AS io_latency 
   FROM performance_schema.events_waits_summary_by_user_by_event_name
+ WHERE event_name LIKE 'wait/io/file/%'
  GROUP BY IF(user IS NULL, 'background', user)
  ORDER BY SUM(sum_timer_wait) DESC;

@@ -34,7 +34,7 @@ When run, this outputs a file named such as `sys_<sys_version>_<mysql_version_id
 * v: The version of MySQL to build the sys schema for, either '56' or '57'
 * b: Whether to omit any lines that deal with sql_log_bin (useful for RDS)
 * u: The user to set as the owner of the objects (useful for RDS)
-* m: Whether to generate a mysql_install_db / mysqld --bootstrap formatted file
+* m: Whether to generate a mysql_install_db / mysqld --initialize formatted file
 
 #### Examples
 
@@ -79,9 +79,14 @@ Note, when functions check for configuration options, they first check whether a
 
 ##### Options included
 
-| Variable               | Default Value | Description                                                                    |
-| ---------------------- | ------------- | ------------------------------------------------------------------------------ |
-| statement_truncate_len | 64            | Sets the size to truncate statements to, for the `format_statement()` function |
+| Variable                             | Default Value | Description                                                                    |
+| ------------------------------------ | ------------- | ------------------------------------------------------------------------------ |
+| statement_truncate_len               | 64            | Sets the size to truncate statements to, for the `format_statement()` function. |
+| statement_performance_analyzer.limit | 100           | The maximum number of rows to include for the views that does not have a built-in limit (e.g. the 95th percentile view). If not set the limit is 100. |
+| statement_performance_analyzer.view  | NULL          | Used together with the 'custom' view. If the value contains a space, it is considered a query, otherwise it must be an existing view querying the performance_schema.events_statements_summary_by_digest table. |
+| diagnostics.allow_i_s_tables         | OFF           | Specifies whether it is allowed to do table scan queries on information_schema.TABLES for the `diagnostics` procedure. |
+| diagnostics.include_raw              | OFF           | Set to 'ON' to include the raw data (e.g. the original output of "SELECT * FROM sys.metrics") for the `diagnostics` procedure.|
+| ps_thread_trx_info.max_length        | 65535         | Sets the maximum output length for JSON object output by the `ps_thread_trx_info()` function. |
 
 ### Views
 
@@ -574,65 +579,71 @@ The lock waits are ordered by the age of the lock descending.
 ##### Structures
 
 ```SQL
-mysql> desc innodb_lock_waits;
-+----------------------------+---------------------+------+-----+---------------------+-------+
-| Field                      | Type                | Null | Key | Default             | Extra |
-+----------------------------+---------------------+------+-----+---------------------+-------+
-| wait_started               | datetime            | YES  |     | NULL                |       |
-| wait_age                   | time                | YES  |     | NULL                |       |
-| locked_table               | varchar(1024)       | NO   |     |                     |       |
-| locked_index               | varchar(1024)       | YES  |     | NULL                |       |
-| locked_type                | varchar(32)         | NO   |     |                     |       |
-| waiting_trx_id             | varchar(18)         | NO   |     |                     |       |
-| waiting_trx_started        | datetime            | NO   |     | 0000-00-00 00:00:00 |       |
-| waiting_trx_age            | time                | YES  |     | NULL                |       |
-| waiting_trx_rows_locked    | bigint(21) unsigned | NO   |     | 0                   |       |
-| waiting_trx_rows_modified  | bigint(21) unsigned | NO   |     | 0                   |       |
-| waiting_pid                | bigint(21) unsigned | NO   |     | 0                   |       |
-| waiting_query              | longtext            | YES  |     | NULL                |       |
-| waiting_lock_id            | varchar(81)         | NO   |     |                     |       |
-| waiting_lock_mode          | varchar(32)         | NO   |     |                     |       |
-| blocking_trx_id            | varchar(18)         | NO   |     |                     |       |
-| blocking_pid               | bigint(21) unsigned | NO   |     | 0                   |       |
-| blocking_query             | longtext            | YES  |     | NULL                |       |
-| blocking_lock_id           | varchar(81)         | NO   |     |                     |       |
-| blocking_lock_mode         | varchar(32)         | NO   |     |                     |       |
-| blocking_trx_started       | datetime            | NO   |     | 0000-00-00 00:00:00 |       |
-| blocking_trx_age           | time                | YES  |     | NULL                |       |
-| blocking_trx_rows_locked   | bigint(21) unsigned | NO   |     | 0                   |       |
-| blocking_trx_rows_modified | bigint(21) unsigned | NO   |     | 0                   |       |
-+----------------------------+---------------------+------+-----+---------------------+-------+
-23 rows in set (0.00 sec)
+mysql> desc sys.innodb_lock_waits;
++------------------------------+---------------------+------+-----+---------------------+-------+
+| Field                        | Type                | Null | Key | Default             | Extra |
++------------------------------+---------------------+------+-----+---------------------+-------+
+| wait_started                 | datetime            | YES  |     | NULL                |       |
+| wait_age                     | time                | YES  |     | NULL                |       |
+| wait_age_secs                | bigint(21)          | YES  |     | NULL                |       |
+| locked_table                 | varchar(1024)       | NO   |     |                     |       |
+| locked_index                 | varchar(1024)       | YES  |     | NULL                |       |
+| locked_type                  | varchar(32)         | NO   |     |                     |       |
+| waiting_trx_id               | varchar(18)         | NO   |     |                     |       |
+| waiting_trx_started          | datetime            | NO   |     | 0000-00-00 00:00:00 |       |
+| waiting_trx_age              | time                | YES  |     | NULL                |       |
+| waiting_trx_rows_locked      | bigint(21) unsigned | NO   |     | 0                   |       |
+| waiting_trx_rows_modified    | bigint(21) unsigned | NO   |     | 0                   |       |
+| waiting_pid                  | bigint(21) unsigned | NO   |     | 0                   |       |
+| waiting_query                | longtext            | YES  |     | NULL                |       |
+| waiting_lock_id              | varchar(81)         | NO   |     |                     |       |
+| waiting_lock_mode            | varchar(32)         | NO   |     |                     |       |
+| blocking_trx_id              | varchar(18)         | NO   |     |                     |       |
+| blocking_pid                 | bigint(21) unsigned | NO   |     | 0                   |       |
+| blocking_query               | longtext            | YES  |     | NULL                |       |
+| blocking_lock_id             | varchar(81)         | NO   |     |                     |       |
+| blocking_lock_mode           | varchar(32)         | NO   |     |                     |       |
+| blocking_trx_started         | datetime            | NO   |     | 0000-00-00 00:00:00 |       |
+| blocking_trx_age             | time                | YES  |     | NULL                |       |
+| blocking_trx_rows_locked     | bigint(21) unsigned | NO   |     | 0                   |       |
+| blocking_trx_rows_modified   | bigint(21) unsigned | NO   |     | 0                   |       |
+| sql_kill_blocking_query      | varchar(32)         | YES  |     | NULL                |       |
+| sql_kill_blocking_connection | varchar(26)         | YES  |     | NULL                |       |
++------------------------------+---------------------+------+-----+---------------------+-------+
+26 rows in set (0.01 sec)
 
-mysql> desc x$innodb_lock_waits;
-+----------------------------+---------------------+------+-----+---------------------+-------+
-| Field                      | Type                | Null | Key | Default             | Extra |
-+----------------------------+---------------------+------+-----+---------------------+-------+
-| wait_started               | datetime            | YES  |     | NULL                |       |
-| wait_age                   | time                | YES  |     | NULL                |       |
-| locked_table               | varchar(1024)       | NO   |     |                     |       |
-| locked_index               | varchar(1024)       | YES  |     | NULL                |       |
-| locked_type                | varchar(32)         | NO   |     |                     |       |
-| waiting_trx_id             | varchar(18)         | NO   |     |                     |       |
-| waiting_trx_started        | datetime            | NO   |     | 0000-00-00 00:00:00 |       |
-| waiting_trx_age            | time                | YES  |     | NULL                |       |
-| waiting_trx_rows_locked    | bigint(21) unsigned | NO   |     | 0                   |       |
-| waiting_trx_rows_modified  | bigint(21) unsigned | NO   |     | 0                   |       |
-| waiting_pid                | bigint(21) unsigned | NO   |     | 0                   |       |
-| waiting_query              | varchar(1024)       | YES  |     | NULL                |       |
-| waiting_lock_id            | varchar(81)         | NO   |     |                     |       |
-| waiting_lock_mode          | varchar(32)         | NO   |     |                     |       |
-| blocking_trx_id            | varchar(18)         | NO   |     |                     |       |
-| blocking_pid               | bigint(21) unsigned | NO   |     | 0                   |       |
-| blocking_query             | varchar(1024)       | YES  |     | NULL                |       |
-| blocking_lock_id           | varchar(81)         | NO   |     |                     |       |
-| blocking_lock_mode         | varchar(32)         | NO   |     |                     |       |
-| blocking_trx_started       | datetime            | NO   |     | 0000-00-00 00:00:00 |       |
-| blocking_trx_age           | time                | YES  |     | NULL                |       |
-| blocking_trx_rows_locked   | bigint(21) unsigned | NO   |     | 0                   |       |
-| blocking_trx_rows_modified | bigint(21) unsigned | NO   |     | 0                   |       |
-+----------------------------+---------------------+------+-----+---------------------+-------+
-23 rows in set (0.12 sec)
+mysql> desc sys.x$innodb_lock_waits;
++------------------------------+---------------------+------+-----+---------------------+-------+
+| Field                        | Type                | Null | Key | Default             | Extra |
++------------------------------+---------------------+------+-----+---------------------+-------+
+| wait_started                 | datetime            | YES  |     | NULL                |       |
+| wait_age                     | time                | YES  |     | NULL                |       |
+| wait_age_secs                | bigint(21)          | YES  |     | NULL                |       |
+| locked_table                 | varchar(1024)       | NO   |     |                     |       |
+| locked_index                 | varchar(1024)       | YES  |     | NULL                |       |
+| locked_type                  | varchar(32)         | NO   |     |                     |       |
+| waiting_trx_id               | varchar(18)         | NO   |     |                     |       |
+| waiting_trx_started          | datetime            | NO   |     | 0000-00-00 00:00:00 |       |
+| waiting_trx_age              | time                | YES  |     | NULL                |       |
+| waiting_trx_rows_locked      | bigint(21) unsigned | NO   |     | 0                   |       |
+| waiting_trx_rows_modified    | bigint(21) unsigned | NO   |     | 0                   |       |
+| waiting_pid                  | bigint(21) unsigned | NO   |     | 0                   |       |
+| waiting_query                | varchar(1024)       | YES  |     | NULL                |       |
+| waiting_lock_id              | varchar(81)         | NO   |     |                     |       |
+| waiting_lock_mode            | varchar(32)         | NO   |     |                     |       |
+| blocking_trx_id              | varchar(18)         | NO   |     |                     |       |
+| blocking_pid                 | bigint(21) unsigned | NO   |     | 0                   |       |
+| blocking_query               | varchar(1024)       | YES  |     | NULL                |       |
+| blocking_lock_id             | varchar(81)         | NO   |     |                     |       |
+| blocking_lock_mode           | varchar(32)         | NO   |     |                     |       |
+| blocking_trx_started         | datetime            | NO   |     | 0000-00-00 00:00:00 |       |
+| blocking_trx_age             | time                | YES  |     | NULL                |       |
+| blocking_trx_rows_locked     | bigint(21) unsigned | NO   |     | 0                   |       |
+| blocking_trx_rows_modified   | bigint(21) unsigned | NO   |     | 0                   |       |
+| sql_kill_blocking_query      | varchar(32)         | YES  |     | NULL                |       |
+| sql_kill_blocking_connection | varchar(26)         | YES  |     | NULL                |       |
++------------------------------+---------------------+------+-----+---------------------+-------+
+26 rows in set (0.02 sec)
 ```
 
 ##### Example
@@ -640,29 +651,32 @@ mysql> desc x$innodb_lock_waits;
 ```SQL
 mysql> SELECT * FROM innodb_lock_waits\G
 *************************** 1. row ***************************
-              wait_started: 2014-11-11 13:39:20
-                  wait_age: 00:00:07
-              locked_table: `db1`.`t1`
-              locked_index: PRIMARY
-               locked_type: RECORD
-            waiting_trx_id: 867158
-       waiting_trx_started: 2014-11-11 13:39:15
-           waiting_trx_age: 00:00:12
-   waiting_trx_rows_locked: 0
- waiting_trx_rows_modified: 0
-               waiting_pid: 3
-             waiting_query: UPDATE t1 SET val = val + 1 WHERE id = 2
-           waiting_lock_id: 867158:2363:3:3
-         waiting_lock_mode: X
-           blocking_trx_id: 867157
-              blocking_pid: 4
-            blocking_query: UPDATE t1 SET val = val + 1 + SLEEP(10) WHERE id = 2
-          blocking_lock_id: 867157:2363:3:3
-        blocking_lock_mode: X
-      blocking_trx_started: 2014-11-11 13:39:11
-          blocking_trx_age: 00:00:16
-  blocking_trx_rows_locked: 1
-blocking_trx_rows_modified: 1
+                wait_started: 2014-11-11 13:39:20
+                    wait_age: 00:00:07
+               wait_age_secs: 7
+                locked_table: `db1`.`t1`
+                locked_index: PRIMARY
+                 locked_type: RECORD
+              waiting_trx_id: 867158
+         waiting_trx_started: 2014-11-11 13:39:15
+             waiting_trx_age: 00:00:12
+     waiting_trx_rows_locked: 0
+   waiting_trx_rows_modified: 0
+                 waiting_pid: 3
+               waiting_query: UPDATE t1 SET val = val + 1 WHERE id = 2
+             waiting_lock_id: 867158:2363:3:3
+           waiting_lock_mode: X
+             blocking_trx_id: 867157
+                blocking_pid: 4
+              blocking_query: UPDATE t1 SET val = val + 1 + SLEEP(10) WHERE id = 2
+            blocking_lock_id: 867157:2363:3:3
+          blocking_lock_mode: X
+        blocking_trx_started: 2014-11-11 13:39:11
+            blocking_trx_age: 00:00:16
+    blocking_trx_rows_locked: 1
+  blocking_trx_rows_modified: 1
+     sql_kill_blocking_query: KILL QUERY 4
+sql_kill_blocking_connection: KILL 4
 ```
 
 #### io_by_thread_by_latency / x$io_by_thread_by_latency
@@ -739,7 +753,7 @@ mysql> desc io_global_by_file_by_bytes;
 +---------------+---------------------+------+-----+---------+-------+
 | Field         | Type                | Null | Key | Default | Extra |
 +---------------+---------------------+------+-----+---------+-------+
-| file          | varchar(260)        | YES  |     | NULL    |       |
+| file          | varchar(512)        | YES  |     | NULL    |       |
 | count_read    | bigint(20) unsigned | NO   |     | NULL    |       |
 | total_read    | text                | YES  |     | NULL    |       |
 | avg_read      | text                | YES  |     | NULL    |       |
@@ -796,7 +810,7 @@ mysql> desc io_global_by_file_by_latency;
 +---------------+---------------------+------+-----+---------+-------+
 | Field         | Type                | Null | Key | Default | Extra |
 +---------------+---------------------+------+-----+---------+-------+
-| file          | varchar(260)        | YES  |     | NULL    |       |
+| file          | varchar(512)        | YES  |     | NULL    |       |
 | total         | bigint(20) unsigned | NO   |     | NULL    |       |
 | total_latency | text                | YES  |     | NULL    |       |
 | count_read    | bigint(20) unsigned | NO   |     | NULL    |       |
@@ -1008,7 +1022,7 @@ mysql> desc latest_file_io;
 | Field     | Type         | Null | Key | Default | Extra |
 +-----------+--------------+------+-----+---------+-------+
 | thread    | varchar(149) | YES  |     | NULL    |       |
-| file      | varchar(260) | YES  |     | NULL    |       |
+| file      | varchar(512) | YES  |     | NULL    |       |
 | latency   | text         | YES  |     | NULL    |       |
 | operation | varchar(32)  | NO   |     | NULL    |       |
 | requested | text         | YES  |     | NULL    |       |
@@ -1163,7 +1177,7 @@ mysql> desc memory_by_user_by_current_bytes;
 +--------------------+---------------+------+-----+---------+-------+
 | Field              | Type          | Null | Key | Default | Extra |
 +--------------------+---------------+------+-----+---------+-------+
-| user               | varchar(16)   | YES  |     | NULL    |       |
+| user               | varchar(32)   | YES  |     | NULL    |       |
 | current_count_used | decimal(41,0) | YES  |     | NULL    |       |
 | current_allocated  | text          | YES  |     | NULL    |       |
 | current_avg_alloc  | text          | YES  |     | NULL    |       |
@@ -1176,7 +1190,7 @@ mysql> desc x$memory_by_user_by_current_bytes;
 +--------------------+---------------+------+-----+---------+-------+
 | Field              | Type          | Null | Key | Default | Extra |
 +--------------------+---------------+------+-----+---------+-------+
-| user               | varchar(16)   | YES  |     | NULL    |       |
+| user               | varchar(32)   | YES  |     | NULL    |       |
 | current_count_used | decimal(41,0) | YES  |     | NULL    |       |
 | current_allocated  | decimal(41,0) | YES  |     | NULL    |       |
 | current_avg_alloc  | decimal(45,4) | NO   |     | 0.0000  |       |
@@ -1289,6 +1303,88 @@ mysql> select * from memory_global_total;
 +-----------------+
 ```
 
+#### metrics
+
+##### Description
+
+Creates a union of the following information:
+
+   *  performance_schema.global_status (information_schema.GLOBAL_STATUS in MySQL 5.6)
+   *  information_schema.INNODB_METRICS
+   *  Performance Schema global memory usage information (only in MySQL 5.7)
+   *  Current time
+
+In MySQL 5.7 it is required that performance_schema = ON, though there is no requirements to which
+instruments and consumers that are enabled. See also the description of the Enabled column below.
+
+For view has the following columns:
+
+   * Variable_name: The name of the variable
+   * Variable_value: The value of the variable
+   * Type: The type of the variable. This will depend on the source, e.g. Global Status, InnoDB Metrics - ..., etc.
+   * Enabled: Whether the variable is enabled or not. Possible values are 'YES', 'NO', 'PARTIAL'.
+     PARTIAL is currently only supported for the memory usage variables and means some but not all of the memory/% instruments are enabled.
+
+##### Structures
+
+```SQL
+mysql> DESC metrics;
++----------------+--------------+------+-----+---------+-------+
+| Field          | Type         | Null | Key | Default | Extra |
++----------------+--------------+------+-----+---------+-------+
+| Variable_name  | varchar(193) | YES  |     | NULL    |       |
+| Variable_value | text         | YES  |     | NULL    |       |
+| Type           | varchar(210) | YES  |     | NULL    |       |
+| Enabled        | varchar(7)   | NO   |     |         |       |
++----------------+--------------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+mysq> DESC metrics_56;
++----------------+--------------+------+-----+---------+-------+
+| Field          | Type         | Null | Key | Default | Extra |
++----------------+--------------+------+-----+---------+-------+
+| Variable_name  | varchar(193) | YES  |     | NULL    |       |
+| Variable_value | text         | YES  |     | NULL    |       |
+| Type           | varchar(210) | YES  |     | NULL    |       |
+| Enabled        | varchar(7)   | NO   |     |         |       |
++----------------+--------------+------+-----+---------+-------+
+4 rows in set (0.01 sec)
+```
+
+##### Example
+
+```SQL
+mysql> SELECT * FROM metrics;
++-----------------------------------------------+-------------------------...+--------------------------------------+---------+
+| Variable_name                                 | Variable_value          ...| Type                                 | Enabled |
++-----------------------------------------------+-------------------------...+--------------------------------------+---------+
+| aborted_clients                               | 0                       ...| Global Status                        | YES     |
+| aborted_connects                              | 0                       ...| Global Status                        | YES     |
+| binlog_cache_disk_use                         | 0                       ...| Global Status                        | YES     |
+| binlog_cache_use                              | 0                       ...| Global Status                        | YES     |
+| binlog_stmt_cache_disk_use                    | 0                       ...| Global Status                        | YES     |
+| binlog_stmt_cache_use                         | 0                       ...| Global Status                        | YES     |
+| bytes_received                                | 217081                  ...| Global Status                        | YES     |
+| bytes_sent                                    | 27257                   ...| Global Status                        | YES     |
+...
+| innodb_rwlock_x_os_waits                      | 0                       ...| InnoDB Metrics - server              | YES     |
+| innodb_rwlock_x_spin_rounds                   | 2723                    ...| InnoDB Metrics - server              | YES     |
+| innodb_rwlock_x_spin_waits                    | 1                       ...| InnoDB Metrics - server              | YES     |
+| trx_active_transactions                       | 0                       ...| InnoDB Metrics - transaction         | NO      |
+...
+| trx_rseg_current_size                         | 0                       ...| InnoDB Metrics - transaction         | NO      |
+| trx_rseg_history_len                          | 4                       ...| InnoDB Metrics - transaction         | YES     |
+| trx_rw_commits                                | 0                       ...| InnoDB Metrics - transaction         | NO      |
+| trx_undo_slots_cached                         | 0                       ...| InnoDB Metrics - transaction         | NO      |
+| trx_undo_slots_used                           | 0                       ...| InnoDB Metrics - transaction         | NO      |
+| memory_current_allocated                      | 138244216               ...| Performance Schema                   | PARTIAL |
+| memory_total_allocated                        | 138244216               ...| Performance Schema                   | PARTIAL |
+| NOW()                                         | 2015-05-31 13:27:50.382 ...| System Time                          | YES     |
+| UNIX_TIMESTAMP()                              | 1433042870.382          ...| System Time                          | YES     |
++-----------------------------------------------+-------------------------...+--------------------------------------+---------+
+412 rows in set (0.02 sec)
+```
+
 #### processlist / x$processlist
 
 ##### Description
@@ -1297,92 +1393,116 @@ A detailed non-blocking processlist view to replace [INFORMATION_SCHEMA. | SHOW 
 
 Performs less locking than the legacy sources, whilst giving extra information.
 
+The output includes both background threads and user connections by default.  See also `session` / `x$session`
+for a view that contains only user session information.
+
 ##### Structures (5.7)
 
 ```SQL
 mysql> desc processlist;
-+------------------------+---------------------+------+-----+---------+-------+
-| Field                  | Type                | Null | Key | Default | Extra |
-+------------------------+---------------------+------+-----+---------+-------+
-| thd_id                 | bigint(20) unsigned | NO   |     | NULL    |       |
-| conn_id                | bigint(20) unsigned | YES  |     | NULL    |       |
-| user                   | varchar(128)        | YES  |     | NULL    |       |
-| db                     | varchar(64)         | YES  |     | NULL    |       |
-| command                | varchar(16)         | YES  |     | NULL    |       |
-| state                  | varchar(64)         | YES  |     | NULL    |       |
-| time                   | bigint(20)          | YES  |     | NULL    |       |
-| current_statement      | longtext            | YES  |     | NULL    |       |
-| lock_latency           | text                | YES  |     | NULL    |       |
-| rows_examined          | bigint(20) unsigned | YES  |     | NULL    |       |
-| rows_sent              | bigint(20) unsigned | YES  |     | NULL    |       |
-| rows_affected          | bigint(20) unsigned | YES  |     | NULL    |       |
-| tmp_tables             | bigint(20) unsigned | YES  |     | NULL    |       |
-| tmp_disk_tables        | bigint(20) unsigned | YES  |     | NULL    |       |
-| full_scan              | varchar(3)          | NO   |     |         |       |
-| current_memory         | text                | YES  |     | NULL    |       |
-| last_statement         | longtext            | YES  |     | NULL    |       |
-| last_statement_latency | text                | YES  |     | NULL    |       |
-| last_wait              | varchar(128)        | YES  |     | NULL    |       |
-| last_wait_latency      | text                | YES  |     | NULL    |       |
-| source                 | varchar(64)         | YES  |     | NULL    |       |
-+------------------------+---------------------+------+-----+---------+-------+
-21 rows in set (0.00 sec)
++------------------------+------------------------------------------+------+-----+---------+-------+
+| Field                  | Type                                     | Null | Key | Default | Extra |
++------------------------+------------------------------------------+------+-----+---------+-------+
+| thd_id                 | bigint(20) unsigned                      | NO   |     | NULL    |       |
+| conn_id                | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| user                   | varchar(128)                             | YES  |     | NULL    |       |
+| db                     | varchar(64)                              | YES  |     | NULL    |       |
+| command                | varchar(16)                              | YES  |     | NULL    |       |
+| state                  | varchar(64)                              | YES  |     | NULL    |       |
+| time                   | bigint(20)                               | YES  |     | NULL    |       |
+| current_statement      | longtext                                 | YES  |     | NULL    |       |
+| statement_latency      | text                                     | YES  |     | NULL    |       |
+| progress               | decimal(26,2)                            | YES  |     | NULL    |       |
+| lock_latency           | text                                     | YES  |     | NULL    |       |
+| rows_examined          | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| rows_sent              | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| rows_affected          | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| tmp_tables             | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| tmp_disk_tables        | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| full_scan              | varchar(3)                               | NO   |     |         |       |
+| last_statement         | longtext                                 | YES  |     | NULL    |       |
+| last_statement_latency | text                                     | YES  |     | NULL    |       |
+| current_memory         | text                                     | YES  |     | NULL    |       |
+| last_wait              | varchar(128)                             | YES  |     | NULL    |       |
+| last_wait_latency      | text                                     | YES  |     | NULL    |       |
+| source                 | varchar(64)                              | YES  |     | NULL    |       |
+| trx_latency            | text                                     | YES  |     | NULL    |       |
+| trx_state              | enum('ACTIVE','COMMITTED','ROLLED BACK') | YES  |     | NULL    |       |
+| trx_autocommit         | enum('YES','NO')                         | YES  |     | NULL    |       |
+| pid                    | varchar(1024)                            | YES  |     | NULL    |       |
+| program_name           | varchar(1024)                            | YES  |     | NULL    |       |
++------------------------+------------------------------------------+------+-----+---------+-------+
+28 rows in set (0.04 sec)
 
 mysql> desc x$processlist;
-+------------------------+---------------------+------+-----+---------+-------+
-| Field                  | Type                | Null | Key | Default | Extra |
-+------------------------+---------------------+------+-----+---------+-------+
-| thd_id                 | bigint(20) unsigned | NO   |     | NULL    |       |
-| conn_id                | bigint(20) unsigned | YES  |     | NULL    |       |
-| user                   | varchar(128)        | YES  |     | NULL    |       |
-| db                     | varchar(64)         | YES  |     | NULL    |       |
-| command                | varchar(16)         | YES  |     | NULL    |       |
-| state                  | varchar(64)         | YES  |     | NULL    |       |
-| time                   | bigint(20)          | YES  |     | NULL    |       |
-| current_statement      | longtext            | YES  |     | NULL    |       |
-| lock_latency           | bigint(20) unsigned | YES  |     | NULL    |       |
-| rows_examined          | bigint(20) unsigned | YES  |     | NULL    |       |
-| rows_sent              | bigint(20) unsigned | YES  |     | NULL    |       |
-| rows_affected          | bigint(20) unsigned | YES  |     | NULL    |       |
-| tmp_tables             | bigint(20) unsigned | YES  |     | NULL    |       |
-| tmp_disk_tables        | bigint(20) unsigned | YES  |     | NULL    |       |
-| full_scan              | varchar(3)          | NO   |     |         |       |
-| current_memory         | decimal(41,0)       | YES  |     | NULL    |       |
-| last_statement         | longtext            | YES  |     | NULL    |       |
-| last_statement_latency | bigint(20) unsigned | YES  |     | NULL    |       |
-| last_wait              | varchar(128)        | YES  |     | NULL    |       |
-| last_wait_latency      | varchar(20)         | YES  |     | NULL    |       |
-| source                 | varchar(64)         | YES  |     | NULL    |       |
-+------------------------+---------------------+------+-----+---------+-------+
-21 rows in set (0.15 sec)
++------------------------+------------------------------------------+------+-----+---------+-------+
+| Field                  | Type                                     | Null | Key | Default | Extra |
++------------------------+------------------------------------------+------+-----+---------+-------+
+| thd_id                 | bigint(20) unsigned                      | NO   |     | NULL    |       |
+| conn_id                | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| user                   | varchar(128)                             | YES  |     | NULL    |       |
+| db                     | varchar(64)                              | YES  |     | NULL    |       |
+| command                | varchar(16)                              | YES  |     | NULL    |       |
+| state                  | varchar(64)                              | YES  |     | NULL    |       |
+| time                   | bigint(20)                               | YES  |     | NULL    |       |
+| current_statement      | longtext                                 | YES  |     | NULL    |       |
+| statement_latency      | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| progress               | decimal(26,2)                            | YES  |     | NULL    |       |
+| lock_latency           | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| rows_examined          | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| rows_sent              | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| rows_affected          | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| tmp_tables             | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| tmp_disk_tables        | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| full_scan              | varchar(3)                               | NO   |     |         |       |
+| last_statement         | longtext                                 | YES  |     | NULL    |       |
+| last_statement_latency | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| current_memory         | decimal(41,0)                            | YES  |     | NULL    |       |
+| last_wait              | varchar(128)                             | YES  |     | NULL    |       |
+| last_wait_latency      | varchar(20)                              | YES  |     | NULL    |       |
+| source                 | varchar(64)                              | YES  |     | NULL    |       |
+| trx_latency            | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| trx_state              | enum('ACTIVE','COMMITTED','ROLLED BACK') | YES  |     | NULL    |       |
+| trx_autocommit         | enum('YES','NO')                         | YES  |     | NULL    |       |
+| pid                    | varchar(1024)                            | YES  |     | NULL    |       |
+| program_name           | varchar(1024)                            | YES  |     | NULL    |       |
++------------------------+------------------------------------------+------+-----+---------+-------+
+28 rows in set (0.01 sec)
 ```
 
 ##### Example
 
 ```SQL
-mysql> select * from processlist where conn_id is not null\G
+mysql> select * from sys.processlist where conn_id is not null and command != 'daemon' and conn_id != connection_id()\G
 *************************** 1. row ***************************
-                thd_id: 31
-               conn_id: 12
-                  user: root@localhost
-                    db: information_schema
+                thd_id: 44524
+               conn_id: 44502
+                  user: msandbox@localhost
+                    db: test
                command: Query
-                 state: Sending data
-                  time: 0
-     current_statement: select * from processlist limit 5
-          lock_latency: 684.00 us
+                 state: alter table (flush)
+                  time: 18
+     current_statement: alter table t1 add column g int
+     statement_latency: 18.45 s
+              progress: 98.84
+          lock_latency: 265.43 ms
          rows_examined: 0
              rows_sent: 0
          rows_affected: 0
-            tmp_tables: 2
+            tmp_tables: 0
        tmp_disk_tables: 0
-             full_scan: YES
-        current_memory: 1.29 MiB
+             full_scan: NO
         last_statement: NULL
 last_statement_latency: NULL
-             last_wait: wait/synch/mutex/sql/THD::LOCK_query_plan
-     last_wait_latency: 260.13 ns
-                source: sql_optimizer.cc:1075
+        current_memory: 664.06 KiB
+             last_wait: wait/io/file/innodb/innodb_data_file
+     last_wait_latency: 1.07 us
+                source: fil0fil.cc:5146
+           trx_latency: NULL
+             trx_state: NULL
+        trx_autocommit: NULL
+                   pid: 4212
+          program_name: mysql
 ```
 
 #### ps_check_lost_instrumentation
@@ -1414,6 +1534,47 @@ mysql> select * from ps_check_lost_instrumentation;
 | Performance_schema_file_handles_lost   | 101223         |
 | Performance_schema_file_instances_lost | 1231           |
 +----------------------------------------+----------------+
+```
+
+#### schema_auto_increment_columns
+
+##### Description
+
+Present current auto_increment usage/capacity in all tables.
+
+##### Structures
+
+```SQL
+mysql> desc schema_auto_increment_columns;
++----------------------+------------------------+------+-----+---------+-------+
+| Field                | Type                   | Null | Key | Default | Extra |
++----------------------+------------------------+------+-----+---------+-------+
+| table_schema         | varchar(64)            | NO   |     |         |       |
+| table_name           | varchar(64)            | NO   |     |         |       |
+| column_name          | varchar(64)            | NO   |     |         |       |
+| data_type            | varchar(64)            | NO   |     |         |       |
+| column_type          | longtext               | NO   |     | NULL    |       |
+| is_signed            | int(1)                 | NO   |     | 0       |       |
+| is_unsigned          | int(1)                 | NO   |     | 0       |       |
+| max_value            | bigint(21) unsigned    | YES  |     | NULL    |       |
+| auto_increment       | bigint(21) unsigned    | YES  |     | NULL    |       |
+| auto_increment_ratio | decimal(25,4) unsigned | YES  |     | NULL    |       |
++----------------------+------------------------+------+-----+---------+-------+
+```
+
+##### Example
+
+```SQL
+mysql> select * from schema_auto_increment_columns limit 5;
++-------------------+-------------------+-------------+-----------+-------------+-----------+-------------+---------------------+----------------+----------------------+
+| table_schema      | table_name        | column_name | data_type | column_type | is_signed | is_unsigned | max_value           | auto_increment | auto_increment_ratio |
++-------------------+-------------------+-------------+-----------+-------------+-----------+-------------+---------------------+----------------+----------------------+
+| test              | t1                | i           | tinyint   | tinyint(4)  |         1 |           0 |                 127 |             34 |               0.2677 |
+| mem__advisor_text | template_meta     | hib_id      | int       | int(11)     |         1 |           0 |          2147483647 |            516 |               0.0000 |
+| mem__advisors     | advisor_schedules | schedule_id | int       | int(11)     |         1 |           0 |          2147483647 |            249 |               0.0000 |
+| mem__advisors     | app_identity_path | hib_id      | int       | int(11)     |         1 |           0 |          2147483647 |            251 |               0.0000 |
+| mem__bean_config  | plists            | id          | bigint    | bigint(20)  |         1 |           0 | 9223372036854775807 |              1 |               0.0000 |
++-------------------+-------------------+-------------+-----------+-------------+-----------+-------------+---------------------+----------------+----------------------+
 ```
 
 #### schema_index_statistics / x$schema_index_statistics
@@ -1633,6 +1794,164 @@ io_write_requests: 0
   io_misc_latency: 126.88 us
 ```
 
+#### schema_redundant_indexes / x$schema_flattened_keys
+
+##### Description
+
+Shows indexes which are made redundant (or duplicate) by other (dominant) keys.
+
+Also includes the the helper view `x$schema_flattened_keys`.
+
+##### Structures
+
+```SQL
+mysql> desc sys.schema_redundant_indexes;
++----------------------------+--------------+------+-----+---------+-------+
+| Field                      | Type         | Null | Key | Default | Extra |
++----------------------------+--------------+------+-----+---------+-------+
+| table_schema               | varchar(64)  | NO   |     |         |       |
+| table_name                 | varchar(64)  | NO   |     |         |       |
+| redundant_index_name       | varchar(64)  | NO   |     |         |       |
+| redundant_index_columns    | text         | YES  |     | NULL    |       |
+| redundant_index_non_unique | bigint(1)    | YES  |     | NULL    |       |
+| dominant_index_name        | varchar(64)  | NO   |     |         |       |
+| dominant_index_columns     | text         | YES  |     | NULL    |       |
+| dominant_index_non_unique  | bigint(1)    | YES  |     | NULL    |       |
+| subpart_exists             | int(1)       | NO   |     | 0       |       |
+| sql_drop_index             | varchar(223) | YES  |     | NULL    |       |
++----------------------------+--------------+------+-----+---------+-------+
+10 rows in set (0.00 sec)
+
+mysql> desc sys.x$schema_flattened_keys;
++----------------+-------------+------+-----+---------+-------+
+| Field          | Type        | Null | Key | Default | Extra |
++----------------+-------------+------+-----+---------+-------+
+| table_schema   | varchar(64) | NO   |     |         |       |
+| table_name     | varchar(64) | NO   |     |         |       |
+| index_name     | varchar(64) | NO   |     |         |       |
+| non_unique     | bigint(1)   | YES  |     | NULL    |       |
+| subpart_exists | bigint(1)   | YES  |     | NULL    |       |
+| index_columns  | text        | YES  |     | NULL    |       |
++----------------+-------------+------+-----+---------+-------+
+6 rows in set (0.00 sec)
+```
+
+##### Example
+
+```SQL
+mysql> select * from sys.schema_redundant_indexes\G
+*************************** 1. row ***************************
+              table_schema: test
+                table_name: rkey
+      redundant_index_name: j
+   redundant_index_columns: j
+redundant_index_non_unique: 1
+       dominant_index_name: j_2
+    dominant_index_columns: j,k
+ dominant_index_non_unique: 1
+            subpart_exists: 0
+            sql_drop_index: ALTER TABLE `test`.`rkey` DROP INDEX `j`
+1 row in set (0.20 sec)
+
+mysql> SHOW CREATE TABLE test.rkey\G
+*************************** 1. row ***************************
+       Table: rkey
+Create Table: CREATE TABLE `rkey` (
+  `i` int(11) NOT NULL,
+  `j` int(11) DEFAULT NULL,
+  `k` int(11) DEFAULT NULL,
+  PRIMARY KEY (`i`),
+  KEY `j` (`j`),
+  KEY `j_2` (`j`,`k`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+1 row in set (0.06 sec)
+```
+
+#### schema_table_lock_waits / x$schema_table_lock_waits
+
+##### Description
+
+Shows sessions that are blocked waiting on table metadata locks, and who is blocking them.
+
+##### Structures
+
+```SQL
+mysql> desc schema_table_lock_waits;
++------------------------------+---------------------+------+-----+---------+-------+
+| Field                        | Type                | Null | Key | Default | Extra |
++------------------------------+---------------------+------+-----+---------+-------+
+| object_schema                | varchar(64)         | YES  |     | NULL    |       |
+| object_name                  | varchar(64)         | YES  |     | NULL    |       |
+| waiting_thread_id            | bigint(20) unsigned | NO   |     | NULL    |       |
+| waiting_pid                  | bigint(20) unsigned | YES  |     | NULL    |       |
+| waiting_account              | text                | YES  |     | NULL    |       |
+| waiting_lock_type            | varchar(32)         | NO   |     | NULL    |       |
+| waiting_lock_duration        | varchar(32)         | NO   |     | NULL    |       |
+| waiting_query                | longtext            | YES  |     | NULL    |       |
+| waiting_query_secs           | bigint(20)          | YES  |     | NULL    |       |
+| waiting_query_rows_affected  | bigint(20) unsigned | YES  |     | NULL    |       |
+| waiting_query_rows_examined  | bigint(20) unsigned | YES  |     | NULL    |       |
+| blocking_thread_id           | bigint(20) unsigned | NO   |     | NULL    |       |
+| blocking_pid                 | bigint(20) unsigned | YES  |     | NULL    |       |
+| blocking_account             | text                | YES  |     | NULL    |       |
+| blocking_lock_type           | varchar(32)         | NO   |     | NULL    |       |
+| blocking_lock_duration       | varchar(32)         | NO   |     | NULL    |       |
+| sql_kill_blocking_query      | varchar(31)         | YES  |     | NULL    |       |
+| sql_kill_blocking_connection | varchar(25)         | YES  |     | NULL    |       |
++------------------------------+---------------------+------+-----+---------+-------+
+18 rows in set (0.15 sec)
+
+mysql> desc x$schema_table_lock_waits;
++------------------------------+---------------------+------+-----+---------+-------+
+| Field                        | Type                | Null | Key | Default | Extra |
++------------------------------+---------------------+------+-----+---------+-------+
+| object_schema                | varchar(64)         | YES  |     | NULL    |       |
+| object_name                  | varchar(64)         | YES  |     | NULL    |       |
+| waiting_thread_id            | bigint(20) unsigned | NO   |     | NULL    |       |
+| waiting_pid                  | bigint(20) unsigned | YES  |     | NULL    |       |
+| waiting_account              | text                | YES  |     | NULL    |       |
+| waiting_lock_type            | varchar(32)         | NO   |     | NULL    |       |
+| waiting_lock_duration        | varchar(32)         | NO   |     | NULL    |       |
+| waiting_query                | longtext            | YES  |     | NULL    |       |
+| waiting_query_secs           | bigint(20)          | YES  |     | NULL    |       |
+| waiting_query_rows_affected  | bigint(20) unsigned | YES  |     | NULL    |       |
+| waiting_query_rows_examined  | bigint(20) unsigned | YES  |     | NULL    |       |
+| blocking_thread_id           | bigint(20) unsigned | NO   |     | NULL    |       |
+| blocking_pid                 | bigint(20) unsigned | YES  |     | NULL    |       |
+| blocking_account             | text                | YES  |     | NULL    |       |
+| blocking_lock_type           | varchar(32)         | NO   |     | NULL    |       |
+| blocking_lock_duration       | varchar(32)         | NO   |     | NULL    |       |
+| sql_kill_blocking_query      | varchar(31)         | YES  |     | NULL    |       |
+| sql_kill_blocking_connection | varchar(25)         | YES  |     | NULL    |       |
++------------------------------+---------------------+------+-----+---------+-------+
+18 rows in set (0.03 sec)
+```
+
+##### Example
+
+```SQL
+mysql> select * from sys.schema_table_lock_waits\G
+*************************** 1. row ***************************
+               object_schema: test
+                 object_name: t
+           waiting_thread_id: 43
+                 waiting_pid: 21
+             waiting_account: msandbox@localhost
+           waiting_lock_type: SHARED_UPGRADABLE
+       waiting_lock_duration: TRANSACTION
+               waiting_query: alter table test.t add foo int
+          waiting_query_secs: 988
+ waiting_query_rows_affected: 0
+ waiting_query_rows_examined: 0
+          blocking_thread_id: 42
+                blocking_pid: 20
+            blocking_account: msandbox@localhost
+          blocking_lock_type: SHARED_NO_READ_WRITE
+      blocking_lock_duration: TRANSACTION
+     sql_kill_blocking_query: KILL QUERY 20
+sql_kill_blocking_connection: KILL 20
+```
+
 #### schema_table_statistics_with_buffer / x$schema_table_statistics_with_buffer
 
 ##### Description
@@ -1828,6 +2147,160 @@ mysql> select * from schema_unused_indexes limit 5;
 | mem30__config      | user_form_defaults  | FKC1AEF1F9E7EE2CFB |
 | mem30__enterprise  | whats_new_entries   | entryId            |
 +--------------------+---------------------+--------------------+
+```
+
+#### session / x$session
+
+##### Description
+
+A detailed non-blocking processlist view to replace [INFORMATION_SCHEMA. | SHOW FULL] PROCESSLIST.
+
+Performs less locking than the legacy sources, whilst giving extra information.
+
+The output of this view is restricted to threads from user sessions.  See also processlist / x$processlist which contains both user and background threads.
+
+##### Structures (5.7)
+
+```SQL
+mysql> desc session;
++------------------------+------------------------------------------+------+-----+---------+-------+
+| Field                  | Type                                     | Null | Key | Default | Extra |
++------------------------+------------------------------------------+------+-----+---------+-------+
+| thd_id                 | bigint(20) unsigned                      | NO   |     | NULL    |       |
+| conn_id                | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| user                   | varchar(128)                             | YES  |     | NULL    |       |
+| db                     | varchar(64)                              | YES  |     | NULL    |       |
+| command                | varchar(16)                              | YES  |     | NULL    |       |
+| state                  | varchar(64)                              | YES  |     | NULL    |       |
+| time                   | bigint(20)                               | YES  |     | NULL    |       |
+| current_statement      | longtext                                 | YES  |     | NULL    |       |
+| statement_latency      | text                                     | YES  |     | NULL    |       |
+| progress               | decimal(26,2)                            | YES  |     | NULL    |       |
+| lock_latency           | text                                     | YES  |     | NULL    |       |
+| rows_examined          | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| rows_sent              | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| rows_affected          | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| tmp_tables             | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| tmp_disk_tables        | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| full_scan              | varchar(3)                               | NO   |     |         |       |
+| last_statement         | longtext                                 | YES  |     | NULL    |       |
+| last_statement_latency | text                                     | YES  |     | NULL    |       |
+| current_memory         | text                                     | YES  |     | NULL    |       |
+| last_wait              | varchar(128)                             | YES  |     | NULL    |       |
+| last_wait_latency      | text                                     | YES  |     | NULL    |       |
+| source                 | varchar(64)                              | YES  |     | NULL    |       |
+| trx_latency            | text                                     | YES  |     | NULL    |       |
+| trx_state              | enum('ACTIVE','COMMITTED','ROLLED BACK') | YES  |     | NULL    |       |
+| trx_autocommit         | enum('YES','NO')                         | YES  |     | NULL    |       |
+| pid                    | varchar(1024)                            | YES  |     | NULL    |       |
+| program_name           | varchar(1024)                            | YES  |     | NULL    |       |
++------------------------+------------------------------------------+------+-----+---------+-------+
+28 rows in set (0.00 sec)
+
+mysql> desc x$session;
++------------------------+------------------------------------------+------+-----+---------+-------+
+| Field                  | Type                                     | Null | Key | Default | Extra |
++------------------------+------------------------------------------+------+-----+---------+-------+
+| thd_id                 | bigint(20) unsigned                      | NO   |     | NULL    |       |
+| conn_id                | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| user                   | varchar(128)                             | YES  |     | NULL    |       |
+| db                     | varchar(64)                              | YES  |     | NULL    |       |
+| command                | varchar(16)                              | YES  |     | NULL    |       |
+| state                  | varchar(64)                              | YES  |     | NULL    |       |
+| time                   | bigint(20)                               | YES  |     | NULL    |       |
+| current_statement      | longtext                                 | YES  |     | NULL    |       |
+| statement_latency      | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| progress               | decimal(26,2)                            | YES  |     | NULL    |       |
+| lock_latency           | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| rows_examined          | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| rows_sent              | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| rows_affected          | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| tmp_tables             | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| tmp_disk_tables        | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| full_scan              | varchar(3)                               | NO   |     |         |       |
+| last_statement         | longtext                                 | YES  |     | NULL    |       |
+| last_statement_latency | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| current_memory         | decimal(41,0)                            | YES  |     | NULL    |       |
+| last_wait              | varchar(128)                             | YES  |     | NULL    |       |
+| last_wait_latency      | varchar(20)                              | YES  |     | NULL    |       |
+| source                 | varchar(64)                              | YES  |     | NULL    |       |
+| trx_latency            | bigint(20) unsigned                      | YES  |     | NULL    |       |
+| trx_state              | enum('ACTIVE','COMMITTED','ROLLED BACK') | YES  |     | NULL    |       |
+| trx_autocommit         | enum('YES','NO')                         | YES  |     | NULL    |       |
+| pid                    | varchar(1024)                            | YES  |     | NULL    |       |
+| program_name           | varchar(1024)                            | YES  |     | NULL    |       |
++------------------------+------------------------------------------+------+-----+---------+-------+
+28 rows in set (0.00 sec)
+```
+
+##### Example
+
+```SQL
+mysql> select * from sys.session\G
+*************************** 1. row ***************************
+                thd_id: 24
+               conn_id: 2
+                  user: root@localhost
+                    db: sys
+               command: Query
+                 state: Sending data
+                  time: 0
+     current_statement: select * from sys.session
+     statement_latency: 137.22 ms
+              progress: NULL
+          lock_latency: 33.75 ms
+         rows_examined: 0
+             rows_sent: 0
+         rows_affected: 0
+            tmp_tables: 4
+       tmp_disk_tables: 1
+             full_scan: YES
+        last_statement: NULL
+last_statement_latency: NULL
+        current_memory: 3.26 MiB
+             last_wait: wait/synch/mutex/innodb/file_format_max_mutex
+     last_wait_latency: 64.09 ns
+                source: trx0sys.cc:778
+           trx_latency: 7.88 s
+             trx_state: ACTIVE
+        trx_autocommit: NO
+                   pid: 4212
+          program_name: mysql
+```
+
+#### session_ssl_status
+
+##### Description
+
+Shows SSL version, cipher and the count of re-used SSL sessions per connection
+
+##### Structures
+
+```SQL
+mysql> desc sys.session_ssl_status;
++---------------------+---------------------+------+-----+---------+-------+
+| Field               | Type                | Null | Key | Default | Extra |
++---------------------+---------------------+------+-----+---------+-------+
+| thread_id           | bigint(20) unsigned | NO   |     | NULL    |       |
+| ssl_version         | varchar(1024)       | YES  |     | NULL    |       |
+| ssl_cipher          | varchar(1024)       | YES  |     | NULL    |       |
+| ssl_sessions_reused | varchar(1024)       | YES  |     | NULL    |       |
++---------------------+---------------------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+```
+
+##### Example
+
+```SQL
+mysql> select * from session_ssl_status;
++-----------+-------------+--------------------+---------------------+
+| thread_id | ssl_version | ssl_cipher         | ssl_sessions_reused |
++-----------+-------------+--------------------+---------------------+
+|        26 | TLSv1       | DHE-RSA-AES256-SHA | 0                   |
+|        27 | TLSv1       | DHE-RSA-AES256-SHA | 0                   |
+|        28 | TLSv1       | DHE-RSA-AES256-SHA | 0                   |
++-----------+-------------+--------------------+---------------------+
+3 rows in set (0.00 sec)
 ```
 
 #### statement_analysis / x$statement_analysis
@@ -2070,7 +2543,7 @@ no_good_index_used_count: 0
 
 ##### Description
 
-Lists all statements who's average runtime, in microseconds, is in the top 95th percentile.
+Lists all statements whose average runtime, in microseconds, is in the top 95th percentile.
 
 Also includes two helper views:
 
@@ -2317,7 +2790,7 @@ mysql> desc user_summary;
 +------------------------+---------------+------+-----+---------+-------+
 | Field                  | Type          | Null | Key | Default | Extra |
 +------------------------+---------------+------+-----+---------+-------+
-| user                   | varchar(16)   | YES  |     | NULL    |       |
+| user                   | varchar(32)   | YES  |     | NULL    |       |
 | statements             | decimal(64,0) | YES  |     | NULL    |       |
 | statement_latency      | text          | YES  |     | NULL    |       |
 | statement_avg_latency  | text          | YES  |     | NULL    |       |
@@ -2336,7 +2809,7 @@ mysql> desc x$user_summary;
 +------------------------+---------------+------+-----+---------+-------+
 | Field                  | Type          | Null | Key | Default | Extra |
 +------------------------+---------------+------+-----+---------+-------+
-| user                   | varchar(16)   | YES  |     | NULL    |       |
+| user                   | varchar(32)   | YES  |     | NULL    |       |
 | statements             | decimal(64,0) | YES  |     | NULL    |       |
 | statement_latency      | decimal(64,0) | YES  |     | NULL    |       |
 | statement_avg_latency  | decimal(65,4) | NO   |     | 0.0000  |       |
@@ -2399,7 +2872,7 @@ mysql> desc user_summary_by_file_io;
 +------------+---------------+------+-----+---------+-------+
 | Field      | Type          | Null | Key | Default | Extra |
 +------------+---------------+------+-----+---------+-------+
-| user       | varchar(16)   | YES  |     | NULL    |       |
+| user       | varchar(32)   | YES  |     | NULL    |       |
 | ios        | decimal(42,0) | YES  |     | NULL    |       |
 | io_latency | text          | YES  |     | NULL    |       |
 +------------+---------------+------+-----+---------+-------+
@@ -2409,7 +2882,7 @@ mysql> desc x$user_summary_by_file_io;
 +------------+---------------+------+-----+---------+-------+
 | Field      | Type          | Null | Key | Default | Extra |
 +------------+---------------+------+-----+---------+-------+
-| user       | varchar(16)   | YES  |     | NULL    |       |
+| user       | varchar(32)   | YES  |     | NULL    |       |
 | ios        | decimal(42,0) | YES  |     | NULL    |       |
 | io_latency | decimal(42,0) | YES  |     | NULL    |       |
 +------------+---------------+------+-----+---------+-------+
@@ -2443,7 +2916,7 @@ mysql> desc user_summary_by_file_io_type;
 +-------------+---------------------+------+-----+---------+-------+
 | Field       | Type                | Null | Key | Default | Extra |
 +-------------+---------------------+------+-----+---------+-------+
-| user        | varchar(16)         | YES  |     | NULL    |       |
+| user        | varchar(32)         | YES  |     | NULL    |       |
 | event_name  | varchar(128)        | NO   |     | NULL    |       |
 | total       | bigint(20) unsigned | NO   |     | NULL    |       |
 | latency     | text                | YES  |     | NULL    |       |
@@ -2455,7 +2928,7 @@ mysql> desc x$user_summary_by_file_io_type;
 +-------------+---------------------+------+-----+---------+-------+
 | Field       | Type                | Null | Key | Default | Extra |
 +-------------+---------------------+------+-----+---------+-------+
-| user        | varchar(16)         | YES  |     | NULL    |       |
+| user        | varchar(32)         | YES  |     | NULL    |       |
 | event_name  | varchar(128)        | NO   |     | NULL    |       |
 | total       | bigint(20) unsigned | NO   |     | NULL    |       |
 | latency     | bigint(20) unsigned | NO   |     | NULL    |       |
@@ -2515,7 +2988,7 @@ mysql> desc user_summary_by_stages;
 +---------------+---------------------+------+-----+---------+-------+
 | Field         | Type                | Null | Key | Default | Extra |
 +---------------+---------------------+------+-----+---------+-------+
-| user          | varchar(16)         | YES  |     | NULL    |       |
+| user          | varchar(32)         | YES  |     | NULL    |       |
 | event_name    | varchar(128)        | NO   |     | NULL    |       |
 | total         | bigint(20) unsigned | NO   |     | NULL    |       |
 | total_latency | text                | YES  |     | NULL    |       |
@@ -2577,7 +3050,7 @@ mysql> desc user_summary_by_statement_latency;
 +---------------+---------------+------+-----+---------+-------+
 | Field         | Type          | Null | Key | Default | Extra |
 +---------------+---------------+------+-----+---------+-------+
-| user          | varchar(16)   | YES  |     | NULL    |       |
+| user          | varchar(32)   | YES  |     | NULL    |       |
 | total         | decimal(42,0) | YES  |     | NULL    |       |
 | total_latency | text          | YES  |     | NULL    |       |
 | max_latency   | text          | YES  |     | NULL    |       |
@@ -2593,7 +3066,7 @@ mysql> desc x$user_summary_by_statement_latency;
 +---------------+---------------+------+-----+---------+-------+
 | Field         | Type          | Null | Key | Default | Extra |
 +---------------+---------------+------+-----+---------+-------+
-| user          | varchar(16)   | YES  |     | NULL    |       |
+| user          | varchar(32)   | YES  |     | NULL    |       |
 | total         | decimal(42,0) | YES  |     | NULL    |       |
 | total_latency | decimal(42,0) | YES  |     | NULL    |       |
 | max_latency   | decimal(42,0) | YES  |     | NULL    |       |
@@ -2632,7 +3105,7 @@ mysql> desc user_summary_by_statement_type;
 +---------------+---------------------+------+-----+---------+-------+
 | Field         | Type                | Null | Key | Default | Extra |
 +---------------+---------------------+------+-----+---------+-------+
-| user          | varchar(16)         | YES  |     | NULL    |       |
+| user          | varchar(32)         | YES  |     | NULL    |       |
 | statement     | varchar(128)        | YES  |     | NULL    |       |
 | total         | bigint(20) unsigned | NO   |     | NULL    |       |
 | total_latency | text                | YES  |     | NULL    |       |
@@ -2649,7 +3122,7 @@ mysql> desc x$user_summary_by_statement_type;
 +---------------+---------------------+------+-----+---------+-------+
 | Field         | Type                | Null | Key | Default | Extra |
 +---------------+---------------------+------+-----+---------+-------+
-| user          | varchar(16)         | YES  |     | NULL    |       |
+| user          | varchar(32)         | YES  |     | NULL    |       |
 | statement     | varchar(128)        | YES  |     | NULL    |       |
 | total         | bigint(20) unsigned | NO   |     | NULL    |       |
 | total_latency | bigint(20) unsigned | NO   |     | NULL    |       |
@@ -2807,7 +3280,7 @@ mysql> desc waits_by_user_by_latency;
 +---------------+---------------------+------+-----+---------+-------+
 | Field         | Type                | Null | Key | Default | Extra |
 +---------------+---------------------+------+-----+---------+-------+
-| user          | varchar(16)         | YES  |     | NULL    |       |
+| user          | varchar(32)         | YES  |     | NULL    |       |
 | event         | varchar(128)        | NO   |     | NULL    |       |
 | total         | bigint(20) unsigned | NO   |     | NULL    |       |
 | total_latency | text                | YES  |     | NULL    |       |
@@ -2820,7 +3293,7 @@ mysql> desc x$waits_by_user_by_latency;
 +---------------+---------------------+------+-----+---------+-------+
 | Field         | Type                | Null | Key | Default | Extra |
 +---------------+---------------------+------+-----+---------+-------+
-| user          | varchar(16)         | YES  |     | NULL    |       |
+| user          | varchar(32)         | YES  |     | NULL    |       |
 | event         | varchar(128)        | NO   |     | NULL    |       |
 | total         | bigint(20) unsigned | NO   |     | NULL    |       |
 | total_latency | bigint(20) unsigned | NO   |     | NULL    |       |
@@ -3094,11 +3567,11 @@ Also normalizes the paths across operating systems, so backslashes on Windows ar
 
 ##### Parameters
 
-* path (VARCHAR(260)): The raw file path value to format.
+* path (VARCHAR(512)): The raw file path value to format.
 
 ##### Returns
 
-VARCHAR(260) CHARSET UTF8
+VARCHAR(512) CHARSET UTF8
 
 ##### Example
 ```SQL
@@ -3123,7 +3596,7 @@ mysql> select format_path('/Users/mark/sandboxes/SmallTree/AMaster/data/mysql/pr
 
 ##### Description
 
-Formats a normalized statement, truncating it if it's > 64 characters long by default.
+Formats a normalized statement, truncating it if it is > 64 characters long by default.
 
 To configure the length to truncate the statement to by default, update the `statement_truncate_len` variable with `sys_config` table to a different value. Alternatively, to change it just for just your particular session, use `SET @sys.statement_truncate_len := <some new value>`.
 
@@ -3197,6 +3670,88 @@ mysql> select format_time(34234);
 1 row in set (0.00 sec)
 ```
 
+#### list_add
+
+##### Description
+
+Takes a list, and a value to add to the list, and returns the resulting list.
+
+Useful for altering certain session variables, like sql_mode or optimizer_switch for instance.
+
+##### Parameters
+
+in_list (TEXT): The comma separated list to add a value to
+
+in_add_value (TEXT): The value to add to the input list
+
+##### Returns
+
+TEXT
+
+##### Example
+
+```SQL
+mysql> select @@sql_mode;
++-----------------------------------------------------------------------------------+
+| @@sql_mode                                                                        |
++-----------------------------------------------------------------------------------+
+| ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION |
++-----------------------------------------------------------------------------------+
+1 row in set (0.00 sec)
+
+mysql> set sql_mode = sys.list_add(@@sql_mode, 'ANSI_QUOTES');
+Query OK, 0 rows affected (0.06 sec)
+
+mysql> select @@sql_mode;
++-----------------------------------------------------------------------------------------------+
+| @@sql_mode                                                                                    |
++-----------------------------------------------------------------------------------------------+
+| ANSI_QUOTES,ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION |
++-----------------------------------------------------------------------------------------------+
+1 row in set (0.00 sec)
+```
+
+#### list_drop
+
+##### Description
+
+Takes a list, and a value to attempt to remove from the list, and returns the resulting list.
+
+Useful for altering certain session variables, like sql_mode or optimizer_switch for instance.
+
+##### Parameters
+
+in_list (TEXT): The comma separated list to drop a value from
+
+in_drop_value (TEXT): The value to drop from the input list
+
+##### Returns
+
+TEXT
+
+##### Example
+
+```SQL
+mysql> select @@sql_mode;
++-----------------------------------------------------------------------------------------------+
+| @@sql_mode                                                                                    |
++-----------------------------------------------------------------------------------------------+
+| ANSI_QUOTES,ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION |
++-----------------------------------------------------------------------------------------------+
+1 row in set (0.00 sec)
+
+mysql> set sql_mode = sys.list_drop(@@sql_mode, 'ONLY_FULL_GROUP_BY');
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> select @@sql_mode;
++----------------------------------------------------------------------------+
+| @@sql_mode                                                                 |
++----------------------------------------------------------------------------+
+| ANSI_QUOTES,STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION |
++----------------------------------------------------------------------------+
+1 row in set (0.00 sec)
+```
+
 #### ps_is_account_enabled
 
 ##### Description
@@ -3206,7 +3761,7 @@ Determines whether instrumentation of an account is enabled within Performance S
 ##### Parameters
 
 * in_host VARCHAR(60): The hostname of the account to check.
-* in_user (VARCHAR(16)): The username of the account to check.
+* in_user VARCHAR(32): The username of the account to check.
 
 ##### Returns
 
@@ -3331,7 +3886,7 @@ Return the Performance Schema THREAD_ID for the specified connection ID.
 
 ##### Parameters
 
-* in_connection_id (BIGINT UNSIGNED): The id of the connection to return the thread id for.
+* in_connection_id (BIGINT UNSIGNED): The id of the connection to return the thread id for. If NULL, the current connection thread id is returned.
 
 ##### Returns
 
@@ -3378,6 +3933,102 @@ thread_stack: {"rankdir": "LR","nodesep": "0.10","stack_created": "2014-02-19 13
 [{"nesting_event_id": "0", "event_id": "10", "timer_wait": 256.35, "event_info": 
 "sql/select", "wait_info": "select @@version_comment limit 1\nerrors: 0\nwarnings: 0\nlock time:
 ...
+```
+
+#### ps_thread_trx_info
+
+##### Description
+
+Returns a JSON object with info on the given thread's current transaction, and the statements it has already executed, derived from the `performance_schema.events_transactions_current` and `performance_schema.events_statements_history` tables (so the consumers for these also have to be enabled within Performance Schema to get full data in the object).
+
+When the output exceeds the default truncation length (65535), a JSON error object is returned, such as:
+
+`{ "error": "Trx info truncated: Row 6 was cut by GROUP_CONCAT()" }`
+
+Similar error objects are returned for other warnings/and exceptions raised when calling the function.
+
+The max length of the output of this function can be controlled with the `ps_thread_trx_info.max_length` variable set via `sys_config`, or the `@sys.ps_thread_trx_info.max_length` user variable, as appropriate.
+
+##### Parameters
+
+* in_thread_id (BIGINT UNSIGNED): The id of the thread to return the transaction info for.
+
+##### Example
+
+```SQL
+SELECT sys.ps_thread_trx_info(48)\G
+*************************** 1. row ***************************
+sys.ps_thread_trx_info(48): [
+  {
+    "time": "790.70 us",
+    "state": "COMMITTED",
+    "mode": "READ WRITE",
+    "autocommitted": "NO",
+    "gtid": "AUTOMATIC",
+    "isolation": "REPEATABLE READ",
+    "statements_executed": [
+      {
+        "sql_text": "INSERT INTO info VALUES (1, \'foo\')",
+        "time": "471.02 us",
+        "schema": "trx",
+        "rows_examined": 0,
+        "rows_affected": 1,
+        "rows_sent": 0,
+        "tmp_tables": 0,
+        "tmp_disk_tables": 0,
+        "sort_rows": 0,
+        "sort_merge_passes": 0
+      },
+      {
+        "sql_text": "COMMIT",
+        "time": "254.42 us",
+        "schema": "trx",
+        "rows_examined": 0,
+        "rows_affected": 0,
+        "rows_sent": 0,
+        "tmp_tables": 0,
+        "tmp_disk_tables": 0,
+        "sort_rows": 0,
+        "sort_merge_passes": 0
+      }
+    ]
+  },
+  {
+    "time": "426.20 us",
+    "state": "COMMITTED",
+    "mode": "READ WRITE",
+    "autocommitted": "NO",
+    "gtid": "AUTOMATIC",
+    "isolation": "REPEATABLE READ",
+    "statements_executed": [
+      {
+        "sql_text": "INSERT INTO info VALUES (2, \'bar\')",
+        "time": "107.33 us",
+        "schema": "trx",
+        "rows_examined": 0,
+        "rows_affected": 1,
+        "rows_sent": 0,
+        "tmp_tables": 0,
+        "tmp_disk_tables": 0,
+        "sort_rows": 0,
+        "sort_merge_passes": 0
+      },
+      {
+        "sql_text": "COMMIT",
+        "time": "213.23 us",
+        "schema": "trx",
+        "rows_examined": 0,
+        "rows_affected": 0,
+        "rows_sent": 0,
+        "tmp_tables": 0,
+        "tmp_disk_tables": 0,
+        "sort_rows": 0,
+        "sort_merge_passes": 0
+      }
+    ]
+  }
+]
+1 row in set (0.03 sec)
 ```
 
 #### sys_get_config
@@ -3429,6 +4080,69 @@ Query OK, 0 rows affected (0.00 sec)
 IF (@sys.statement_truncate_len IS NULL) THEN
     SET @sys.statement_truncate_len = sys.sys_get_config('statement_truncate_len', 64);
 END IF;
+```
+
+#### version_major
+
+##### Description
+
+Returns the major version of MySQL Server.
+
+##### Returns
+
+TINYINT UNSIGNED
+
+##### Example
+```SQL
+mysql> SELECT VERSION(), sys.version_major();
++--------------------------------------+---------------------+
+| VERSION()                            | sys.version_major() |
++--------------------------------------+---------------------+
+| 5.7.9-enterprise-commercial-advanced | 5                   |
++--------------------------------------+---------------------+
+1 row in set (0.00 sec)
+```
+
+#### version_minor
+
+##### Description
+
+Returns the minor (release series) version of MySQL Server.
+
+##### Returns
+
+TINYINT UNSIGNED
+
+##### Example
+```SQL
+mysql> SELECT VERSION(), sys.server_minor();
++--------------------------------------+---------------------+
+| VERSION()                            | sys.version_minor() |
++--------------------------------------+---------------------+
+| 5.7.9-enterprise-commercial-advanced | 7                   |
++--------------------------------------+---------------------+
+1 row in set (0.00 sec)
+```
+
+#### version_patch
+
+##### Description
+
+Returns the patch release version of MySQL Server.
+
+##### Returns
+
+TINYINT UNSIGNED
+
+##### Example
+```SQL
+mysql> SELECT VERSION(), sys.version_patch();
++--------------------------------------+---------------------+
+| VERSION()                            | sys.version_patch() |
++--------------------------------------+---------------------+
+| 5.7.9-enterprise-commercial-advanced | 9                   |
++--------------------------------------+---------------------+
+1 row in set (0.00 sec)
 ```
 
 
@@ -3495,6 +4209,117 @@ mysql> SHOW FULL TABLES FROM ps;
 | events_stages_current                   | VIEW       |
 | events_stages_history                   | VIEW       |
 ...
+```
+
+#### execute_prepared_stmt
+
+##### Description
+
+Takes the query in the argument and executes it using a prepared statement. The prepared statement is deallocated,
+so the procedure is mainly useful for executing one off dynamically created queries.
+
+The sys_execute_prepared_stmt prepared statement name is used for the query and is required not to exist.
+
+##### Parameters
+
+* in_query (longtext CHARACTER SET UTF8):
+** The query to execute.
+
+The following configuration option is supported:
+
+   * sys.debug
+     Whether to provide debugging output.
+     Default is 'OFF'. Set to 'ON' to include.
+
+##### Example
+```SQL
+mysql> CALL sys.execute_prepared_stmt(''SELECT * FROM sys.sys_config'');
++------------------------+-------+---------------------+--------+
+| variable               | value | set_time            | set_by |
++------------------------+-------+---------------------+--------+
+| statement_truncate_len | 64    | 2015-06-30 13:06:00 | NULL   |
++------------------------+-------+---------------------+--------+
+1 row in set (0.00 sec)
+
+Query OK, 0 rows affected (0.00 sec)
+```
+
+#### diagnostics
+
+##### Description
+
+Create a report of the current status of the server for diagnostics purposes. Data collected includes (some items depends on versions and settings):
+
+* The GLOBAL VARIABLES
+* Several sys schema views including metrics or equivalent (depending on version and settings)
+* Queries in the 95th percentile
+* Several ndbinfo views for MySQL Cluster
+* Replication (both master and slave) information.
+
+Some of the sys schema views are calculated as initial (optional), overall, delta:
+
+* The initial view is the content of the view at the start of this procedure.
+  This output will be the same as the the start values used for the delta view.
+  The initial view is included if @sys.diagnostics.include_raw = 'ON'.
+* The overall view is the content of the view at the end of this procedure.
+  This output is the same as the end values used for the delta view.
+  The overall view is always included.
+* The delta view is the difference from the beginning to the end. Note that for min and max values
+  they are simply the min or max value from the end view respectively, so does not necessarily reflect
+  the minimum/maximum value in the monitored period.
+  Note: except for the metrics view the delta is only calculation between the first and last outputs.
+
+Requires the SUPER privilege for "SET sql_log_bin = 0;".
+
+Versions supported:
+* MySQL 5.6: 5.6.10 and later
+* MySQL 5.7: 5.7.9 and later
+
+Some configuration options are supported:
+
+* sys.diagnostics.allow_i_s_tables
+  Specifies whether it is allowed to do table scan queries on information_schema.TABLES. This can be expensive if there
+  are many tables. Set to 'ON' to allow, 'OFF' to not allow.
+  Default is 'OFF'.
+
+* sys.diagnostics.include_raw
+  Set to 'ON' to include the raw data (e.g. the original output of "SELECT * FROM sys.metrics").
+  Use this to get the initial values of the various views.
+  Default is 'OFF'.
+
+* sys.statement_truncate_len
+  How much of queries in the process list output to include.
+  Default is 64.
+
+* sys.debug
+  Whether to provide debugging output.
+  Default is 'OFF'. Set to 'ON' to include.
+
+##### Parameters
+
+* in_max_runtime (INT UNSIGNED):
+The maximum time to keep collecting data.
+Use NULL to get the default which is 60 seconds, otherwise enter a value greater than 0.
+* in_interval (INT UNSIGNED):
+How long to sleep between data collections.
+Use NULL to get the default which is 30 seconds, otherwise enter a value greater than 0.
+* in_auto_config (ENUM('current', 'medium', 'full'))
+Automatically enable Performance Schema instruments and consumers.
+NOTE: The more that are enabled, the more impact on the performance.
+If another setting the 'current' is chosen, the current settings
+are restored at the end of the procedure.
+Supported values are:
+** current - use the current settings.
+** medium - enable some settings. This requires the SUPER privilege.
+** full - enables all settings. This will have a big impact on the
+   performance - be careful using this option. This requires the SUPER privilege.
+
+##### Example
+```SQL
+mysql> TEE diag.out;
+mysql> CALL sys.diagnostics(120, 30, 'current');
+...
+mysql> NOTEE;
 ```
 
 #### ps_setup_disable_background_threads
@@ -4312,4 +5137,285 @@ mysql> CALL sys.ps_truncate_all_tables(false);
 | Truncated 44 tables |
 +---------------------+
 1 row in set (0.10 sec)
+```
+
+#### statement_performance_analyzer
+
+##### Description
+Create a report of the statements running on the server.
+
+The views are calculated based on the overall and/or delta activity.
+
+Requires the SUPER privilege for "SET sql_log_bin = 0;".
+
+The following configuration options are supported:
+
+   * sys.statement_performance_analyzer.limit
+     The maximum number of rows to include for the views that does not have a built-in limit (e.g. the 95th percentile view).
+     If not set the limit is 100.
+
+   * sys.statement_performance_analyzer.view
+     Used together with the 'custom' view. If the value contains a space, it is considered a query, otherwise it must be
+     an existing view querying the performance_schema.events_statements_summary_by_digest table. There cannot be any limit
+     clause including in the query or view definition if @sys.statement_performance_analyzer.limit > 0.
+     If specifying a view, use the same format as for in_table.
+
+   * sys.debug
+     Whether to provide debugging output.
+     Default is 'OFF'. Set to 'ON' to include.
+
+##### Parameters
+
+* in_action (ENUM('snapshot', 'overall', 'delta', 'create_tmp', 'create_table', 'save', 'cleanup')):
+  The action to take. Supported actions are:
+    - snapshot      Store a snapshot. The default is to make a snapshot of the current content of
+                    performance_schema.events_statements_summary_by_digest, but by setting in_table
+                    this can be overwritten to copy the content of the specified table.
+                    The snapshot is stored in the sys.tmp_digests temporary table.
+    - overall       Generate analyzis based on the content specified by in_table. For the overall analyzis,
+                    in_table can be NOW() to use a fresh snapshot. This will overwrite an existing snapshot.
+                    Use NULL for in_table to use the existing snapshot. If in_table IS NULL and no snapshot
+                    exists, a new will be created.
+                    See also in_views and @sys.statement_performance_analyzer.limit.
+    - delta         Generate a delta analysis. The delta will be calculated between the reference table in
+                    in_table and the snapshot. An existing snapshot must exist.
+                    The action uses the sys.tmp_digests_delta temporary table.
+                    See also in_views and @sys.statement_performance_analyzer.limit.
+    - create_table  Create a regular table suitable for storing the snapshot for later use, e.g. for
+                    calculating deltas.
+    - create_tmp    Create a temporary table suitable for storing the snapshot for later use, e.g. for
+                    calculating deltas.
+    - save          Save the snapshot in the table specified by in_table. The table must exists and have
+                    the correct structure.
+                    If no snapshot exists, a new is created.
+    - cleanup       Remove the temporary tables used for the snapshot and delta.
+
+* in_table (VARCHAR(129)):
+  The table argument used for some actions. Use the format 'db1.t1' or 't1' without using any backticks (`)
+  for quoting. Periods (.) are not supported in the database and table names.
+  
+  The meaning of the table for each action supporting the argument is:
+
+    - snapshot      The snapshot is created based on the specified table. Set to NULL or NOW() to use
+                    the current content of performance_schema.events_statements_summary_by_digest.
+    - overall       The table with the content to create the overall analyzis for. The following values
+                    can be used:
+                      - A table name - use the content of that table.
+                      - NOW()        - create a fresh snapshot and overwrite the existing snapshot.
+                      - NULL         - use the last stored snapshot.
+    - delta         The table name is mandatory and specified the reference view to compare the currently
+                    stored snapshot against. If no snapshot exists, a new will be created.
+    - create_table  The name of the regular table to create.
+    - create_tmp    The name of the temporary table to create.
+    - save          The name of the table to save the currently stored snapshot into.
+
+* in_views (SET ('with_runtimes_in_95th_percentile', 'analysis', 'with_errors_or_warnings',
+                 'with_full_table_scans', 'with_sorting', 'with_temp_tables', 'custom'))
+  Which views to include:
+
+    - with_runtimes_in_95th_percentile  Based on the sys.statements_with_runtimes_in_95th_percentile view
+    - analysis                          Based on the sys.statement_analysis view
+    - with_errors_or_warnings           Based on the sys.statements_with_errors_or_warnings view
+    - with_full_table_scans             Based on the sys.statements_with_full_table_scans view
+    - with_sorting                      Based on the sys.statements_with_sorting view
+    - with_temp_tables                  Based on the sys.statements_with_temp_tables view
+    - custom                            Use a custom view. This view must be specified in @sys.statement_performance_analyzer.view to an existing view or a query
+
+  Default is to include all except 'custom'.
+
+##### Example
+```SQL
+-- To create a report with the queries in the 95th percentile since last truncate of performance_schema.events_statements_summary_by_digest and the delta for a 1 minute period:
+--
+--    1. Create a temporary table to store the initial snapshot.
+--    2. Create the initial snapshot.
+--    3. Save the initial snapshot in the temporary table.
+--    4. Wait one minute.
+--    5. Create a new snapshot.
+--    6. Perform analyzis based on the new snapshot.
+--    7. Perform analyzis based on the delta between the initial and new snapshots.
+
+mysql> CALL sys.statement_performance_analyzer('create_tmp', 'mydb.tmp_digests_ini', NULL);
+Query OK, 0 rows affected (0.08 sec)
+
+mysql> CALL sys.statement_performance_analyzer('snapshot', NULL, NULL);
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> CALL sys.statement_performance_analyzer('save', 'mydb.tmp_digests_ini', NULL);
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> DO SLEEP(60);
+Query OK, 0 rows affected (1 min 0.00 sec)
+
+mysql> CALL sys.statement_performance_analyzer('snapshot', NULL, NULL);
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> CALL sys.statement_performance_analyzer('overall', NULL, 'with_runtimes_in_95th_percentile');
++-----------------------------------------+
+| Next Output                             |
++-----------------------------------------+
+| Queries with Runtime in 95th Percentile |
++-----------------------------------------+
+1 row in set (0.05 sec)
+
+...
+
+mysql> CALL sys.statement_performance_analyzer('delta', 'mydb.tmp_digests_ini', 'with_runtimes_in_95th_percentile');
++-----------------------------------------+
+| Next Output                             |
++-----------------------------------------+
+| Queries with Runtime in 95th Percentile |
++-----------------------------------------+
+1 row in set (0.03 sec)
+
+...
+
+
+-- To create an overall report of the 95th percentile queries and the top 10 queries with full table scans:
+
+mysql> CALL sys.statement_performance_analyzer('snapshot', NULL, NULL);
+Query OK, 0 rows affected (0.01 sec)                                   
+
+mysql> SET @sys.statement_performance_analyzer.limit = 10;
+Query OK, 0 rows affected (0.00 sec)          
+
+mysql> CALL sys.statement_performance_analyzer('overall', NULL, 'with_runtimes_in_95th_percentile,with_full_table_scans');
++-----------------------------------------+
+| Next Output                             |
++-----------------------------------------+
+| Queries with Runtime in 95th Percentile |
++-----------------------------------------+
+1 row in set (0.01 sec)
+
+...
+
++-------------------------------------+
+| Next Output                         |
++-------------------------------------+
+| Top 10 Queries with Full Table Scan |
++-------------------------------------+
+1 row in set (0.09 sec)
+
+...
+
+
+-- Use a custom view showing the top 10 query sorted by total execution time refreshing the view every minute using
+-- the watch command in Linux.
+
+mysql> CREATE OR REPLACE VIEW mydb.my_statements AS
+    -> SELECT sys.format_statement(DIGEST_TEXT) AS query,
+    ->        SCHEMA_NAME AS db,
+    ->        COUNT_STAR AS exec_count,
+    ->        sys.format_time(SUM_TIMER_WAIT) AS total_latency,
+    ->        sys.format_time(AVG_TIMER_WAIT) AS avg_latency,
+    ->        ROUND(IFNULL(SUM_ROWS_SENT / NULLIF(COUNT_STAR, 0), 0)) AS rows_sent_avg,
+    ->        ROUND(IFNULL(SUM_ROWS_EXAMINED / NULLIF(COUNT_STAR, 0), 0)) AS rows_examined_avg,
+    ->        ROUND(IFNULL(SUM_ROWS_AFFECTED / NULLIF(COUNT_STAR, 0), 0)) AS rows_affected_avg,
+    ->        DIGEST AS digest
+    ->   FROM performance_schema.events_statements_summary_by_digest
+    -> ORDER BY SUM_TIMER_WAIT DESC;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> CALL sys.statement_performance_analyzer('create_table', 'mydb.digests_prev', NULL);
+Query OK, 0 rows affected (0.10 sec)
+
+shell$ watch -n 60 "mysql sys --table -e \"
+> SET @sys.statement_performance_analyzer.view = 'mydb.my_statements';
+> SET @sys.statement_performance_analyzer.limit = 10;
+> CALL statement_performance_analyzer('snapshot', NULL, NULL);
+> CALL statement_performance_analyzer('delta', 'mydb.digests_prev', 'custom');
+> CALL statement_performance_analyzer('save', 'mydb.digests_prev', NULL);
+> \""
+
+Every 60.0s: mysql sys --table -e "                                                                                                   ...  Mon Dec 22 10:58:51 2014
+
++----------------------------------+
+| Next Output                      |
++----------------------------------+
+| Top 10 Queries Using Custom View |
++----------------------------------+
++-------------------+-------+------------+---------------+-------------+---------------+-------------------+-------------------+----------------------------------+
+| query             | db    | exec_count | total_latency | avg_latency | rows_sent_avg | rows_examined_avg | rows_affected_avg | digest                           |
++-------------------+-------+------------+---------------+-------------+---------------+-------------------+-------------------+----------------------------------+
+...
+```
+
+#### table_exists
+
+##### Description
+Tests whether the table specified in in_db and in_table exists either as a regular
+table, or as a temporary table. The returned value corresponds to the table that
+will be used, so if there's both a temporary and a permanent table with the given
+name, then 'TEMPORARY' will be returned.
+
+##### Parameters
+
+* in_db (VARCHAR(64)): The database name to check for the existance of the table in.
+
+* in_table (VARCHAR(64)): The name of the table to check the existance of.
+
+* out_exists ENUM('', 'BASE TABLE', 'VIEW', 'TEMPORARY'):  The return value: whether the table exists. The value is one of:
+   - ''           - the table does not exist neither as a base table, view, nor temporary table.
+   - 'BASE TABLE' - the table name exists as a permanent base table table.
+   - 'VIEW'       - the table name exists as a view.
+   - 'TEMPORARY'  - the table name exists as a temporary table.
+
+##### Example
+```SQL
+mysql> CREATE DATABASE db1;
+Query OK, 1 row affected (0.07 sec)
+
+mysql> use db1;
+Database changed
+mysql> CREATE TABLE t1 (id INT PRIMARY KEY);
+Query OK, 0 rows affected (0.08 sec)
+
+mysql> CREATE TABLE t2 (id INT PRIMARY KEY);
+Query OK, 0 rows affected (0.08 sec)
+
+mysql> CREATE view v_t1 AS SELECT * FROM t1;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> CREATE TEMPORARY TABLE t1 (id INT PRIMARY KEY);
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> CALL sys.table_exists('db1', 't1', @exists); SELECT @exists;
+Query OK, 0 rows affected (0.00 sec)
+
++------------+
+| @exists    |
++------------+
+| TEMPORARY  |
++------------+
+1 row in set (0.00 sec)
+
+mysql> CALL sys.table_exists('db1', 't2', @exists); SELECT @exists;
+Query OK, 0 rows affected (0.00 sec)
+
++------------+
+| @exists    |
++------------+
+| BASE TABLE |
++------------+
+1 row in set (0.01 sec)
+
+mysql> CALL sys.table_exists('db1', 'v_t1', @exists); SELECT @exists;
+Query OK, 0 rows affected (0.00 sec)
+
++---------+
+| @exists |
++---------+
+| VIEW    |
++---------+
+1 row in set (0.00 sec)
+
+mysql> CALL sys.table_exists('db1', 't3', @exists); SELECT @exists;
+Query OK, 0 rows affected (0.01 sec)
+
++---------+
+| @exists |
++---------+
+|         |
++---------+
+1 row in set (0.00 sec)
 ```

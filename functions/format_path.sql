@@ -18,9 +18,9 @@ DROP FUNCTION IF EXISTS format_path;
 DELIMITER $$
 
 CREATE DEFINER='root'@'localhost' FUNCTION format_path (
-        path VARCHAR(260)
+        path VARCHAR(512)
     )
-    RETURNS VARCHAR(260) CHARSET UTF8
+    RETURNS VARCHAR(512) CHARSET UTF8
     COMMENT '
              Description
              -----------
@@ -34,13 +34,13 @@ CREATE DEFINER='root'@'localhost' FUNCTION format_path (
              Parameters
              -----------
 
-             path (VARCHAR(260)): 
+             path (VARCHAR(512)):
                The raw file path value to format.
 
              Returns
              -----------
 
-             VARCHAR(260) CHARSET UTF8
+             VARCHAR(512) CHARSET UTF8
 
              Example
              -----------
@@ -65,7 +65,7 @@ CREATE DEFINER='root'@'localhost' FUNCTION format_path (
     DETERMINISTIC
     NO SQL
 BEGIN
-  DECLARE v_path VARCHAR(260);
+  DECLARE v_path VARCHAR(512);
   DECLARE v_undo_dir VARCHAR(1024);
 
   -- OSX hides /private/ in variables, but Performance Schema does not
