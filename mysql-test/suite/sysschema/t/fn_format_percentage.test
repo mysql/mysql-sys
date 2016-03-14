@@ -1,0 +1,19 @@
+-- source include/not_embedded.inc
+# Tests for sys schema
+# Verify the sys.format_percentage() function perfoms as expected
+
+# Passing NULL/nothing should return NULL
+SELECT sys.format_percentage(NULL);
+
+# Format valid "normal" percentages
+select sys.format_percentage(0.99921);
+select sys.format_percentage(0.012);
+select sys.format_percentage(0);
+select sys.format_percentage(1);
+
+# Relative percentages can be out of 0-1 range.
+# For example:
+# 112% faster or -20% regression
+
+select sys.format_percentage(1.12);
+select sys.format_percentage(-0.2);
