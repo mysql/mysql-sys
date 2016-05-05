@@ -1,7 +1,7 @@
 --
 -- View: engine_usage_by_schema
 --
--- Storage engines (and views) usage statistics, grouped by database.
+-- Storage engines usage statistics, grouped by database.
 --
 -- mysql> SELECT * FROM sys.engine_usage_by_schema;
 --          +---------------+--------+--------------+
@@ -23,7 +23,8 @@ VIEW engine_usage_by_schema (
   engine,
   tables_count
 ) AS
-  SELECT TABLE_SCHEMA AS engine_schema, IFNULL(ENGINE, 'VIEW'), COUNT(*) AS tables_count
+  SELECT TABLE_SCHEMA AS engine_schema, ENGINE, COUNT(*) AS tables_count
     FROM INFORMATION_SCHEMA.TABLES
+    WHERE ENGINE IS NOT NULL
     GROUP BY TABLE_SCHEMA, ENGINE
     ORDER BY TABLE_SCHEMA, ENGINE;
