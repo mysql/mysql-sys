@@ -1,9 +1,9 @@
 --
--- View: engines_usage
+-- View: engine_usage
 --
 -- Storage engines usage statistics.
 --
--- mysql> SELECT * FROM sys.engines_usage;
+-- mysql> SELECT * FROM sys.engine_usage;
 --          +--------+--------------+
 --          | engine | tables_count |
 --          +--------+--------------+
@@ -26,7 +26,6 @@ VIEW engine_usage (
     FROM INFORMATION_SCHEMA.ENGINES e
     LEFT JOIN INFORMATION_SCHEMA.TABLES t
       ON e.ENGINE = t.ENGINE
-    WHERE t.TABLE_SCHEMA NOT IN ('performance_schema', 'information_schema', 'mysql')
-      AND e.SUPPORT IN ('YES', 'DEFAULT')
+    WHERE e.SUPPORT IN ('YES', 'DEFAULT')
     GROUP BY e.ENGINE
     ORDER BY e.ENGINE;
