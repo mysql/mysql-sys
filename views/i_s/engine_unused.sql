@@ -18,7 +18,7 @@ CREATE OR REPLACE
   ALGORITHM = TEMPTABLE
   DEFINER = 'root'@'localhost'
   SQL SECURITY INVOKER
-VIEW engines_unused (
+VIEW engine_unused (
   engine
 ) AS
   SELECT e.ENGINE
