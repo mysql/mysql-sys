@@ -4,14 +4,15 @@
 -- Storage engines usage statistics, grouped by database.
 --
 -- mysql> SELECT * FROM sys.engine_usage_by_schema;
---          +---------------+--------+--------------+
---          | engine_schema | engine | tables_count |
---          +---------------+--------+--------------+
---          | sys           | VIEW   |          103 |
---          | sys           | InnoDB |            1 |
+--          +--------------------+--------------------+--------------+
+--          | engine_schema      | engine             | tables_count |
+--          +--------------------+--------------------+--------------+
+--          | information_schema | InnoDB             |           10 |
+--          | information_schema | MEMORY             |           51 |
+--          | mysql              | CSV                |            2 |
 -- ...
---          +---------------+--------+--------------+
---          5 rows in set (0.00 sec)
+--          +--------------------+--------------------+--------------+
+--          10 rows in set (0.01 sec)
 --
 
 CREATE OR REPLACE

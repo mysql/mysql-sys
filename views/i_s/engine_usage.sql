@@ -4,14 +4,16 @@
 -- Storage engines usage statistics.
 --
 -- mysql> SELECT * FROM sys.engine_usage;
---          +--------+--------------+
---          | engine | tables_count |
---          +--------+--------------+
---          | InnoDB |            5 |
---          | MEMORY |            3 |
---          | MyISAM |            5 |
---          +--------+--------------+
---          3 rows in set (0.01 sec)
+--          +--------------------+--------------+
+--          | engine             | tables_count |
+--          +--------------------+--------------+
+--          | ARCHIVE            |            0 |
+--          | BLACKHOLE          |            0 |
+--          | CSV                |            2 |
+--          | InnoDB             |          306 |
+-- ...
+--          +--------------------+--------------+
+--          8 rows in set (0.01 sec)
 --
 
 CREATE OR REPLACE
