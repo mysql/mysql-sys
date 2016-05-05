@@ -55,6 +55,7 @@ SOURCE ./views/i_s/schema_auto_increment_columns.sql
 SOURCE ./views/i_s/x_schema_flattened_keys.sql
 SOURCE ./views/i_s/schema_redundant_indexes.sql
 SOURCE ./views/i_s/engines_usage.sql
+SOURCE ./views/i_s/engines_usage_by_schema.sql
 SOURCE ./views/i_s/engines_unused.sql
 
 SOURCE ./views/p_s/ps_check_lost_instrumentation.sql
