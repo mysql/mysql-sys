@@ -584,7 +584,7 @@ BEGIN
             SELECT /*!50706 Channel_name, */Host, User_name, Port, Connect_retry,
                    Enabled_ssl, Ssl_ca, Ssl_capath, Ssl_cert, Ssl_cipher, Ssl_key, Ssl_verify_server_cert,
                    Heartbeat, Bind, Ignored_server_ids, Uuid, Retry_count, Ssl_crl, Ssl_crlpath,
-                   Enabled_auto_position
+                   Tls_version, Enabled_auto_position
               FROM mysql.slave_master_info/*!50706 ORDER BY Channel_name*/;
         END IF;
 
