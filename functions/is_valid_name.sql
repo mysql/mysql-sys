@@ -11,6 +11,7 @@ CREATE DEFINER='root'@'localhost' PROCEDURE is_valid_name (
              -----------
 
              Returns weather the passed string is a valid name in current MySQL version.
+	     A valid name is a string that does not require quoting to be used as an object identifier.
 
 
              Parameters
