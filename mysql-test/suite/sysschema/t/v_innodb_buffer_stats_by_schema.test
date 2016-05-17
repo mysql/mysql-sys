@@ -20,3 +20,11 @@ DESC sys.x$innodb_buffer_stats_by_schema;
 SELECT * FROM sys.x$innodb_buffer_stats_by_schema;
 --enable_result_log
 
+
+# Check that the old pages percentage is smaller than @@global.innodb_old_blocks_pct
+# Add 3 percent to avoid false positives due to rounding errors
+SELECT (SUM(pages_old)/sum(pages)*100 < (@@global.innodb_old_blocks_pct + 3)) AS OldPagesSmallEnough
+  FROM sys.innodb_buffer_stats_by_schema;
+
+SELECT (SUM(pages_old)/sum(pages)*100 < (@@global.innodb_old_blocks_pct + 3)) AS OldPagesSmallEnough
+  FROM sys.x$innodb_buffer_stats_by_schema;
