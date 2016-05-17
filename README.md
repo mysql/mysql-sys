@@ -4829,15 +4829,16 @@ mysql> CALL sys.ps_setup_show_enabled(TRUE, TRUE);
 +---------------+
 1 row in set (0.01 sec)
 
-+----------------------+---------+-------+
-| objects              | enabled | timed |
-+----------------------+---------+-------+
-| mysql.%              | NO      | NO    |
-| performance_schema.% | NO      | NO    |
-| information_schema.% | NO      | NO    |
-| %.%                  | YES     | YES   |
-+----------------------+---------+-------+
-4 rows in set (0.01 sec)
++-------------+---------+---------+-------+
+| object_type | objects | enabled | timed |
++-------------+---------+---------+-------+
+| EVENT       | %.%     | YES     | YES   |
+| FUNCTION    | %.%     | YES     | YES   |
+| PROCEDURE   | %.%     | YES     | YES   |
+| TABLE       | %.%     | YES     | YES   |
+| TRIGGER     | %.%     | YES     | YES   |
++-------------+---------+---------+-------+
+5 rows in set (0.01 sec)
 
 +---------------------------+
 | enabled_consumers         |
@@ -4849,16 +4850,33 @@ mysql> CALL sys.ps_setup_show_enabled(TRUE, TRUE);
 +---------------------------+
 4 rows in set (0.05 sec)
 
-+--------------------------+-------------+
-| enabled_threads          | thread_type |
-+--------------------------+-------------+
-| innodb/srv_master_thread | BACKGROUND  |
-| root@localhost           | FOREGROUND  |
-| root@localhost           | FOREGROUND  |
-| root@localhost           | FOREGROUND  |
-| root@localhost           | FOREGROUND  |
-+--------------------------+-------------+
-5 rows in set (0.03 sec)
++---------------------------------+-------------+
+| enabled_threads                 | thread_type |
++---------------------------------+-------------+
+| sql/main                        | BACKGROUND  |
+| sql/thread_timer_notifier       | BACKGROUND  |
+| innodb/io_ibuf_thread           | BACKGROUND  |
+| innodb/io_log_thread            | BACKGROUND  |
+| innodb/io_read_thread           | BACKGROUND  |
+| innodb/io_read_thread           | BACKGROUND  |
+| innodb/io_write_thread          | BACKGROUND  |
+| innodb/io_write_thread          | BACKGROUND  |
+| innodb/page_cleaner_thread      | BACKGROUND  |
+| innodb/srv_lock_timeout_thread  | BACKGROUND  |
+| innodb/srv_error_monitor_thread | BACKGROUND  |
+| innodb/srv_monitor_thread       | BACKGROUND  |
+| innodb/srv_master_thread        | BACKGROUND  |
+| innodb/srv_purge_thread         | BACKGROUND  |
+| innodb/srv_worker_thread        | BACKGROUND  |
+| innodb/srv_worker_thread        | BACKGROUND  |
+| innodb/srv_worker_thread        | BACKGROUND  |
+| innodb/buf_dump_thread          | BACKGROUND  |
+| innodb/dict_stats_thread        | BACKGROUND  |
+| sql/signal_handler              | BACKGROUND  |
+| sql/compress_gtid_table         | FOREGROUND  |
+| root@localhost                  | FOREGROUND  |
++---------------------------------+-------------+
+22 rows in set (0.01 sec)
 
 +-------------------------------------+-------+
 | enabled_instruments                 | timed |

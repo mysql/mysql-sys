@@ -1,0 +1,16 @@
+-- source include/not_embedded.inc
+
+# Show limited info (no thread or instrument info)
+CALL sys.ps_setup_show_enabled(FALSE, FALSE);
+
+# Should show instrument data, but not thread info
+CALL sys.ps_setup_show_enabled(TRUE, FALSE);
+
+# Should show thread info, but no instrument data
+CALL sys.ps_setup_show_enabled(FALSE, TRUE);
+
+# Should show all info
+CALL sys.ps_setup_show_enabled(TRUE, TRUE);
+
+# Clean up
+-- source ../include/ps_setup_reset_to_default_cleanup.inc
