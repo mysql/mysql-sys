@@ -352,20 +352,20 @@ mysql> desc host_summary_by_statement_latency;
 9 rows in set (0.29 sec)
 
 mysql> desc x$host_summary_by_statement_latency;
-+---------------+---------------+------+-----+---------+-------+
-| Field         | Type          | Null | Key | Default | Extra |
-+---------------+---------------+------+-----+---------+-------+
-| host          | varchar(60)   | YES  |     | NULL    |       |
-| total         | decimal(42,0) | YES  |     | NULL    |       |
-| total_latency | decimal(42,0) | YES  |     | NULL    |       |
-| max_latency   | decimal(42,0) | YES  |     | NULL    |       |
-| lock_latency  | decimal(42,0) | YES  |     | NULL    |       |
-| rows_sent     | decimal(42,0) | YES  |     | NULL    |       |
-| rows_examined | decimal(42,0) | YES  |     | NULL    |       |
-| rows_affected | decimal(42,0) | YES  |     | NULL    |       |
-| full_scans    | decimal(43,0) | YES  |     | NULL    |       |
-+---------------+---------------+------+-----+---------+-------+
-9 rows in set (0.54 sec)
++---------------+---------------------+------+-----+---------+-------+
+| Field         | Type                | Null | Key | Default | Extra |
++---------------+---------------------+------+-----+---------+-------+
+| host          | varchar(60)         | YES  |     | NULL    |       |
+| total         | decimal(42,0)       | YES  |     | NULL    |       |
+| total_latency | decimal(42,0)       | YES  |     | NULL    |       |
+| max_latency   | bigint(20) unsigned | YES  |     | NULL    |       |
+| lock_latency  | decimal(42,0)       | YES  |     | NULL    |       |
+| rows_sent     | decimal(42,0)       | YES  |     | NULL    |       |
+| rows_examined | decimal(42,0)       | YES  |     | NULL    |       |
+| rows_affected | decimal(42,0)       | YES  |     | NULL    |       |
+| full_scans    | decimal(43,0)       | YES  |     | NULL    |       |
++---------------+---------------------+------+-----+---------+-------+
+9 rows in set (0.00 sec)
 ```
 
 ##### Example
