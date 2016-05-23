@@ -1092,8 +1092,8 @@ global_instrumentation
 thread_instrumentation
 statements_digest
 enabled_threads	thread_type
-sql/main	BACKGROUND
-sql/thread_timer_notifier	BACKGROUND
+innodb/buf_dump_thread	BACKGROUND
+innodb/dict_stats_thread	BACKGROUND
 innodb/io_ibuf_thread	BACKGROUND
 innodb/io_log_thread	BACKGROUND
 innodb/io_read_thread	BACKGROUND
@@ -1101,19 +1101,19 @@ innodb/io_read_thread	BACKGROUND
 innodb/io_write_thread	BACKGROUND
 innodb/io_write_thread	BACKGROUND
 innodb/page_cleaner_thread	BACKGROUND
-innodb/srv_lock_timeout_thread	BACKGROUND
 innodb/srv_error_monitor_thread	BACKGROUND
-innodb/srv_monitor_thread	BACKGROUND
+innodb/srv_lock_timeout_thread	BACKGROUND
 innodb/srv_master_thread	BACKGROUND
+innodb/srv_monitor_thread	BACKGROUND
 innodb/srv_purge_thread	BACKGROUND
 innodb/srv_worker_thread	BACKGROUND
 innodb/srv_worker_thread	BACKGROUND
 innodb/srv_worker_thread	BACKGROUND
-innodb/buf_dump_thread	BACKGROUND
-innodb/dict_stats_thread	BACKGROUND
-sql/signal_handler	BACKGROUND
-sql/compress_gtid_table	FOREGROUND
 root@localhost	FOREGROUND
+sql/compress_gtid_table	FOREGROUND
+sql/main	BACKGROUND
+sql/signal_handler	BACKGROUND
+sql/thread_timer_notifier	BACKGROUND
 CALL sys.ps_setup_show_enabled(TRUE, TRUE);
 performance_schema_enabled
 1
@@ -1142,8 +1142,8 @@ global_instrumentation
 thread_instrumentation
 statements_digest
 enabled_threads	thread_type
-sql/main	BACKGROUND
-sql/thread_timer_notifier	BACKGROUND
+innodb/buf_dump_thread	BACKGROUND
+innodb/dict_stats_thread	BACKGROUND
 innodb/io_ibuf_thread	BACKGROUND
 innodb/io_log_thread	BACKGROUND
 innodb/io_read_thread	BACKGROUND
@@ -1151,19 +1151,19 @@ innodb/io_read_thread	BACKGROUND
 innodb/io_write_thread	BACKGROUND
 innodb/io_write_thread	BACKGROUND
 innodb/page_cleaner_thread	BACKGROUND
-innodb/srv_lock_timeout_thread	BACKGROUND
 innodb/srv_error_monitor_thread	BACKGROUND
-innodb/srv_monitor_thread	BACKGROUND
+innodb/srv_lock_timeout_thread	BACKGROUND
 innodb/srv_master_thread	BACKGROUND
+innodb/srv_monitor_thread	BACKGROUND
 innodb/srv_purge_thread	BACKGROUND
 innodb/srv_worker_thread	BACKGROUND
 innodb/srv_worker_thread	BACKGROUND
 innodb/srv_worker_thread	BACKGROUND
-innodb/buf_dump_thread	BACKGROUND
-innodb/dict_stats_thread	BACKGROUND
-sql/signal_handler	BACKGROUND
-sql/compress_gtid_table	FOREGROUND
 root@localhost	FOREGROUND
+sql/compress_gtid_table	FOREGROUND
+sql/main	BACKGROUND
+sql/signal_handler	BACKGROUND
+sql/thread_timer_notifier	BACKGROUND
 enabled_instruments	timed
 wait/synch/mutex/sql/TC_LOG_MMAP::LOCK_tc	YES
 wait/synch/mutex/sql/LOCK_des_key_file	YES

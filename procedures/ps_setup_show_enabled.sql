@@ -1,4 +1,4 @@
--- Copyright (c) 2014, 2015, Oracle and/or its affiliates. All rights reserved.
+-- Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
 --
 -- This program is free software; you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -143,7 +143,8 @@ BEGIN
                   REPLACE(name, 'thread/', '')) AS enabled_threads,
         TYPE AS thread_type
           FROM performance_schema.threads
-         WHERE INSTRUMENTED = 'YES';
+         WHERE INSTRUMENTED = 'YES'
+         ORDER BY enabled_threads;
     END IF;
 
     IF (in_show_instruments) THEN
