@@ -121,6 +121,7 @@ ps_thread_account	FUNCTION
 ps_thread_id	FUNCTION
 ps_thread_stack	FUNCTION
 ps_thread_trx_info	FUNCTION
+quote_identifier	FUNCTION
 sys_get_config	FUNCTION
 version_major	FUNCTION
 version_minor	FUNCTION

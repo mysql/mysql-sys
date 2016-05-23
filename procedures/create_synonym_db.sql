@@ -1,4 +1,4 @@
--- Copyright (c) 2014, 2015, Oracle and/or its affiliates. All rights reserved.
+-- Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
 --
 -- This program is free software; you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -56,11 +56,11 @@ CREATE DEFINER='root'@'localhost' PROCEDURE create_synonym_db (
              5 rows in set (0.00 sec)
 
              mysql> CALL sys.create_synonym_db(\'performance_schema\', \'ps\');
-             +-------------------------------------+
-             | summary                             |
-             +-------------------------------------+
-             | Created 74 views in the ps database |
-             +-------------------------------------+
+             +---------------------------------------+
+             | summary                               |
+             +---------------------------------------+
+             | Created 74 views in the `ps` database |
+             +---------------------------------------+
              1 row in set (8.57 sec)
 
              Query OK, 0 rows affected (8.57 sec)
@@ -131,7 +131,7 @@ BEGIN
     END IF;
 
     -- All good, create the database and views
-    SET @create_db_stmt := CONCAT('CREATE DATABASE ', in_synonym);
+    SET @create_db_stmt := CONCAT('CREATE DATABASE ', sys.quote_identifier(in_synonym));
     PREPARE create_db_stmt FROM @create_db_stmt;
     EXECUTE create_db_stmt;
     DEALLOCATE PREPARE create_db_stmt;
@@ -144,7 +144,16 @@ BEGIN
             LEAVE c_table_names;
         END IF;
 
-        SET @create_view_stmt = CONCAT('CREATE SQL SECURITY INVOKER VIEW ', in_synonym, '.', v_table, ' AS SELECT * FROM ', in_db_name, '.', v_table);
+        SET @create_view_stmt = CONCAT(
+            'CREATE SQL SECURITY INVOKER VIEW ',
+            sys.quote_identifier(in_synonym),
+            '.',
+            sys.quote_identifier(v_table),
+            ' AS SELECT * FROM ',
+            sys.quote_identifier(in_db_name),
+            '.',
+            sys.quote_identifier(v_table)
+        );
         PREPARE create_view_stmt FROM @create_view_stmt;
         EXECUTE create_view_stmt;
         DEALLOCATE PREPARE create_view_stmt;
@@ -153,7 +162,11 @@ BEGIN
     END LOOP;
     CLOSE c_table_names;
 
-    SELECT CONCAT('Created ', v_views_created, ' view', IF(v_views_created != 1, 's', ''), ' in the ', in_synonym, ' database') AS summary;
+    SELECT CONCAT(
+        'Created ', v_views_created, ' view',
+        IF(v_views_created != 1, 's', ''), ' in the ',
+        sys.quote_identifier(in_synonym), ' database'
+    ) AS summary;
 
 END$$
 

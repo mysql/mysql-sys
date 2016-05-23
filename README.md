@@ -4031,6 +4031,40 @@ sys.ps_thread_trx_info(48): [
 1 row in set (0.03 sec)
 ```
 
+#### quote_identifier
+
+##### Description
+
+Takes an unquoted identifier (schema name, table name, etc.) and
+returns the identifier quoted with backticks.
+
+##### Parameters
+
+* in_identifier (TEXT): The identifier to quote.
+
+##### Returns
+
+TEXT
+
+##### Example
+```SQL
+mysql> SELECT sys.quote_identifier('my_identifier') AS Identifier;
++-----------------+
+| Identifier      |
++-----------------+
+| `my_identifier` |
++-----------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT sys.quote_identifier('my`idenfier') AS Identifier;
++----------------+
+| Identifier     |
++----------------+
+| `my``idenfier` |
++----------------+
+1 row in set (0.00 sec)
+```
+
 #### sys_get_config
 
 ##### Description
@@ -4178,11 +4212,11 @@ mysql> SHOW DATABASES;
 5 rows in set (0.00 sec)
 
 mysql> CALL sys.create_synonym_db('performance_schema', 'ps');
-+-------------------------------------+
-| summary                             |
-+-------------------------------------+
-| Created 74 views in the ps database |
-+-------------------------------------+
++---------------------------------------+
+| summary                               |
++---------------------------------------+
+| Created 74 views in the `ps` database |
++---------------------------------------+
 1 row in set (8.57 sec)
 
 Query OK, 0 rows affected (8.57 sec)

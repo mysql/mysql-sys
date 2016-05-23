@@ -39,6 +39,7 @@ SOURCE ./functions/ps_is_thread_instrumented.sql
 SOURCE ./functions/ps_thread_id.sql
 SOURCE ./functions/ps_thread_account.sql
 SOURCE ./functions/ps_thread_stack.sql
+SOURCE ./functions/quote_identifier.sql
 SOURCE ./functions/sys_get_config.sql
 SOURCE ./functions/version_major.sql
 SOURCE ./functions/version_minor.sql
