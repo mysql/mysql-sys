@@ -1,8 +1,22 @@
+INSERT INTO performance_schema.setup_actors
+VALUES ('localhost', 'foo', '%', 'YES', 'YES'),
+('localhost', 'bar', '%', 'NO', 'NO');
+UPDATE performance_schema.setup_instruments
+SET ENABLED = 'NO'
+ WHERE NAME NOT LIKE 'memory/performance_schema/%'
+       AND NAME NOT LIKE 'stage/innodb/%'
+       AND NAME NOT LIKE 'statement/com/%'
+       AND NAME <> 'idle';
+UPDATE performance_schema.setup_consumers
+SET ENABLED = 'NO'
+ WHERE NAME LIKE '%\_history\_long';
+UPDATE performance_schema.threads SET INSTRUMENTED = 'NO' WHERE NAME LIKE 'thread/innodb/srv\_%';
 CALL sys.ps_setup_show_enabled(FALSE, FALSE);
 performance_schema_enabled
 1
 enabled_users
 '%'@'%'
+'foo'@'localhost'
 object_type	objects	enabled	timed
 EVENT	%.%	YES	YES
 FUNCTION	%.%	YES	YES
@@ -12,24 +26,21 @@ TRIGGER	%.%	YES	YES
 enabled_consumers
 events_stages_current
 events_stages_history
-events_stages_history_long
 events_statements_current
 events_statements_history
-events_statements_history_long
 events_transactions_current
 events_transactions_history
-events_transactions_history_long
 events_waits_current
 events_waits_history
-events_waits_history_long
 global_instrumentation
-thread_instrumentation
 statements_digest
+thread_instrumentation
 CALL sys.ps_setup_show_enabled(TRUE, FALSE);
 performance_schema_enabled
 1
 enabled_users
 '%'@'%'
+'foo'@'localhost'
 object_type	objects	enabled	timed
 EVENT	%.%	YES	YES
 FUNCTION	%.%	YES	YES
@@ -39,448 +50,87 @@ TRIGGER	%.%	YES	YES
 enabled_consumers
 events_stages_current
 events_stages_history
-events_stages_history_long
 events_statements_current
 events_statements_history
-events_statements_history_long
 events_transactions_current
 events_transactions_history
-events_transactions_history_long
 events_waits_current
 events_waits_history
-events_waits_history_long
 global_instrumentation
-thread_instrumentation
 statements_digest
+thread_instrumentation
 enabled_instruments	timed
-wait/synch/mutex/sql/TC_LOG_MMAP::LOCK_tc	YES
-wait/synch/mutex/sql/LOCK_des_key_file	YES
-wait/synch/mutex/sql/MYSQL_BIN_LOG::LOCK_commit	YES
-wait/synch/mutex/sql/MYSQL_BIN_LOG::LOCK_commit_queue	YES
-wait/synch/mutex/sql/MYSQL_BIN_LOG::LOCK_done	YES
-wait/synch/mutex/sql/MYSQL_BIN_LOG::LOCK_flush_queue	YES
-wait/synch/mutex/sql/MYSQL_BIN_LOG::LOCK_index	YES
-wait/synch/mutex/sql/MYSQL_BIN_LOG::LOCK_log	YES
-wait/synch/mutex/sql/MYSQL_BIN_LOG::LOCK_binlog_end_pos	YES
-wait/synch/mutex/sql/MYSQL_BIN_LOG::LOCK_sync	YES
-wait/synch/mutex/sql/MYSQL_BIN_LOG::LOCK_sync_queue	YES
-wait/synch/mutex/sql/MYSQL_BIN_LOG::LOCK_xids	YES
-wait/synch/mutex/sql/MYSQL_RELAY_LOG::LOCK_commit	YES
-wait/synch/mutex/sql/MYSQL_RELAY_LOG::LOCK_commit_queue	YES
-wait/synch/mutex/sql/MYSQL_RELAY_LOG::LOCK_done	YES
-wait/synch/mutex/sql/MYSQL_RELAY_LOG::LOCK_flush_queue	YES
-wait/synch/mutex/sql/MYSQL_RELAY_LOG::LOCK_index	YES
-wait/synch/mutex/sql/MYSQL_RELAY_LOG::LOCK_log	YES
-wait/synch/mutex/sql/MYSQL_RELAY_LOG::LOCK_sync	YES
-wait/synch/mutex/sql/MYSQL_RELAY_LOG::LOCK_sync_queue	YES
-wait/synch/mutex/sql/MYSQL_RELAY_LOG::LOCK_xids	YES
-wait/synch/mutex/sql/hash_filo::lock	YES
-wait/synch/mutex/sql/Gtid_set::gtid_executed::free_intervals_mutex	YES
-wait/synch/mutex/sql/LOCK_crypt	YES
-wait/synch/mutex/sql/LOCK_error_log	YES
-wait/synch/mutex/sql/LOCK_gdl	YES
-wait/synch/mutex/sql/LOCK_global_system_variables	YES
-wait/synch/mutex/sql/LOCK_manager	YES
-wait/synch/mutex/sql/LOCK_prepared_stmt_count	YES
-wait/synch/mutex/sql/LOCK_sql_slave_skip_counter	YES
-wait/synch/mutex/sql/LOCK_slave_net_timeout	YES
-wait/synch/mutex/sql/LOCK_server_started	YES
-wait/synch/mutex/sql/LOCK_socket_listener_active	YES
-wait/synch/mutex/sql/LOCK_start_signal_handler	YES
-wait/synch/mutex/sql/LOCK_status	YES
-wait/synch/mutex/sql/LOCK_system_variables_hash	YES
-wait/synch/mutex/sql/LOCK_table_share	YES
-wait/synch/mutex/sql/THD::LOCK_thd_data	YES
-wait/synch/mutex/sql/THD::LOCK_thd_query	YES
-wait/synch/mutex/sql/THD::LOCK_thd_sysvar	YES
-wait/synch/mutex/sql/LOCK_user_conn	YES
-wait/synch/mutex/sql/LOCK_uuid_generator	YES
-wait/synch/mutex/sql/LOCK_sql_rand	YES
-wait/synch/mutex/sql/LOG::LOCK_log	YES
-wait/synch/mutex/sql/Master_info::data_lock	YES
-wait/synch/mutex/sql/Master_info::run_lock	YES
-wait/synch/mutex/sql/Master_info::sleep_lock	YES
-wait/synch/mutex/sql/Master_info::info_thd_lock	YES
-wait/synch/mutex/sql/Slave_reporting_capability::err_lock	YES
-wait/synch/mutex/sql/Relay_log_info::data_lock	YES
-wait/synch/mutex/sql/Relay_log_info::sleep_lock	YES
-wait/synch/mutex/sql/Relay_log_info::info_thd_lock	YES
-wait/synch/mutex/sql/Relay_log_info::log_space_lock	YES
-wait/synch/mutex/sql/Relay_log_info::run_lock	YES
-wait/synch/mutex/sql/Relay_log_info::pending_jobs_lock	YES
-wait/synch/mutex/sql/Relay_log_info::exit_count_lock	YES
-wait/synch/mutex/sql/Relay_log_info::temp_tables_lock	YES
-wait/synch/mutex/sql/Worker_info::jobs_lock	YES
-wait/synch/mutex/sql/Query_cache::structure_guard_mutex	YES
-wait/synch/mutex/sql/TABLE_SHARE::LOCK_ha_data	YES
-wait/synch/mutex/sql/LOCK_error_messages	YES
-wait/synch/mutex/sql/LOCK_log_throttle_qni	YES
-wait/synch/mutex/sql/Gtid_state	YES
-wait/synch/mutex/sql/THD::LOCK_query_plan	YES
-wait/synch/mutex/sql/Cost_constant_cache::LOCK_cost_const	YES
-wait/synch/mutex/sql/THD::LOCK_current_cond	YES
-wait/synch/mutex/sql/key_mts_temp_table_LOCK	YES
-wait/synch/mutex/sql/LOCK_reset_gtid_table	YES
-wait/synch/mutex/sql/LOCK_compress_gtid_table	YES
-wait/synch/mutex/sql/key_mts_gaq_LOCK	YES
-wait/synch/mutex/sql/thd_timer_mutex	YES
-wait/synch/mutex/sql/Commit_order_manager::m_mutex	YES
-wait/synch/mutex/sql/Relay_log_info::slave_worker_hash_lock	YES
-wait/synch/mutex/sql/LOCK_offline_mode	YES
-wait/synch/mutex/sql/LOCK_default_password_lifetime	YES
-wait/synch/mutex/mysys/BITMAP::mutex	YES
-wait/synch/mutex/mysys/IO_CACHE::append_buffer_lock	YES
-wait/synch/mutex/mysys/IO_CACHE::SHARE_mutex	YES
-wait/synch/mutex/mysys/KEY_CACHE::cache_lock	YES
-wait/synch/mutex/mysys/THR_LOCK_charset	YES
-wait/synch/mutex/mysys/THR_LOCK_heap	YES
-wait/synch/mutex/mysys/THR_LOCK_lock	YES
-wait/synch/mutex/mysys/THR_LOCK_malloc	YES
-wait/synch/mutex/mysys/THR_LOCK::mutex	YES
-wait/synch/mutex/mysys/THR_LOCK_myisam	YES
-wait/synch/mutex/mysys/THR_LOCK_net	YES
-wait/synch/mutex/mysys/THR_LOCK_open	YES
-wait/synch/mutex/mysys/THR_LOCK_threads	YES
-wait/synch/mutex/mysys/TMPDIR_mutex	YES
-wait/synch/mutex/mysys/THR_LOCK_myisam_mmap	YES
-wait/synch/mutex/sql/LOCK_audit_mask	YES
-wait/synch/mutex/session/LOCK_srv_session_threads	YES
-wait/synch/mutex/sql/LOCK_event_queue	YES
-wait/synch/mutex/sql/Event_scheduler::LOCK_scheduler_state	YES
-wait/synch/mutex/sql/LOCK_thread_cache	YES
-wait/synch/mutex/sql/LOCK_connection_count	YES
-wait/synch/mutex/sql/LOCK_thd_list	YES
-wait/synch/mutex/sql/LOCK_thd_remove	YES
-wait/synch/mutex/sql/LOCK_thread_ids	YES
-wait/synch/mutex/sql/LOCK_load_client_plugin	YES
-wait/synch/mutex/sql/LOCK_item_func_sleep	YES
-wait/synch/mutex/sql/MDL_wait::LOCK_wait_status	YES
-wait/synch/mutex/sql/Partiton_share::auto_inc_mutex	YES
-wait/synch/mutex/sql/LOCK_open	YES
-wait/synch/mutex/sql/LOCK_table_cache	YES
-wait/synch/mutex/sql/LOCK_slave_list	YES
-wait/synch/mutex/sql/LOCK_transaction_cache	YES
-wait/synch/mutex/sql/LOCK_plugin	YES
-wait/synch/mutex/sql/LOCK_plugin_delete	YES
-wait/synch/mutex/csv/tina	YES
-wait/synch/mutex/csv/TINA_SHARE::mutex	YES
-wait/synch/mutex/innodb/commit_cond_mutex	YES
-wait/synch/mutex/innodb/innobase_share_mutex	YES
-wait/synch/mutex/innodb/autoinc_mutex	YES
-wait/synch/mutex/innodb/buf_pool_mutex	YES
-wait/synch/mutex/innodb/buf_pool_zip_mutex	YES
-wait/synch/mutex/innodb/cache_last_read_mutex	YES
-wait/synch/mutex/innodb/dict_foreign_err_mutex	YES
-wait/synch/mutex/innodb/dict_sys_mutex	YES
-wait/synch/mutex/innodb/recalc_pool_mutex	YES
-wait/synch/mutex/innodb/file_format_max_mutex	YES
-wait/synch/mutex/innodb/fil_system_mutex	YES
-wait/synch/mutex/innodb/flush_list_mutex	YES
-wait/synch/mutex/innodb/fts_bg_threads_mutex	YES
-wait/synch/mutex/innodb/fts_delete_mutex	YES
-wait/synch/mutex/innodb/fts_optimize_mutex	YES
-wait/synch/mutex/innodb/fts_doc_id_mutex	YES
-wait/synch/mutex/innodb/log_flush_order_mutex	YES
-wait/synch/mutex/innodb/hash_table_mutex	YES
-wait/synch/mutex/innodb/ibuf_bitmap_mutex	YES
-wait/synch/mutex/innodb/ibuf_mutex	YES
-wait/synch/mutex/innodb/ibuf_pessimistic_insert_mutex	YES
-wait/synch/mutex/innodb/log_sys_mutex	YES
-wait/synch/mutex/innodb/log_sys_write_mutex	YES
-wait/synch/mutex/innodb/mutex_list_mutex	YES
-wait/synch/mutex/innodb/page_zip_stat_per_index_mutex	YES
-wait/synch/mutex/innodb/purge_sys_pq_mutex	YES
-wait/synch/mutex/innodb/recv_sys_mutex	YES
-wait/synch/mutex/innodb/recv_writer_mutex	YES
-wait/synch/mutex/innodb/redo_rseg_mutex	YES
-wait/synch/mutex/innodb/noredo_rseg_mutex	YES
-wait/synch/mutex/innodb/rw_lock_list_mutex	YES
-wait/synch/mutex/innodb/rw_lock_mutex	YES
-wait/synch/mutex/innodb/srv_dict_tmpfile_mutex	YES
-wait/synch/mutex/innodb/srv_innodb_monitor_mutex	YES
-wait/synch/mutex/innodb/srv_misc_tmpfile_mutex	YES
-wait/synch/mutex/innodb/srv_monitor_file_mutex	YES
-wait/synch/mutex/innodb/buf_dblwr_mutex	YES
-wait/synch/mutex/innodb/trx_undo_mutex	YES
-wait/synch/mutex/innodb/trx_pool_mutex	YES
-wait/synch/mutex/innodb/trx_pool_manager_mutex	YES
-wait/synch/mutex/innodb/srv_sys_mutex	YES
-wait/synch/mutex/innodb/lock_mutex	YES
-wait/synch/mutex/innodb/lock_wait_mutex	YES
-wait/synch/mutex/innodb/trx_mutex	YES
-wait/synch/mutex/innodb/srv_threads_mutex	YES
-wait/synch/mutex/innodb/rtr_active_mutex	YES
-wait/synch/mutex/innodb/rtr_match_mutex	YES
-wait/synch/mutex/innodb/rtr_path_mutex	YES
-wait/synch/mutex/innodb/rtr_ssn_mutex	YES
-wait/synch/mutex/innodb/trx_sys_mutex	YES
-wait/synch/mutex/innodb/zip_pad_mutex	YES
-wait/synch/mutex/innodb/master_key_id_mutex	YES
-wait/synch/mutex/myisam/MI_SORT_INFO::mutex	YES
-wait/synch/mutex/myisam/MYISAM_SHARE::intern_lock	YES
-wait/synch/mutex/myisam/MI_CHECK::print_msg	YES
-wait/synch/mutex/myisammrg/MYRG_INFO::mutex	YES
-wait/synch/mutex/archive/Archive_share::mutex	YES
-wait/synch/mutex/blackhole/blackhole	YES
-wait/synch/mutex/sql/tz_LOCK	YES
-wait/synch/rwlock/sql/Binlog_transmit_delegate::lock	YES
-wait/synch/rwlock/sql/Binlog_relay_IO_delegate::lock	YES
-wait/synch/rwlock/sql/LOCK_grant	YES
-wait/synch/rwlock/sql/LOGGER::LOCK_logger	YES
-wait/synch/rwlock/sql/LOCK_sys_init_connect	YES
-wait/synch/rwlock/sql/LOCK_sys_init_slave	YES
-wait/synch/rwlock/sql/LOCK_system_variables_hash	YES
-wait/synch/rwlock/sql/Query_cache_query::lock	YES
-wait/synch/rwlock/sql/gtid_commit_rollback	YES
-wait/synch/rwlock/sql/gtid_mode_lock	YES
-wait/synch/rwlock/sql/channel_map_lock	YES
-wait/synch/rwlock/sql/channel_lock	YES
-wait/synch/rwlock/sql/Trans_delegate::lock	YES
-wait/synch/rwlock/sql/Server_state_delegate::lock	YES
-wait/synch/rwlock/sql/Binlog_storage_delegate::lock	YES
-wait/synch/rwlock/mysys/SAFE_HASH::lock	YES
-wait/synch/rwlock/session/LOCK_srv_session_collection	YES
-wait/synch/rwlock/sql/LOCK_dboptions	YES
-wait/synch/rwlock/sql/MDL_lock::rwlock	YES
-wait/synch/rwlock/sql/MDL_context::LOCK_waiting_for	YES
-wait/synch/sxlock/innodb/btr_search_latch	YES
-wait/synch/sxlock/innodb/dict_operation_lock	YES
-wait/synch/sxlock/innodb/fil_space_latch	YES
-wait/synch/sxlock/innodb/checkpoint_lock	YES
-wait/synch/sxlock/innodb/fts_cache_rw_lock	YES
-wait/synch/sxlock/innodb/fts_cache_init_rw_lock	YES
-wait/synch/sxlock/innodb/trx_i_s_cache_lock	YES
-wait/synch/sxlock/innodb/trx_purge_latch	YES
-wait/synch/sxlock/innodb/index_tree_rw_lock	YES
-wait/synch/sxlock/innodb/index_online_log	YES
-wait/synch/sxlock/innodb/dict_table_stats	YES
-wait/synch/sxlock/innodb/hash_table_locks	YES
-wait/synch/rwlock/myisam/MYISAM_SHARE::key_root_lock	YES
-wait/synch/rwlock/myisam/MYISAM_SHARE::mmap_lock	YES
-wait/synch/rwlock/sql/THR_LOCK_servers	YES
-wait/synch/rwlock/sql/THR_LOCK_udf	YES
-wait/synch/cond/sql/PAGE::cond	YES
-wait/synch/cond/sql/TC_LOG_MMAP::COND_active	YES
-wait/synch/cond/sql/TC_LOG_MMAP::COND_pool	YES
-wait/synch/cond/sql/MYSQL_BIN_LOG::COND_done	YES
-wait/synch/cond/sql/MYSQL_BIN_LOG::update_cond	YES
-wait/synch/cond/sql/MYSQL_BIN_LOG::prep_xids_cond	YES
-wait/synch/cond/sql/MYSQL_RELAY_LOG::COND_done	YES
-wait/synch/cond/sql/MYSQL_RELAY_LOG::update_cond	YES
-wait/synch/cond/sql/MYSQL_RELAY_LOG::prep_xids_cond	YES
-wait/synch/cond/sql/Query_cache::COND_cache_status_changed	YES
-wait/synch/cond/sql/COND_manager	YES
-wait/synch/cond/sql/COND_server_started	YES
-wait/synch/cond/sql/COND_socket_listener_active	YES
-wait/synch/cond/sql/COND_start_signal_handler	YES
-wait/synch/cond/sql/COND_thr_lock	YES
-wait/synch/cond/sql/Item_func_sleep::cond	YES
-wait/synch/cond/sql/Master_info::data_cond	YES
-wait/synch/cond/sql/Master_info::start_cond	YES
-wait/synch/cond/sql/Master_info::stop_cond	YES
-wait/synch/cond/sql/Master_info::sleep_cond	YES
-wait/synch/cond/sql/Relay_log_info::data_cond	YES
-wait/synch/cond/sql/Relay_log_info::log_space_cond	YES
-wait/synch/cond/sql/Relay_log_info::start_cond	YES
-wait/synch/cond/sql/Relay_log_info::stop_cond	YES
-wait/synch/cond/sql/Relay_log_info::sleep_cond	YES
-wait/synch/cond/sql/Relay_log_info::pending_jobs_cond	YES
-wait/synch/cond/sql/Worker_info::jobs_cond	YES
-wait/synch/cond/sql/Relay_log_info::mts_gaq_cond	YES
-wait/synch/cond/sql/TABLE_SHARE::cond	YES
-wait/synch/cond/sql/User_level_lock::cond	YES
-wait/synch/cond/sql/Gtid_state	YES
-wait/synch/cond/sql/COND_compress_gtid_table	YES
-wait/synch/cond/sql/Commit_order_manager::m_workers.cond	YES
-wait/synch/cond/sql/Relay_log_info::slave_worker_hash_lock	YES
-wait/synch/cond/mysys/IO_CACHE_SHARE::cond	YES
-wait/synch/cond/mysys/IO_CACHE_SHARE::cond_writer	YES
-wait/synch/cond/mysys/THR_COND_threads	YES
-wait/synch/cond/sql/Event_scheduler::COND_state	YES
-wait/synch/cond/sql/COND_queue_state	YES
-wait/synch/cond/sql/COND_thread_cache	YES
-wait/synch/cond/sql/COND_flush_thread_cache	YES
-wait/synch/cond/sql/COND_connection_count	YES
-wait/synch/cond/sql/COND_thd_list	YES
-wait/synch/cond/sql/MDL_context::COND_wait_status	YES
-wait/synch/cond/sql/COND_open	YES
-wait/synch/cond/innodb/commit_cond	YES
-wait/synch/cond/myisam/MI_SORT_INFO::cond	YES
-wait/synch/cond/myisam/keycache_thread_var::suspend	YES
-wait/io/file/sql/map	YES
-wait/io/file/sql/binlog	YES
-wait/io/file/sql/binlog_cache	YES
-wait/io/file/sql/binlog_index	YES
-wait/io/file/sql/binlog_index_cache	YES
-wait/io/file/sql/relaylog	YES
-wait/io/file/sql/relaylog_cache	YES
-wait/io/file/sql/relaylog_index	YES
-wait/io/file/sql/relaylog_index_cache	YES
-wait/io/file/sql/io_cache	YES
-wait/io/file/sql/casetest	YES
-wait/io/file/sql/dbopt	YES
-wait/io/file/sql/des_key_file	YES
-wait/io/file/sql/ERRMSG	YES
-wait/io/file/sql/select_to_file	YES
-wait/io/file/sql/file_parser	YES
-wait/io/file/sql/FRM	YES
-wait/io/file/sql/global_ddl_log	YES
-wait/io/file/sql/load	YES
-wait/io/file/sql/LOAD_FILE	YES
-wait/io/file/sql/log_event_data	YES
-wait/io/file/sql/log_event_info	YES
-wait/io/file/sql/master_info	YES
-wait/io/file/sql/misc	YES
-wait/io/file/sql/partition_ddl_log	YES
-wait/io/file/sql/pid	YES
-wait/io/file/sql/query_log	YES
-wait/io/file/sql/relay_log_info	YES
-wait/io/file/sql/send_file	YES
-wait/io/file/sql/slow_log	YES
-wait/io/file/sql/tclog	YES
-wait/io/file/sql/trigger_name	YES
-wait/io/file/sql/trigger	YES
-wait/io/file/sql/init	YES
-wait/io/file/mysys/charset	YES
-wait/io/file/mysys/cnf	YES
-wait/io/file/csv/metadata	YES
-wait/io/file/csv/data	YES
-wait/io/file/csv/update	YES
-wait/io/file/innodb/innodb_data_file	YES
-wait/io/file/innodb/innodb_log_file	YES
-wait/io/file/innodb/innodb_temp_file	YES
-wait/io/file/myisam/data_tmp	YES
-wait/io/file/myisam/dfile	YES
-wait/io/file/myisam/kfile	YES
-wait/io/file/myisam/log	YES
-wait/io/file/myisammrg/MRG	YES
-wait/io/file/archive/metadata	YES
-wait/io/file/archive/data	YES
-wait/io/file/archive/FRM	YES
-wait/io/file/partition/ha_partition::parfile	YES
-wait/io/table/sql/handler	YES
-wait/lock/table/sql/handler	YES
-stage/sql/After create	YES
-stage/sql/allocating local table	YES
-stage/sql/preparing for alter table	YES
-stage/sql/altering table	YES
-stage/sql/committing alter table to storage engine	YES
-stage/sql/Changing master	YES
-stage/sql/Checking master version	YES
-stage/sql/checking permissions	YES
-stage/sql/checking privileges on cached query	YES
-stage/sql/checking query cache for query	YES
-stage/sql/cleaning up	YES
-stage/sql/closing tables	YES
-stage/sql/Compressing gtid_executed table	YES
-stage/sql/Connecting to master	YES
-stage/sql/converting HEAP to ondisk	YES
-stage/sql/Copying to group table	YES
-stage/sql/Copying to tmp table	YES
-stage/sql/copy to tmp table	YES
-stage/sql/Creating sort index	YES
-stage/sql/creating table	YES
-stage/sql/Creating tmp table	YES
-stage/sql/deleting from main table	YES
-stage/sql/deleting from reference tables	YES
-stage/sql/discard_or_import_tablespace	YES
-stage/sql/end	YES
-stage/sql/executing	YES
-stage/sql/Execution of init_command	YES
-stage/sql/explaining	YES
-stage/sql/Finished reading one binlog; switching to next binlog	YES
-stage/sql/Flushing relay log and master info repository.	YES
-stage/sql/Flushing relay-log info file.	YES
-stage/sql/freeing items	YES
-stage/sql/FULLTEXT initialization	YES
-stage/sql/got handler lock	YES
-stage/sql/got old table	YES
-stage/sql/init	YES
-stage/sql/insert	YES
-stage/sql/invalidating query cache entries (table)	YES
-stage/sql/invalidating query cache entries (table list)	YES
-stage/sql/Killing slave	YES
-stage/sql/logging slow query	YES
-stage/sql/Making temporary file (append) before replaying LOAD DATA INFILE	YES
-stage/sql/Making temporary file (create) before replaying LOAD DATA INFILE	YES
-stage/sql/manage keys	YES
-stage/sql/Master has sent all binlog to slave; waiting for more updates	YES
-stage/sql/Opening tables	YES
-stage/sql/optimizing	YES
-stage/sql/preparing	YES
-stage/sql/Purging old relay logs	YES
-stage/sql/query end	YES
-stage/sql/Queueing master event to the relay log	YES
-stage/sql/Reading event from the relay log	YES
-stage/sql/Registering slave on master	YES
-stage/sql/Removing duplicates	YES
-stage/sql/removing tmp table	YES
-stage/sql/rename	YES
-stage/sql/rename result table	YES
-stage/sql/Requesting binlog dump	YES
-stage/sql/reschedule	YES
-stage/sql/Searching rows for update	YES
-stage/sql/Sending binlog event to slave	YES
-stage/sql/sending cached result to client	YES
-stage/sql/Sending data	YES
-stage/sql/setup	YES
-stage/sql/Slave has read all relay log; waiting for more updates	YES
-stage/sql/Waiting for an event from Coordinator	YES
-stage/sql/Waiting for slave workers to process their queues	YES
-stage/sql/Waiting for Slave Worker queue	YES
-stage/sql/Waiting for Slave Workers to free pending events	YES
-stage/sql/Waiting for Slave Worker to release partition	YES
-stage/sql/Waiting for workers to exit	YES
-stage/sql/Sorting for group	YES
-stage/sql/Sorting for order	YES
-stage/sql/Sorting result	YES
-stage/sql/Waiting until MASTER_DELAY seconds after master executed event	YES
-stage/sql/statistics	YES
-stage/sql/storing result in query cache	YES
-stage/sql/storing row into queue	YES
-stage/sql/System lock	YES
-stage/sql/update	YES
-stage/sql/updating	YES
-stage/sql/updating main table	YES
-stage/sql/updating reference tables	YES
-stage/sql/upgrading lock	YES
-stage/sql/User sleep	YES
-stage/sql/verifying table	YES
-stage/sql/Waiting for GTID to be committed	YES
-stage/sql/waiting for handler insert	YES
-stage/sql/waiting for handler lock	YES
-stage/sql/waiting for handler open	YES
-stage/sql/Waiting for INSERT	YES
-stage/sql/Waiting for master to send event	YES
-stage/sql/Waiting for master update	YES
-stage/sql/Waiting for the slave SQL thread to free enough relay log space	YES
-stage/sql/Waiting for slave mutex on exit	YES
-stage/sql/Waiting for slave thread to start	YES
-stage/sql/Waiting for table flush	YES
-stage/sql/Waiting for query cache lock	YES
-stage/sql/Waiting for the next event in relay log	YES
-stage/sql/Waiting for the slave SQL thread to advance position	YES
-stage/sql/Waiting to finalize termination	YES
-stage/sql/Waiting for preceding transaction to commit	YES
-stage/sql/Waiting for dependent transaction to commit	YES
-stage/sql/Suspending	YES
-stage/sql/starting	YES
-stage/sql/Waiting for no channel reference.	YES
-stage/mysys/Waiting for table level lock	YES
-stage/sql/Waiting on empty queue	YES
-stage/sql/Waiting for next activation	YES
-stage/sql/Waiting for the scheduler to stop	YES
-stage/sql/Waiting for global read lock	YES
-stage/sql/Waiting for tablespace metadata lock	YES
-stage/sql/Waiting for schema metadata lock	YES
-stage/sql/Waiting for table metadata lock	YES
-stage/sql/Waiting for stored function metadata lock	YES
-stage/sql/Waiting for stored procedure metadata lock	YES
-stage/sql/Waiting for trigger metadata lock	YES
-stage/sql/Waiting for event metadata lock	YES
-stage/sql/Waiting for commit lock	YES
-stage/sql/User lock	YES
-stage/sql/Waiting for locking service lock	YES
+idle	YES
+memory/performance_schema/accounts	NO
+memory/performance_schema/cond_class	NO
+memory/performance_schema/cond_instances	NO
+memory/performance_schema/events_stages_history	NO
+memory/performance_schema/events_stages_history_long	NO
+memory/performance_schema/events_stages_summary_by_account_by_event_name	NO
+memory/performance_schema/events_stages_summary_by_host_by_event_name	NO
+memory/performance_schema/events_stages_summary_by_thread_by_event_name	NO
+memory/performance_schema/events_stages_summary_by_user_by_event_name	NO
+memory/performance_schema/events_stages_summary_global_by_event_name	NO
+memory/performance_schema/events_statements_current	NO
+memory/performance_schema/events_statements_current.sqltext	NO
+memory/performance_schema/events_statements_current.tokens	NO
+memory/performance_schema/events_statements_history	NO
+memory/performance_schema/events_statements_history.sqltext	NO
+memory/performance_schema/events_statements_history.tokens	NO
+memory/performance_schema/events_statements_history_long	NO
+memory/performance_schema/events_statements_history_long.sqltext	NO
+memory/performance_schema/events_statements_history_long.tokens	NO
+memory/performance_schema/events_statements_summary_by_account_by_event_name	NO
+memory/performance_schema/events_statements_summary_by_digest	NO
+memory/performance_schema/events_statements_summary_by_digest.tokens	NO
+memory/performance_schema/events_statements_summary_by_host_by_event_name	NO
+memory/performance_schema/events_statements_summary_by_program	NO
+memory/performance_schema/events_statements_summary_by_thread_by_event_name	NO
+memory/performance_schema/events_statements_summary_by_user_by_event_name	NO
+memory/performance_schema/events_statements_summary_global_by_event_name	NO
+memory/performance_schema/events_transactions_history	NO
+memory/performance_schema/events_transactions_history_long	NO
+memory/performance_schema/events_transactions_summary_by_account_by_event_name	NO
+memory/performance_schema/events_transactions_summary_by_host_by_event_name	NO
+memory/performance_schema/events_transactions_summary_by_thread_by_event_name	NO
+memory/performance_schema/events_transactions_summary_by_user_by_event_name	NO
+memory/performance_schema/events_waits_history	NO
+memory/performance_schema/events_waits_history_long	NO
+memory/performance_schema/events_waits_summary_by_account_by_event_name	NO
+memory/performance_schema/events_waits_summary_by_host_by_event_name	NO
+memory/performance_schema/events_waits_summary_by_thread_by_event_name	NO
+memory/performance_schema/events_waits_summary_by_user_by_event_name	NO
+memory/performance_schema/file_class	NO
+memory/performance_schema/file_handle	NO
+memory/performance_schema/file_instances	NO
+memory/performance_schema/hosts	NO
+memory/performance_schema/memory_class	NO
+memory/performance_schema/memory_summary_by_account_by_event_name	NO
+memory/performance_schema/memory_summary_by_host_by_event_name	NO
+memory/performance_schema/memory_summary_by_thread_by_event_name	NO
+memory/performance_schema/memory_summary_by_user_by_event_name	NO
+memory/performance_schema/memory_summary_global_by_event_name	NO
+memory/performance_schema/metadata_locks	NO
+memory/performance_schema/mutex_class	NO
+memory/performance_schema/mutex_instances	NO
+memory/performance_schema/prepared_statements_instances	NO
+memory/performance_schema/rwlock_class	NO
+memory/performance_schema/rwlock_instances	NO
+memory/performance_schema/scalable_buffer	NO
+memory/performance_schema/session_connect_attrs	NO
+memory/performance_schema/setup_actors	NO
+memory/performance_schema/setup_objects	NO
+memory/performance_schema/socket_class	NO
+memory/performance_schema/socket_instances	NO
+memory/performance_schema/stage_class	NO
+memory/performance_schema/statement_class	NO
+memory/performance_schema/table_handles	NO
+memory/performance_schema/table_io_waits_summary_by_index_usage	NO
+memory/performance_schema/table_lock_waits_summary_by_table	NO
+memory/performance_schema/table_shares	NO
+memory/performance_schema/threads	NO
+memory/performance_schema/thread_class	NO
+memory/performance_schema/users	NO
 stage/innodb/alter table (end)	YES
 stage/innodb/alter table (flush)	YES
 stage/innodb/alter table (insert)	YES
@@ -489,586 +139,44 @@ stage/innodb/alter table (log apply table)	YES
 stage/innodb/alter table (merge sort)	YES
 stage/innodb/alter table (read PK and internal sort)	YES
 stage/innodb/buffer pool load	YES
-statement/sql/select	YES
-statement/sql/create_table	YES
-statement/sql/create_index	YES
-statement/sql/alter_table	YES
-statement/sql/update	YES
-statement/sql/insert	YES
-statement/sql/insert_select	YES
-statement/sql/delete	YES
-statement/sql/truncate	YES
-statement/sql/drop_table	YES
-statement/sql/drop_index	YES
-statement/sql/show_databases	YES
-statement/sql/show_tables	YES
-statement/sql/show_fields	YES
-statement/sql/show_keys	YES
-statement/sql/show_variables	YES
-statement/sql/show_status	YES
-statement/sql/show_engine_logs	YES
-statement/sql/show_engine_status	YES
-statement/sql/show_engine_mutex	YES
-statement/sql/show_processlist	YES
-statement/sql/show_master_status	YES
-statement/sql/show_slave_status	YES
-statement/sql/show_grants	YES
-statement/sql/show_create_table	YES
-statement/sql/show_charsets	YES
-statement/sql/show_collations	YES
-statement/sql/show_create_db	YES
-statement/sql/show_table_status	YES
-statement/sql/show_triggers	YES
-statement/sql/load	YES
-statement/sql/set_option	YES
-statement/sql/lock_tables	YES
-statement/sql/unlock_tables	YES
-statement/sql/grant	YES
-statement/sql/change_db	YES
-statement/sql/create_db	YES
-statement/sql/drop_db	YES
-statement/sql/alter_db	YES
-statement/sql/repair	YES
-statement/sql/replace	YES
-statement/sql/replace_select	YES
-statement/sql/create_udf	YES
-statement/sql/drop_function	YES
-statement/sql/revoke	YES
-statement/sql/optimize	YES
-statement/sql/check	YES
-statement/sql/assign_to_keycache	YES
-statement/sql/preload_keys	YES
-statement/sql/flush	YES
-statement/sql/kill	YES
-statement/sql/analyze	YES
-statement/sql/rollback	YES
-statement/sql/rollback_to_savepoint	YES
-statement/sql/commit	YES
-statement/sql/savepoint	YES
-statement/sql/release_savepoint	YES
-statement/sql/slave_start	YES
-statement/sql/slave_stop	YES
-statement/sql/group_replication_start	YES
-statement/sql/group_replication_stop	YES
-statement/sql/begin	YES
-statement/sql/change_master	YES
-statement/sql/change_repl_filter	YES
-statement/sql/rename_table	YES
-statement/sql/reset	YES
-statement/sql/purge	YES
-statement/sql/purge_before_date	YES
-statement/sql/show_binlogs	YES
-statement/sql/show_open_tables	YES
-statement/sql/ha_open	YES
-statement/sql/ha_close	YES
-statement/sql/ha_read	YES
-statement/sql/show_slave_hosts	YES
-statement/sql/delete_multi	YES
-statement/sql/update_multi	YES
-statement/sql/show_binlog_events	YES
-statement/sql/do	YES
-statement/sql/show_warnings	YES
-statement/sql/empty_query	YES
-statement/sql/show_errors	YES
-statement/sql/show_storage_engines	YES
-statement/sql/show_privileges	YES
-statement/sql/help	YES
-statement/sql/create_user	YES
-statement/sql/drop_user	YES
-statement/sql/rename_user	YES
-statement/sql/revoke_all	YES
-statement/sql/checksum	YES
-statement/sql/create_procedure	YES
-statement/sql/create_function	YES
-statement/sql/call_procedure	YES
-statement/sql/drop_procedure	YES
-statement/sql/alter_procedure	YES
-statement/sql/alter_function	YES
-statement/sql/show_create_proc	YES
-statement/sql/show_create_func	YES
-statement/sql/show_procedure_status	YES
-statement/sql/show_function_status	YES
-statement/sql/prepare_sql	YES
-statement/sql/execute_sql	YES
-statement/sql/dealloc_sql	YES
-statement/sql/create_view	YES
-statement/sql/drop_view	YES
-statement/sql/create_trigger	YES
-statement/sql/drop_trigger	YES
-statement/sql/xa_start	YES
-statement/sql/xa_end	YES
-statement/sql/xa_prepare	YES
-statement/sql/xa_commit	YES
-statement/sql/xa_rollback	YES
-statement/sql/xa_recover	YES
-statement/sql/show_procedure_code	YES
-statement/sql/show_function_code	YES
-statement/sql/alter_tablespace	YES
-statement/sql/install_plugin	YES
-statement/sql/uninstall_plugin	YES
-statement/sql/binlog	YES
-statement/sql/show_plugins	YES
-statement/sql/create_server	YES
-statement/sql/drop_server	YES
-statement/sql/alter_server	YES
-statement/sql/create_event	YES
-statement/sql/alter_event	YES
-statement/sql/drop_event	YES
-statement/sql/show_create_event	YES
-statement/sql/show_events	YES
-statement/sql/show_create_trigger	YES
-statement/sql/alter_db_upgrade	YES
-statement/sql/show_profile	YES
-statement/sql/show_profiles	YES
-statement/sql/signal	YES
-statement/sql/resignal	YES
-statement/sql/show_relaylog_events	YES
-statement/sql/get_diagnostics	YES
-statement/sql/alter_user	YES
-statement/sql/explain_other	YES
-statement/sql/show_create_user	YES
-statement/sql/shutdown	YES
-statement/sql/alter_instance	YES
-statement/sql/error	YES
-statement/sp/stmt	YES
-statement/sp/set	YES
-statement/sp/set_trigger_field	YES
-statement/sp/jump	YES
-statement/sp/jump_if_not	YES
-statement/sp/freturn	YES
-statement/sp/hpush_jump	YES
-statement/sp/hpop	YES
-statement/sp/hreturn	YES
-statement/sp/cpush	YES
-statement/sp/cpop	YES
-statement/sp/copen	YES
-statement/sp/cclose	YES
-statement/sp/cfetch	YES
-statement/sp/error	YES
-statement/sp/set_case_expr	YES
-statement/scheduler/event	YES
-statement/com/Sleep	YES
-statement/com/Quit	YES
-statement/com/Init DB	YES
-statement/com/Field List	YES
-statement/com/Create DB	YES
-statement/com/Drop DB	YES
-statement/com/Refresh	YES
-statement/com/Shutdown	YES
-statement/com/Statistics	YES
-statement/com/Processlist	YES
-statement/com/Connect	YES
-statement/com/Kill	YES
-statement/com/Debug	YES
-statement/com/Ping	YES
-statement/com/Time	YES
-statement/com/Delayed insert	YES
-statement/com/Change user	YES
 statement/com/Binlog Dump	YES
-statement/com/Table Dump	YES
-statement/com/Connect Out	YES
-statement/com/Register Slave	YES
-statement/com/Prepare	YES
-statement/com/Execute	YES
-statement/com/Long Data	YES
+statement/com/Binlog Dump GTID	YES
+statement/com/Change user	YES
 statement/com/Close stmt	YES
+statement/com/Connect	YES
+statement/com/Connect Out	YES
+statement/com/Create DB	YES
+statement/com/Daemon	YES
+statement/com/Debug	YES
+statement/com/Delayed insert	YES
+statement/com/Drop DB	YES
+statement/com/Error	YES
+statement/com/Execute	YES
+statement/com/Fetch	YES
+statement/com/Field List	YES
+statement/com/Init DB	YES
+statement/com/Kill	YES
+statement/com/Long Data	YES
+statement/com/Ping	YES
+statement/com/Prepare	YES
+statement/com/Processlist	YES
+statement/com/Quit	YES
+statement/com/Refresh	YES
+statement/com/Register Slave	YES
+statement/com/Reset Connection	YES
 statement/com/Reset stmt	YES
 statement/com/Set option	YES
-statement/com/Fetch	YES
-statement/com/Daemon	YES
-statement/com/Binlog Dump GTID	YES
-statement/com/Reset Connection	YES
-statement/com/Error	YES
-statement/abstract/Query	YES
-statement/abstract/new_packet	YES
-statement/abstract/relay_log	YES
-transaction	YES
-wait/io/socket/sql/server_tcpip_socket	YES
-wait/io/socket/sql/server_unix_socket	YES
-wait/io/socket/sql/client_connection	YES
-idle	YES
-memory/performance_schema/mutex_instances	NO
-memory/performance_schema/rwlock_instances	NO
-memory/performance_schema/cond_instances	NO
-memory/performance_schema/file_instances	NO
-memory/performance_schema/socket_instances	NO
-memory/performance_schema/metadata_locks	NO
-memory/performance_schema/file_handle	NO
-memory/performance_schema/accounts	NO
-memory/performance_schema/events_waits_summary_by_account_by_event_name	NO
-memory/performance_schema/events_stages_summary_by_account_by_event_name	NO
-memory/performance_schema/events_statements_summary_by_account_by_event_name	NO
-memory/performance_schema/events_transactions_summary_by_account_by_event_name	NO
-memory/performance_schema/memory_summary_by_account_by_event_name	NO
-memory/performance_schema/events_stages_summary_global_by_event_name	NO
-memory/performance_schema/events_statements_summary_global_by_event_name	NO
-memory/performance_schema/memory_summary_global_by_event_name	NO
-memory/performance_schema/hosts	NO
-memory/performance_schema/events_waits_summary_by_host_by_event_name	NO
-memory/performance_schema/events_stages_summary_by_host_by_event_name	NO
-memory/performance_schema/events_statements_summary_by_host_by_event_name	NO
-memory/performance_schema/events_transactions_summary_by_host_by_event_name	NO
-memory/performance_schema/memory_summary_by_host_by_event_name	NO
-memory/performance_schema/threads	NO
-memory/performance_schema/events_waits_summary_by_thread_by_event_name	NO
-memory/performance_schema/events_stages_summary_by_thread_by_event_name	NO
-memory/performance_schema/events_statements_summary_by_thread_by_event_name	NO
-memory/performance_schema/events_transactions_summary_by_thread_by_event_name	NO
-memory/performance_schema/memory_summary_by_thread_by_event_name	NO
-memory/performance_schema/events_waits_history	NO
-memory/performance_schema/events_stages_history	NO
-memory/performance_schema/events_statements_history	NO
-memory/performance_schema/events_statements_history.tokens	NO
-memory/performance_schema/events_statements_history.sqltext	NO
-memory/performance_schema/events_statements_current	NO
-memory/performance_schema/events_statements_current.tokens	NO
-memory/performance_schema/events_statements_current.sqltext	NO
-memory/performance_schema/events_transactions_history	NO
-memory/performance_schema/session_connect_attrs	NO
-memory/performance_schema/users	NO
-memory/performance_schema/events_waits_summary_by_user_by_event_name	NO
-memory/performance_schema/events_stages_summary_by_user_by_event_name	NO
-memory/performance_schema/events_statements_summary_by_user_by_event_name	NO
-memory/performance_schema/events_transactions_summary_by_user_by_event_name	NO
-memory/performance_schema/memory_summary_by_user_by_event_name	NO
-memory/performance_schema/mutex_class	NO
-memory/performance_schema/rwlock_class	NO
-memory/performance_schema/cond_class	NO
-memory/performance_schema/thread_class	NO
-memory/performance_schema/file_class	NO
-memory/performance_schema/socket_class	NO
-memory/performance_schema/stage_class	NO
-memory/performance_schema/statement_class	NO
-memory/performance_schema/memory_class	NO
-memory/performance_schema/setup_actors	NO
-memory/performance_schema/setup_objects	NO
-memory/performance_schema/events_statements_summary_by_digest	NO
-memory/performance_schema/events_statements_summary_by_digest.tokens	NO
-memory/performance_schema/events_stages_history_long	NO
-memory/performance_schema/events_statements_history_long	NO
-memory/performance_schema/events_statements_history_long.tokens	NO
-memory/performance_schema/events_statements_history_long.sqltext	NO
-memory/performance_schema/events_transactions_history_long	NO
-memory/performance_schema/events_waits_history_long	NO
-memory/performance_schema/table_handles	NO
-memory/performance_schema/table_shares	NO
-memory/performance_schema/table_io_waits_summary_by_index_usage	NO
-memory/performance_schema/table_lock_waits_summary_by_table	NO
-memory/performance_schema/events_statements_summary_by_program	NO
-memory/performance_schema/prepared_statements_instances	NO
-memory/performance_schema/scalable_buffer	NO
-memory/sql/Locked_tables_list::m_locked_tables_root	NO
-memory/sql/display_table_locks	NO
-memory/sql/THD::transactions::mem_root	NO
-memory/sql/Delegate::memroot	NO
-memory/sql/sql_acl_mem	NO
-memory/sql/sql_acl_memex	NO
-memory/sql/acl_cache	NO
-memory/sql/thd::main_mem_root	NO
-memory/sql/help	NO
-memory/sql/new_frm_mem	NO
-memory/sql/TABLE_SHARE::mem_root	NO
-memory/sql/gdl	NO
-memory/sql/Table_triggers_list	NO
-memory/sql/servers	NO
-memory/sql/Prepared_statement_map	NO
-memory/sql/Prepared_statement::main_mem_root	NO
-memory/sql/Protocol_local::m_rset_root	NO
-memory/sql/Warning_info::m_warn_root	NO
-memory/sql/THD::sp_cache	NO
-memory/sql/sp_head::main_mem_root	NO
-memory/sql/sp_head::execute_mem_root	NO
-memory/sql/sp_head::call_mem_root	NO
-memory/sql/table_mapping::m_mem_root	NO
-memory/sql/QUICK_RANGE_SELECT::alloc	NO
-memory/sql/QUICK_INDEX_MERGE_SELECT::alloc	NO
-memory/sql/QUICK_ROR_INTERSECT_SELECT::alloc	NO
-memory/sql/QUICK_ROR_UNION_SELECT::alloc	NO
-memory/sql/QUICK_GROUP_MIN_MAX_SELECT::alloc	NO
-memory/sql/test_quick_select	NO
-memory/sql/prune_partitions::exec	NO
-memory/sql/MYSQL_BIN_LOG::recover	NO
-memory/sql/Blob_mem_storage::storage	NO
-memory/sql/NAMED_ILINK::name	NO
-memory/sql/String::value	NO
-memory/sql/Sys_var_charptr::value	NO
-memory/sql/Queue::queue_item	NO
-memory/sql/THD::db	NO
-memory/sql/user_var_entry	NO
-memory/sql/Slave_job_group::group_relay_log_name	NO
-memory/sql/Relay_log_info::group_relay_log_name	NO
-memory/sql/binlog_cache_mngr	NO
-memory/sql/Row_data_memory::memory	NO
-memory/sql/Gtid_set::to_string	NO
-memory/sql/Gtid_state::to_string	NO
-memory/sql/Owned_gtids::to_string	NO
-memory/sql/Log_event	NO
-memory/sql/Incident_log_event::message	NO
-memory/sql/Rows_query_log_event::rows_query	NO
-memory/sql/Sort_param::tmp_buffer	NO
-memory/sql/Filesort_info::merge	NO
-memory/sql/Filesort_info::record_pointers	NO
-memory/sql/Filesort_buffer::sort_keys	NO
-memory/sql/handler::errmsgs	NO
-memory/sql/handlerton	NO
-memory/sql/XID	NO
-memory/sql/host_cache::hostname	NO
-memory/sql/user_var_entry::value	NO
-memory/sql/User_level_lock	NO
-memory/sql/MYSQL_LOG::name	NO
-memory/sql/TC_LOG_MMAP::pages	NO
-memory/sql/my_bitmap_map	NO
-memory/sql/QUICK_RANGE_SELECT::mrr_buf_desc	NO
-memory/sql/Event_queue_element_for_exec::names	NO
-memory/sql/my_str_malloc	NO
-memory/sql/MYSQL_BIN_LOG::basename	NO
-memory/sql/MYSQL_BIN_LOG::index	NO
-memory/sql/MYSQL_RELAY_LOG::basename	NO
-memory/sql/MYSQL_RELAY_LOG::index	NO
-memory/sql/rpl_filter memory	NO
-memory/sql/errmsgs	NO
-memory/sql/Gis_read_stream::err_msg	NO
-memory/sql/Geometry::ptr_and_wkb_data	NO
-memory/sql/MYSQL_LOCK	NO
-memory/sql/NET::buff	NO
-memory/sql/NET::compress_packet	NO
-memory/sql/Event_scheduler::scheduler_param	NO
-memory/sql/Gtid_set::Interval_chunk	NO
-memory/sql/Owned_gtids::sidno_to_hash	NO
-memory/sql/Sid_map::Node	NO
-memory/sql/Mutex_cond_array::Mutex_cond	NO
-memory/sql/TABLE_RULE_ENT	NO
-memory/sql/Rpl_info_table	NO
-memory/sql/Rpl_info_file::buffer	NO
-memory/sql/db_worker_hash_entry	NO
-memory/sql/rpl_slave::check_temp_dir	NO
-memory/sql/rpl_slave::command_buffer	NO
-memory/sql/binlog_ver_1_event	NO
-memory/sql/SLAVE_INFO	NO
-memory/sql/binlog_pos	NO
-memory/sql/HASH_ROW_ENTRY	NO
-memory/sql/binlog_statement_buffer	NO
-memory/sql/partition_syntax_buffer	NO
-memory/sql/READ_INFO	NO
-memory/sql/JOIN_CACHE	NO
-memory/sql/TABLE::sort_io_cache	NO
-memory/sql/frm	NO
-memory/sql/Unique::sort_buffer	NO
-memory/sql/Unique::merge_buffer	NO
-memory/sql/TABLE	NO
-memory/sql/frm::extra_segment_buff	NO
-memory/sql/frm::form_pos	NO
-memory/sql/frm::string	NO
-memory/sql/LOG_name	NO
-memory/sql/DATE_TIME_FORMAT	NO
-memory/sql/DDL_LOG_MEMORY_ENTRY	NO
-memory/sql/ST_SCHEMA_TABLE	NO
-memory/sql/ignored_db	NO
-memory/sql/PROFILE	NO
-memory/sql/global_system_variables	NO
-memory/sql/THD::variables	NO
-memory/sql/Security_context	NO
-memory/sql/Shared_memory_name	NO
-memory/sql/bison_stack	NO
-memory/sql/THD::handler_tables_hash	NO
-memory/sql/hash_index_key_buffer	NO
-memory/sql/dboptions_hash	NO
-memory/sql/user_conn	NO
-memory/sql/LOG_POS_COORD	NO
-memory/sql/XID_STATE	NO
-memory/sql/MPVIO_EXT::auth_info	NO
-memory/sql/opt_bin_logname	NO
-memory/sql/Query_cache	NO
-memory/sql/READ_RECORD_cache	NO
-memory/sql/Quick_ranges	NO
-memory/sql/File_query_log::name	NO
-memory/sql/Table_trigger_dispatcher::m_mem_root	NO
-memory/sql/thd_timer	NO
-memory/sql/THD::Session_tracker	NO
-memory/sql/THD::Session_sysvar_resource_manager	NO
-memory/sql/show_slave_status_io_gtid_set	NO
-memory/sql/write_set_extraction	NO
-memory/sql/get_all_tables	NO
-memory/sql/fill_schema_schemata	NO
-memory/sql/native_functions	NO
-memory/sql/JSON	NO
-memory/client/mysql_options	NO
-memory/client/MYSQL_DATA	NO
-memory/client/MYSQL	NO
-memory/client/MYSQL_RES	NO
-memory/client/MYSQL_ROW	NO
-memory/client/MYSQL_STATE_CHANGE_INFO	NO
-memory/client/MYSQL_HANDSHAKE	NO
-memory/vio/ssl_fd	NO
-memory/vio/vio	NO
-memory/vio/read_buffer	NO
-memory/mysys/max_alloca	NO
-memory/mysys/charset_file	NO
-memory/mysys/charset_loader	NO
-memory/mysys/lf_node	NO
-memory/mysys/lf_dynarray	NO
-memory/mysys/lf_slist	NO
-memory/mysys/LIST	NO
-memory/mysys/IO_CACHE	NO
-memory/mysys/KEY_CACHE	NO
-memory/mysys/SAFE_HASH_ENTRY	NO
-memory/mysys/MY_TMPDIR::full_list	NO
-memory/mysys/MY_BITMAP::bitmap	NO
-memory/mysys/my_compress_alloc	NO
-memory/mysys/pack_frm	NO
-memory/mysys/my_err_head	NO
-memory/mysys/my_file_info	NO
-memory/mysys/MY_DIR	NO
-memory/mysys/MY_STAT	NO
-memory/mysys/QUEUE	NO
-memory/mysys/DYNAMIC_STRING	NO
-memory/mysys/TREE	NO
-memory/sql/Event_basic::mem_root	NO
-memory/sql/root	NO
-memory/sql/load_env_plugins	NO
-memory/sql/MDL_context::acquire_locks	NO
-memory/sql/Partition_share	NO
-memory/sql/partition_sort_buffer	NO
-memory/sql/Partition_admin	NO
-memory/sql/plugin_mem_root	NO
-memory/sql/plugin_init_tmp	NO
-memory/sql/plugin_int_mem_root	NO
-memory/sql/mysql_plugin_dl	NO
-memory/sql/mysql_plugin	NO
-memory/sql/plugin_bookmark	NO
-memory/csv/TINA_SHARE	NO
-memory/csv/blobroot	NO
-memory/csv/tina_set	NO
-memory/csv/row	NO
-memory/csv/Transparent_file	NO
-memory/innodb/adaptive hash index	NO
-memory/innodb/buf_buf_pool	NO
-memory/innodb/dict_stats_bg_recalc_pool_t	NO
-memory/innodb/dict_stats_index_map_t	NO
-memory/innodb/dict_stats_n_diff_on_level	NO
-memory/innodb/other	NO
-memory/innodb/row_log_buf	NO
-memory/innodb/row_merge_sort	NO
-memory/innodb/std	NO
-memory/innodb/trx_sys_t::rw_trx_ids	NO
-memory/innodb/partitioning	NO
-memory/innodb/api0api	NO
-memory/innodb/btr0btr	NO
-memory/innodb/btr0bulk	NO
-memory/innodb/btr0cur	NO
-memory/innodb/btr0pcur	NO
-memory/innodb/btr0sea	NO
-memory/innodb/buf0buf	NO
-memory/innodb/buf0dblwr	NO
-memory/innodb/buf0dump	NO
-memory/innodb/buf0flu	NO
-memory/innodb/buf0lru	NO
-memory/innodb/dict0dict	NO
-memory/innodb/dict0mem	NO
-memory/innodb/dict0stats	NO
-memory/innodb/dict0stats_bg	NO
-memory/innodb/eval0eval	NO
-memory/innodb/fil0fil	NO
-memory/innodb/fsp0file	NO
-memory/innodb/fsp0space	NO
-memory/innodb/fsp0sysspace	NO
-memory/innodb/fts0ast	NO
-memory/innodb/fts0config	NO
-memory/innodb/fts0fts	NO
-memory/innodb/fts0opt	NO
-memory/innodb/fts0pars	NO
-memory/innodb/fts0que	NO
-memory/innodb/fts0sql	NO
-memory/innodb/gis0sea	NO
-memory/innodb/ha0ha	NO
-memory/innodb/ha_innodb	NO
-memory/innodb/handler0alter	NO
-memory/innodb/hash0hash	NO
-memory/innodb/i_s	NO
-memory/innodb/ibuf0ibuf	NO
-memory/innodb/lexyy	NO
-memory/innodb/lock0lock	NO
-memory/innodb/log0log	NO
-memory/innodb/log0recv	NO
-memory/innodb/mem0mem	NO
-memory/innodb/os0event	NO
-memory/innodb/os0file	NO
-memory/innodb/page0cur	NO
-memory/innodb/page0zip	NO
-memory/innodb/pars0lex	NO
-memory/innodb/read0read	NO
-memory/innodb/rem0rec	NO
-memory/innodb/row0ftsort	NO
-memory/innodb/row0import	NO
-memory/innodb/row0log	NO
-memory/innodb/row0merge	NO
-memory/innodb/row0mysql	NO
-memory/innodb/row0sel	NO
-memory/innodb/row0trunc	NO
-memory/innodb/srv0conc	NO
-memory/innodb/srv0srv	NO
-memory/innodb/srv0start	NO
-memory/innodb/sync0arr	NO
-memory/innodb/sync0debug	NO
-memory/innodb/sync0rw	NO
-memory/innodb/sync0types	NO
-memory/innodb/trx0i_s	NO
-memory/innodb/trx0purge	NO
-memory/innodb/trx0roll	NO
-memory/innodb/trx0rseg	NO
-memory/innodb/trx0sys	NO
-memory/innodb/trx0trx	NO
-memory/innodb/trx0undo	NO
-memory/innodb/usr0sess	NO
-memory/innodb/ut0list	NO
-memory/innodb/ut0mem	NO
-memory/innodb/ut0mutex	NO
-memory/innodb/ut0pool	NO
-memory/innodb/ut0rbt	NO
-memory/innodb/ut0wqueue	NO
-memory/myisam/MYISAM_SHARE	NO
-memory/myisam/MI_INFO	NO
-memory/myisam/MI_INFO::ft1_to_ft2	NO
-memory/myisam/MI_INFO::bulk_insert	NO
-memory/myisam/record_buffer	NO
-memory/myisam/FTB	NO
-memory/myisam/FT_INFO	NO
-memory/myisam/FTPARSER_PARAM	NO
-memory/myisam/ft_memroot	NO
-memory/myisam/ft_stopwords	NO
-memory/myisam/MI_SORT_PARAM	NO
-memory/myisam/MI_SORT_PARAM::wordroot	NO
-memory/myisam/SORT_FT_BUF	NO
-memory/myisam/SORT_KEY_BLOCKS	NO
-memory/myisam/filecopy	NO
-memory/myisam/SORT_INFO::buffer	NO
-memory/myisam/MI_DECODE_TREE	NO
-memory/myisam/MYISAM_SHARE::decode_tables	NO
-memory/myisam/preload_buffer	NO
-memory/myisam/stPageList::pages	NO
-memory/myisam/keycache_thread_var	NO
-memory/memory/HP_SHARE	NO
-memory/memory/HP_INFO	NO
-memory/memory/HP_PTRS	NO
-memory/memory/HP_KEYDEF	NO
-memory/myisammrg/MYRG_INFO	NO
-memory/myisammrg/children	NO
-memory/archive/FRM	NO
-memory/archive/record_buffer	NO
-memory/blackhole/blackhole_share	NO
-memory/partition/ha_partition::file	NO
-memory/partition/ha_partition::engine_array	NO
-memory/partition/ha_partition::part_ids	NO
-memory/sql/tz_storage	NO
-memory/sql/servers_cache	NO
-memory/sql/udf_mem	NO
-memory/sql/Relay_log_info::mts_coor	NO
-wait/lock/metadata/sql/mdl	YES
+statement/com/Shutdown	YES
+statement/com/Sleep	YES
+statement/com/Statistics	YES
+statement/com/Table Dump	YES
+statement/com/Time	YES
 CALL sys.ps_setup_show_enabled(FALSE, TRUE);
 performance_schema_enabled
 1
 enabled_users
 '%'@'%'
+'foo'@'localhost'
 object_type	objects	enabled	timed
 EVENT	%.%	YES	YES
 FUNCTION	%.%	YES	YES
@@ -1078,19 +186,15 @@ TRIGGER	%.%	YES	YES
 enabled_consumers
 events_stages_current
 events_stages_history
-events_stages_history_long
 events_statements_current
 events_statements_history
-events_statements_history_long
 events_transactions_current
 events_transactions_history
-events_transactions_history_long
 events_waits_current
 events_waits_history
-events_waits_history_long
 global_instrumentation
-thread_instrumentation
 statements_digest
+thread_instrumentation
 enabled_threads	thread_type
 innodb/buf_dump_thread	BACKGROUND
 innodb/dict_stats_thread	BACKGROUND
@@ -1101,14 +205,6 @@ innodb/io_read_thread	BACKGROUND
 innodb/io_write_thread	BACKGROUND
 innodb/io_write_thread	BACKGROUND
 innodb/page_cleaner_thread	BACKGROUND
-innodb/srv_error_monitor_thread	BACKGROUND
-innodb/srv_lock_timeout_thread	BACKGROUND
-innodb/srv_master_thread	BACKGROUND
-innodb/srv_monitor_thread	BACKGROUND
-innodb/srv_purge_thread	BACKGROUND
-innodb/srv_worker_thread	BACKGROUND
-innodb/srv_worker_thread	BACKGROUND
-innodb/srv_worker_thread	BACKGROUND
 root@localhost	FOREGROUND
 sql/compress_gtid_table	FOREGROUND
 sql/main	BACKGROUND
@@ -1119,6 +215,7 @@ performance_schema_enabled
 1
 enabled_users
 '%'@'%'
+'foo'@'localhost'
 object_type	objects	enabled	timed
 EVENT	%.%	YES	YES
 FUNCTION	%.%	YES	YES
@@ -1128,19 +225,15 @@ TRIGGER	%.%	YES	YES
 enabled_consumers
 events_stages_current
 events_stages_history
-events_stages_history_long
 events_statements_current
 events_statements_history
-events_statements_history_long
 events_transactions_current
 events_transactions_history
-events_transactions_history_long
 events_waits_current
 events_waits_history
-events_waits_history_long
 global_instrumentation
-thread_instrumentation
 statements_digest
+thread_instrumentation
 enabled_threads	thread_type
 innodb/buf_dump_thread	BACKGROUND
 innodb/dict_stats_thread	BACKGROUND
@@ -1151,448 +244,83 @@ innodb/io_read_thread	BACKGROUND
 innodb/io_write_thread	BACKGROUND
 innodb/io_write_thread	BACKGROUND
 innodb/page_cleaner_thread	BACKGROUND
-innodb/srv_error_monitor_thread	BACKGROUND
-innodb/srv_lock_timeout_thread	BACKGROUND
-innodb/srv_master_thread	BACKGROUND
-innodb/srv_monitor_thread	BACKGROUND
-innodb/srv_purge_thread	BACKGROUND
-innodb/srv_worker_thread	BACKGROUND
-innodb/srv_worker_thread	BACKGROUND
-innodb/srv_worker_thread	BACKGROUND
 root@localhost	FOREGROUND
 sql/compress_gtid_table	FOREGROUND
 sql/main	BACKGROUND
 sql/signal_handler	BACKGROUND
 sql/thread_timer_notifier	BACKGROUND
 enabled_instruments	timed
-wait/synch/mutex/sql/TC_LOG_MMAP::LOCK_tc	YES
-wait/synch/mutex/sql/LOCK_des_key_file	YES
-wait/synch/mutex/sql/MYSQL_BIN_LOG::LOCK_commit	YES
-wait/synch/mutex/sql/MYSQL_BIN_LOG::LOCK_commit_queue	YES
-wait/synch/mutex/sql/MYSQL_BIN_LOG::LOCK_done	YES
-wait/synch/mutex/sql/MYSQL_BIN_LOG::LOCK_flush_queue	YES
-wait/synch/mutex/sql/MYSQL_BIN_LOG::LOCK_index	YES
-wait/synch/mutex/sql/MYSQL_BIN_LOG::LOCK_log	YES
-wait/synch/mutex/sql/MYSQL_BIN_LOG::LOCK_binlog_end_pos	YES
-wait/synch/mutex/sql/MYSQL_BIN_LOG::LOCK_sync	YES
-wait/synch/mutex/sql/MYSQL_BIN_LOG::LOCK_sync_queue	YES
-wait/synch/mutex/sql/MYSQL_BIN_LOG::LOCK_xids	YES
-wait/synch/mutex/sql/MYSQL_RELAY_LOG::LOCK_commit	YES
-wait/synch/mutex/sql/MYSQL_RELAY_LOG::LOCK_commit_queue	YES
-wait/synch/mutex/sql/MYSQL_RELAY_LOG::LOCK_done	YES
-wait/synch/mutex/sql/MYSQL_RELAY_LOG::LOCK_flush_queue	YES
-wait/synch/mutex/sql/MYSQL_RELAY_LOG::LOCK_index	YES
-wait/synch/mutex/sql/MYSQL_RELAY_LOG::LOCK_log	YES
-wait/synch/mutex/sql/MYSQL_RELAY_LOG::LOCK_sync	YES
-wait/synch/mutex/sql/MYSQL_RELAY_LOG::LOCK_sync_queue	YES
-wait/synch/mutex/sql/MYSQL_RELAY_LOG::LOCK_xids	YES
-wait/synch/mutex/sql/hash_filo::lock	YES
-wait/synch/mutex/sql/Gtid_set::gtid_executed::free_intervals_mutex	YES
-wait/synch/mutex/sql/LOCK_crypt	YES
-wait/synch/mutex/sql/LOCK_error_log	YES
-wait/synch/mutex/sql/LOCK_gdl	YES
-wait/synch/mutex/sql/LOCK_global_system_variables	YES
-wait/synch/mutex/sql/LOCK_manager	YES
-wait/synch/mutex/sql/LOCK_prepared_stmt_count	YES
-wait/synch/mutex/sql/LOCK_sql_slave_skip_counter	YES
-wait/synch/mutex/sql/LOCK_slave_net_timeout	YES
-wait/synch/mutex/sql/LOCK_server_started	YES
-wait/synch/mutex/sql/LOCK_socket_listener_active	YES
-wait/synch/mutex/sql/LOCK_start_signal_handler	YES
-wait/synch/mutex/sql/LOCK_status	YES
-wait/synch/mutex/sql/LOCK_system_variables_hash	YES
-wait/synch/mutex/sql/LOCK_table_share	YES
-wait/synch/mutex/sql/THD::LOCK_thd_data	YES
-wait/synch/mutex/sql/THD::LOCK_thd_query	YES
-wait/synch/mutex/sql/THD::LOCK_thd_sysvar	YES
-wait/synch/mutex/sql/LOCK_user_conn	YES
-wait/synch/mutex/sql/LOCK_uuid_generator	YES
-wait/synch/mutex/sql/LOCK_sql_rand	YES
-wait/synch/mutex/sql/LOG::LOCK_log	YES
-wait/synch/mutex/sql/Master_info::data_lock	YES
-wait/synch/mutex/sql/Master_info::run_lock	YES
-wait/synch/mutex/sql/Master_info::sleep_lock	YES
-wait/synch/mutex/sql/Master_info::info_thd_lock	YES
-wait/synch/mutex/sql/Slave_reporting_capability::err_lock	YES
-wait/synch/mutex/sql/Relay_log_info::data_lock	YES
-wait/synch/mutex/sql/Relay_log_info::sleep_lock	YES
-wait/synch/mutex/sql/Relay_log_info::info_thd_lock	YES
-wait/synch/mutex/sql/Relay_log_info::log_space_lock	YES
-wait/synch/mutex/sql/Relay_log_info::run_lock	YES
-wait/synch/mutex/sql/Relay_log_info::pending_jobs_lock	YES
-wait/synch/mutex/sql/Relay_log_info::exit_count_lock	YES
-wait/synch/mutex/sql/Relay_log_info::temp_tables_lock	YES
-wait/synch/mutex/sql/Worker_info::jobs_lock	YES
-wait/synch/mutex/sql/Query_cache::structure_guard_mutex	YES
-wait/synch/mutex/sql/TABLE_SHARE::LOCK_ha_data	YES
-wait/synch/mutex/sql/LOCK_error_messages	YES
-wait/synch/mutex/sql/LOCK_log_throttle_qni	YES
-wait/synch/mutex/sql/Gtid_state	YES
-wait/synch/mutex/sql/THD::LOCK_query_plan	YES
-wait/synch/mutex/sql/Cost_constant_cache::LOCK_cost_const	YES
-wait/synch/mutex/sql/THD::LOCK_current_cond	YES
-wait/synch/mutex/sql/key_mts_temp_table_LOCK	YES
-wait/synch/mutex/sql/LOCK_reset_gtid_table	YES
-wait/synch/mutex/sql/LOCK_compress_gtid_table	YES
-wait/synch/mutex/sql/key_mts_gaq_LOCK	YES
-wait/synch/mutex/sql/thd_timer_mutex	YES
-wait/synch/mutex/sql/Commit_order_manager::m_mutex	YES
-wait/synch/mutex/sql/Relay_log_info::slave_worker_hash_lock	YES
-wait/synch/mutex/sql/LOCK_offline_mode	YES
-wait/synch/mutex/sql/LOCK_default_password_lifetime	YES
-wait/synch/mutex/mysys/BITMAP::mutex	YES
-wait/synch/mutex/mysys/IO_CACHE::append_buffer_lock	YES
-wait/synch/mutex/mysys/IO_CACHE::SHARE_mutex	YES
-wait/synch/mutex/mysys/KEY_CACHE::cache_lock	YES
-wait/synch/mutex/mysys/THR_LOCK_charset	YES
-wait/synch/mutex/mysys/THR_LOCK_heap	YES
-wait/synch/mutex/mysys/THR_LOCK_lock	YES
-wait/synch/mutex/mysys/THR_LOCK_malloc	YES
-wait/synch/mutex/mysys/THR_LOCK::mutex	YES
-wait/synch/mutex/mysys/THR_LOCK_myisam	YES
-wait/synch/mutex/mysys/THR_LOCK_net	YES
-wait/synch/mutex/mysys/THR_LOCK_open	YES
-wait/synch/mutex/mysys/THR_LOCK_threads	YES
-wait/synch/mutex/mysys/TMPDIR_mutex	YES
-wait/synch/mutex/mysys/THR_LOCK_myisam_mmap	YES
-wait/synch/mutex/sql/LOCK_audit_mask	YES
-wait/synch/mutex/session/LOCK_srv_session_threads	YES
-wait/synch/mutex/sql/LOCK_event_queue	YES
-wait/synch/mutex/sql/Event_scheduler::LOCK_scheduler_state	YES
-wait/synch/mutex/sql/LOCK_thread_cache	YES
-wait/synch/mutex/sql/LOCK_connection_count	YES
-wait/synch/mutex/sql/LOCK_thd_list	YES
-wait/synch/mutex/sql/LOCK_thd_remove	YES
-wait/synch/mutex/sql/LOCK_thread_ids	YES
-wait/synch/mutex/sql/LOCK_load_client_plugin	YES
-wait/synch/mutex/sql/LOCK_item_func_sleep	YES
-wait/synch/mutex/sql/MDL_wait::LOCK_wait_status	YES
-wait/synch/mutex/sql/Partiton_share::auto_inc_mutex	YES
-wait/synch/mutex/sql/LOCK_open	YES
-wait/synch/mutex/sql/LOCK_table_cache	YES
-wait/synch/mutex/sql/LOCK_slave_list	YES
-wait/synch/mutex/sql/LOCK_transaction_cache	YES
-wait/synch/mutex/sql/LOCK_plugin	YES
-wait/synch/mutex/sql/LOCK_plugin_delete	YES
-wait/synch/mutex/csv/tina	YES
-wait/synch/mutex/csv/TINA_SHARE::mutex	YES
-wait/synch/mutex/innodb/commit_cond_mutex	YES
-wait/synch/mutex/innodb/innobase_share_mutex	YES
-wait/synch/mutex/innodb/autoinc_mutex	YES
-wait/synch/mutex/innodb/buf_pool_mutex	YES
-wait/synch/mutex/innodb/buf_pool_zip_mutex	YES
-wait/synch/mutex/innodb/cache_last_read_mutex	YES
-wait/synch/mutex/innodb/dict_foreign_err_mutex	YES
-wait/synch/mutex/innodb/dict_sys_mutex	YES
-wait/synch/mutex/innodb/recalc_pool_mutex	YES
-wait/synch/mutex/innodb/file_format_max_mutex	YES
-wait/synch/mutex/innodb/fil_system_mutex	YES
-wait/synch/mutex/innodb/flush_list_mutex	YES
-wait/synch/mutex/innodb/fts_bg_threads_mutex	YES
-wait/synch/mutex/innodb/fts_delete_mutex	YES
-wait/synch/mutex/innodb/fts_optimize_mutex	YES
-wait/synch/mutex/innodb/fts_doc_id_mutex	YES
-wait/synch/mutex/innodb/log_flush_order_mutex	YES
-wait/synch/mutex/innodb/hash_table_mutex	YES
-wait/synch/mutex/innodb/ibuf_bitmap_mutex	YES
-wait/synch/mutex/innodb/ibuf_mutex	YES
-wait/synch/mutex/innodb/ibuf_pessimistic_insert_mutex	YES
-wait/synch/mutex/innodb/log_sys_mutex	YES
-wait/synch/mutex/innodb/log_sys_write_mutex	YES
-wait/synch/mutex/innodb/mutex_list_mutex	YES
-wait/synch/mutex/innodb/page_zip_stat_per_index_mutex	YES
-wait/synch/mutex/innodb/purge_sys_pq_mutex	YES
-wait/synch/mutex/innodb/recv_sys_mutex	YES
-wait/synch/mutex/innodb/recv_writer_mutex	YES
-wait/synch/mutex/innodb/redo_rseg_mutex	YES
-wait/synch/mutex/innodb/noredo_rseg_mutex	YES
-wait/synch/mutex/innodb/rw_lock_list_mutex	YES
-wait/synch/mutex/innodb/rw_lock_mutex	YES
-wait/synch/mutex/innodb/srv_dict_tmpfile_mutex	YES
-wait/synch/mutex/innodb/srv_innodb_monitor_mutex	YES
-wait/synch/mutex/innodb/srv_misc_tmpfile_mutex	YES
-wait/synch/mutex/innodb/srv_monitor_file_mutex	YES
-wait/synch/mutex/innodb/buf_dblwr_mutex	YES
-wait/synch/mutex/innodb/trx_undo_mutex	YES
-wait/synch/mutex/innodb/trx_pool_mutex	YES
-wait/synch/mutex/innodb/trx_pool_manager_mutex	YES
-wait/synch/mutex/innodb/srv_sys_mutex	YES
-wait/synch/mutex/innodb/lock_mutex	YES
-wait/synch/mutex/innodb/lock_wait_mutex	YES
-wait/synch/mutex/innodb/trx_mutex	YES
-wait/synch/mutex/innodb/srv_threads_mutex	YES
-wait/synch/mutex/innodb/rtr_active_mutex	YES
-wait/synch/mutex/innodb/rtr_match_mutex	YES
-wait/synch/mutex/innodb/rtr_path_mutex	YES
-wait/synch/mutex/innodb/rtr_ssn_mutex	YES
-wait/synch/mutex/innodb/trx_sys_mutex	YES
-wait/synch/mutex/innodb/zip_pad_mutex	YES
-wait/synch/mutex/innodb/master_key_id_mutex	YES
-wait/synch/mutex/myisam/MI_SORT_INFO::mutex	YES
-wait/synch/mutex/myisam/MYISAM_SHARE::intern_lock	YES
-wait/synch/mutex/myisam/MI_CHECK::print_msg	YES
-wait/synch/mutex/myisammrg/MYRG_INFO::mutex	YES
-wait/synch/mutex/archive/Archive_share::mutex	YES
-wait/synch/mutex/blackhole/blackhole	YES
-wait/synch/mutex/sql/tz_LOCK	YES
-wait/synch/rwlock/sql/Binlog_transmit_delegate::lock	YES
-wait/synch/rwlock/sql/Binlog_relay_IO_delegate::lock	YES
-wait/synch/rwlock/sql/LOCK_grant	YES
-wait/synch/rwlock/sql/LOGGER::LOCK_logger	YES
-wait/synch/rwlock/sql/LOCK_sys_init_connect	YES
-wait/synch/rwlock/sql/LOCK_sys_init_slave	YES
-wait/synch/rwlock/sql/LOCK_system_variables_hash	YES
-wait/synch/rwlock/sql/Query_cache_query::lock	YES
-wait/synch/rwlock/sql/gtid_commit_rollback	YES
-wait/synch/rwlock/sql/gtid_mode_lock	YES
-wait/synch/rwlock/sql/channel_map_lock	YES
-wait/synch/rwlock/sql/channel_lock	YES
-wait/synch/rwlock/sql/Trans_delegate::lock	YES
-wait/synch/rwlock/sql/Server_state_delegate::lock	YES
-wait/synch/rwlock/sql/Binlog_storage_delegate::lock	YES
-wait/synch/rwlock/mysys/SAFE_HASH::lock	YES
-wait/synch/rwlock/session/LOCK_srv_session_collection	YES
-wait/synch/rwlock/sql/LOCK_dboptions	YES
-wait/synch/rwlock/sql/MDL_lock::rwlock	YES
-wait/synch/rwlock/sql/MDL_context::LOCK_waiting_for	YES
-wait/synch/sxlock/innodb/btr_search_latch	YES
-wait/synch/sxlock/innodb/dict_operation_lock	YES
-wait/synch/sxlock/innodb/fil_space_latch	YES
-wait/synch/sxlock/innodb/checkpoint_lock	YES
-wait/synch/sxlock/innodb/fts_cache_rw_lock	YES
-wait/synch/sxlock/innodb/fts_cache_init_rw_lock	YES
-wait/synch/sxlock/innodb/trx_i_s_cache_lock	YES
-wait/synch/sxlock/innodb/trx_purge_latch	YES
-wait/synch/sxlock/innodb/index_tree_rw_lock	YES
-wait/synch/sxlock/innodb/index_online_log	YES
-wait/synch/sxlock/innodb/dict_table_stats	YES
-wait/synch/sxlock/innodb/hash_table_locks	YES
-wait/synch/rwlock/myisam/MYISAM_SHARE::key_root_lock	YES
-wait/synch/rwlock/myisam/MYISAM_SHARE::mmap_lock	YES
-wait/synch/rwlock/sql/THR_LOCK_servers	YES
-wait/synch/rwlock/sql/THR_LOCK_udf	YES
-wait/synch/cond/sql/PAGE::cond	YES
-wait/synch/cond/sql/TC_LOG_MMAP::COND_active	YES
-wait/synch/cond/sql/TC_LOG_MMAP::COND_pool	YES
-wait/synch/cond/sql/MYSQL_BIN_LOG::COND_done	YES
-wait/synch/cond/sql/MYSQL_BIN_LOG::update_cond	YES
-wait/synch/cond/sql/MYSQL_BIN_LOG::prep_xids_cond	YES
-wait/synch/cond/sql/MYSQL_RELAY_LOG::COND_done	YES
-wait/synch/cond/sql/MYSQL_RELAY_LOG::update_cond	YES
-wait/synch/cond/sql/MYSQL_RELAY_LOG::prep_xids_cond	YES
-wait/synch/cond/sql/Query_cache::COND_cache_status_changed	YES
-wait/synch/cond/sql/COND_manager	YES
-wait/synch/cond/sql/COND_server_started	YES
-wait/synch/cond/sql/COND_socket_listener_active	YES
-wait/synch/cond/sql/COND_start_signal_handler	YES
-wait/synch/cond/sql/COND_thr_lock	YES
-wait/synch/cond/sql/Item_func_sleep::cond	YES
-wait/synch/cond/sql/Master_info::data_cond	YES
-wait/synch/cond/sql/Master_info::start_cond	YES
-wait/synch/cond/sql/Master_info::stop_cond	YES
-wait/synch/cond/sql/Master_info::sleep_cond	YES
-wait/synch/cond/sql/Relay_log_info::data_cond	YES
-wait/synch/cond/sql/Relay_log_info::log_space_cond	YES
-wait/synch/cond/sql/Relay_log_info::start_cond	YES
-wait/synch/cond/sql/Relay_log_info::stop_cond	YES
-wait/synch/cond/sql/Relay_log_info::sleep_cond	YES
-wait/synch/cond/sql/Relay_log_info::pending_jobs_cond	YES
-wait/synch/cond/sql/Worker_info::jobs_cond	YES
-wait/synch/cond/sql/Relay_log_info::mts_gaq_cond	YES
-wait/synch/cond/sql/TABLE_SHARE::cond	YES
-wait/synch/cond/sql/User_level_lock::cond	YES
-wait/synch/cond/sql/Gtid_state	YES
-wait/synch/cond/sql/COND_compress_gtid_table	YES
-wait/synch/cond/sql/Commit_order_manager::m_workers.cond	YES
-wait/synch/cond/sql/Relay_log_info::slave_worker_hash_lock	YES
-wait/synch/cond/mysys/IO_CACHE_SHARE::cond	YES
-wait/synch/cond/mysys/IO_CACHE_SHARE::cond_writer	YES
-wait/synch/cond/mysys/THR_COND_threads	YES
-wait/synch/cond/sql/Event_scheduler::COND_state	YES
-wait/synch/cond/sql/COND_queue_state	YES
-wait/synch/cond/sql/COND_thread_cache	YES
-wait/synch/cond/sql/COND_flush_thread_cache	YES
-wait/synch/cond/sql/COND_connection_count	YES
-wait/synch/cond/sql/COND_thd_list	YES
-wait/synch/cond/sql/MDL_context::COND_wait_status	YES
-wait/synch/cond/sql/COND_open	YES
-wait/synch/cond/innodb/commit_cond	YES
-wait/synch/cond/myisam/MI_SORT_INFO::cond	YES
-wait/synch/cond/myisam/keycache_thread_var::suspend	YES
-wait/io/file/sql/map	YES
-wait/io/file/sql/binlog	YES
-wait/io/file/sql/binlog_cache	YES
-wait/io/file/sql/binlog_index	YES
-wait/io/file/sql/binlog_index_cache	YES
-wait/io/file/sql/relaylog	YES
-wait/io/file/sql/relaylog_cache	YES
-wait/io/file/sql/relaylog_index	YES
-wait/io/file/sql/relaylog_index_cache	YES
-wait/io/file/sql/io_cache	YES
-wait/io/file/sql/casetest	YES
-wait/io/file/sql/dbopt	YES
-wait/io/file/sql/des_key_file	YES
-wait/io/file/sql/ERRMSG	YES
-wait/io/file/sql/select_to_file	YES
-wait/io/file/sql/file_parser	YES
-wait/io/file/sql/FRM	YES
-wait/io/file/sql/global_ddl_log	YES
-wait/io/file/sql/load	YES
-wait/io/file/sql/LOAD_FILE	YES
-wait/io/file/sql/log_event_data	YES
-wait/io/file/sql/log_event_info	YES
-wait/io/file/sql/master_info	YES
-wait/io/file/sql/misc	YES
-wait/io/file/sql/partition_ddl_log	YES
-wait/io/file/sql/pid	YES
-wait/io/file/sql/query_log	YES
-wait/io/file/sql/relay_log_info	YES
-wait/io/file/sql/send_file	YES
-wait/io/file/sql/slow_log	YES
-wait/io/file/sql/tclog	YES
-wait/io/file/sql/trigger_name	YES
-wait/io/file/sql/trigger	YES
-wait/io/file/sql/init	YES
-wait/io/file/mysys/charset	YES
-wait/io/file/mysys/cnf	YES
-wait/io/file/csv/metadata	YES
-wait/io/file/csv/data	YES
-wait/io/file/csv/update	YES
-wait/io/file/innodb/innodb_data_file	YES
-wait/io/file/innodb/innodb_log_file	YES
-wait/io/file/innodb/innodb_temp_file	YES
-wait/io/file/myisam/data_tmp	YES
-wait/io/file/myisam/dfile	YES
-wait/io/file/myisam/kfile	YES
-wait/io/file/myisam/log	YES
-wait/io/file/myisammrg/MRG	YES
-wait/io/file/archive/metadata	YES
-wait/io/file/archive/data	YES
-wait/io/file/archive/FRM	YES
-wait/io/file/partition/ha_partition::parfile	YES
-wait/io/table/sql/handler	YES
-wait/lock/table/sql/handler	YES
-stage/sql/After create	YES
-stage/sql/allocating local table	YES
-stage/sql/preparing for alter table	YES
-stage/sql/altering table	YES
-stage/sql/committing alter table to storage engine	YES
-stage/sql/Changing master	YES
-stage/sql/Checking master version	YES
-stage/sql/checking permissions	YES
-stage/sql/checking privileges on cached query	YES
-stage/sql/checking query cache for query	YES
-stage/sql/cleaning up	YES
-stage/sql/closing tables	YES
-stage/sql/Compressing gtid_executed table	YES
-stage/sql/Connecting to master	YES
-stage/sql/converting HEAP to ondisk	YES
-stage/sql/Copying to group table	YES
-stage/sql/Copying to tmp table	YES
-stage/sql/copy to tmp table	YES
-stage/sql/Creating sort index	YES
-stage/sql/creating table	YES
-stage/sql/Creating tmp table	YES
-stage/sql/deleting from main table	YES
-stage/sql/deleting from reference tables	YES
-stage/sql/discard_or_import_tablespace	YES
-stage/sql/end	YES
-stage/sql/executing	YES
-stage/sql/Execution of init_command	YES
-stage/sql/explaining	YES
-stage/sql/Finished reading one binlog; switching to next binlog	YES
-stage/sql/Flushing relay log and master info repository.	YES
-stage/sql/Flushing relay-log info file.	YES
-stage/sql/freeing items	YES
-stage/sql/FULLTEXT initialization	YES
-stage/sql/got handler lock	YES
-stage/sql/got old table	YES
-stage/sql/init	YES
-stage/sql/insert	YES
-stage/sql/invalidating query cache entries (table)	YES
-stage/sql/invalidating query cache entries (table list)	YES
-stage/sql/Killing slave	YES
-stage/sql/logging slow query	YES
-stage/sql/Making temporary file (append) before replaying LOAD DATA INFILE	YES
-stage/sql/Making temporary file (create) before replaying LOAD DATA INFILE	YES
-stage/sql/manage keys	YES
-stage/sql/Master has sent all binlog to slave; waiting for more updates	YES
-stage/sql/Opening tables	YES
-stage/sql/optimizing	YES
-stage/sql/preparing	YES
-stage/sql/Purging old relay logs	YES
-stage/sql/query end	YES
-stage/sql/Queueing master event to the relay log	YES
-stage/sql/Reading event from the relay log	YES
-stage/sql/Registering slave on master	YES
-stage/sql/Removing duplicates	YES
-stage/sql/removing tmp table	YES
-stage/sql/rename	YES
-stage/sql/rename result table	YES
-stage/sql/Requesting binlog dump	YES
-stage/sql/reschedule	YES
-stage/sql/Searching rows for update	YES
-stage/sql/Sending binlog event to slave	YES
-stage/sql/sending cached result to client	YES
-stage/sql/Sending data	YES
-stage/sql/setup	YES
-stage/sql/Slave has read all relay log; waiting for more updates	YES
-stage/sql/Waiting for an event from Coordinator	YES
-stage/sql/Waiting for slave workers to process their queues	YES
-stage/sql/Waiting for Slave Worker queue	YES
-stage/sql/Waiting for Slave Workers to free pending events	YES
-stage/sql/Waiting for Slave Worker to release partition	YES
-stage/sql/Waiting for workers to exit	YES
-stage/sql/Sorting for group	YES
-stage/sql/Sorting for order	YES
-stage/sql/Sorting result	YES
-stage/sql/Waiting until MASTER_DELAY seconds after master executed event	YES
-stage/sql/statistics	YES
-stage/sql/storing result in query cache	YES
-stage/sql/storing row into queue	YES
-stage/sql/System lock	YES
-stage/sql/update	YES
-stage/sql/updating	YES
-stage/sql/updating main table	YES
-stage/sql/updating reference tables	YES
-stage/sql/upgrading lock	YES
-stage/sql/User sleep	YES
-stage/sql/verifying table	YES
-stage/sql/Waiting for GTID to be committed	YES
-stage/sql/waiting for handler insert	YES
-stage/sql/waiting for handler lock	YES
-stage/sql/waiting for handler open	YES
-stage/sql/Waiting for INSERT	YES
-stage/sql/Waiting for master to send event	YES
-stage/sql/Waiting for master update	YES
-stage/sql/Waiting for the slave SQL thread to free enough relay log space	YES
-stage/sql/Waiting for slave mutex on exit	YES
-stage/sql/Waiting for slave thread to start	YES
-stage/sql/Waiting for table flush	YES
-stage/sql/Waiting for query cache lock	YES
-stage/sql/Waiting for the next event in relay log	YES
-stage/sql/Waiting for the slave SQL thread to advance position	YES
-stage/sql/Waiting to finalize termination	YES
-stage/sql/Waiting for preceding transaction to commit	YES
-stage/sql/Waiting for dependent transaction to commit	YES
-stage/sql/Suspending	YES
-stage/sql/starting	YES
-stage/sql/Waiting for no channel reference.	YES
-stage/mysys/Waiting for table level lock	YES
-stage/sql/Waiting on empty queue	YES
-stage/sql/Waiting for next activation	YES
-stage/sql/Waiting for the scheduler to stop	YES
-stage/sql/Waiting for global read lock	YES
-stage/sql/Waiting for tablespace metadata lock	YES
-stage/sql/Waiting for schema metadata lock	YES
-stage/sql/Waiting for table metadata lock	YES
-stage/sql/Waiting for stored function metadata lock	YES
-stage/sql/Waiting for stored procedure metadata lock	YES
-stage/sql/Waiting for trigger metadata lock	YES
-stage/sql/Waiting for event metadata lock	YES
-stage/sql/Waiting for commit lock	YES
-stage/sql/User lock	YES
-stage/sql/Waiting for locking service lock	YES
+idle	YES
+memory/performance_schema/accounts	NO
+memory/performance_schema/cond_class	NO
+memory/performance_schema/cond_instances	NO
+memory/performance_schema/events_stages_history	NO
+memory/performance_schema/events_stages_history_long	NO
+memory/performance_schema/events_stages_summary_by_account_by_event_name	NO
+memory/performance_schema/events_stages_summary_by_host_by_event_name	NO
+memory/performance_schema/events_stages_summary_by_thread_by_event_name	NO
+memory/performance_schema/events_stages_summary_by_user_by_event_name	NO
+memory/performance_schema/events_stages_summary_global_by_event_name	NO
+memory/performance_schema/events_statements_current	NO
+memory/performance_schema/events_statements_current.sqltext	NO
+memory/performance_schema/events_statements_current.tokens	NO
+memory/performance_schema/events_statements_history	NO
+memory/performance_schema/events_statements_history.sqltext	NO
+memory/performance_schema/events_statements_history.tokens	NO
+memory/performance_schema/events_statements_history_long	NO
+memory/performance_schema/events_statements_history_long.sqltext	NO
+memory/performance_schema/events_statements_history_long.tokens	NO
+memory/performance_schema/events_statements_summary_by_account_by_event_name	NO
+memory/performance_schema/events_statements_summary_by_digest	NO
+memory/performance_schema/events_statements_summary_by_digest.tokens	NO
+memory/performance_schema/events_statements_summary_by_host_by_event_name	NO
+memory/performance_schema/events_statements_summary_by_program	NO
+memory/performance_schema/events_statements_summary_by_thread_by_event_name	NO
+memory/performance_schema/events_statements_summary_by_user_by_event_name	NO
+memory/performance_schema/events_statements_summary_global_by_event_name	NO
+memory/performance_schema/events_transactions_history	NO
+memory/performance_schema/events_transactions_history_long	NO
+memory/performance_schema/events_transactions_summary_by_account_by_event_name	NO
+memory/performance_schema/events_transactions_summary_by_host_by_event_name	NO
+memory/performance_schema/events_transactions_summary_by_thread_by_event_name	NO
+memory/performance_schema/events_transactions_summary_by_user_by_event_name	NO
+memory/performance_schema/events_waits_history	NO
+memory/performance_schema/events_waits_history_long	NO
+memory/performance_schema/events_waits_summary_by_account_by_event_name	NO
+memory/performance_schema/events_waits_summary_by_host_by_event_name	NO
+memory/performance_schema/events_waits_summary_by_thread_by_event_name	NO
+memory/performance_schema/events_waits_summary_by_user_by_event_name	NO
+memory/performance_schema/file_class	NO
+memory/performance_schema/file_handle	NO
+memory/performance_schema/file_instances	NO
+memory/performance_schema/hosts	NO
+memory/performance_schema/memory_class	NO
+memory/performance_schema/memory_summary_by_account_by_event_name	NO
+memory/performance_schema/memory_summary_by_host_by_event_name	NO
+memory/performance_schema/memory_summary_by_thread_by_event_name	NO
+memory/performance_schema/memory_summary_by_user_by_event_name	NO
+memory/performance_schema/memory_summary_global_by_event_name	NO
+memory/performance_schema/metadata_locks	NO
+memory/performance_schema/mutex_class	NO
+memory/performance_schema/mutex_instances	NO
+memory/performance_schema/prepared_statements_instances	NO
+memory/performance_schema/rwlock_class	NO
+memory/performance_schema/rwlock_instances	NO
+memory/performance_schema/scalable_buffer	NO
+memory/performance_schema/session_connect_attrs	NO
+memory/performance_schema/setup_actors	NO
+memory/performance_schema/setup_objects	NO
+memory/performance_schema/socket_class	NO
+memory/performance_schema/socket_instances	NO
+memory/performance_schema/stage_class	NO
+memory/performance_schema/statement_class	NO
+memory/performance_schema/table_handles	NO
+memory/performance_schema/table_io_waits_summary_by_index_usage	NO
+memory/performance_schema/table_lock_waits_summary_by_table	NO
+memory/performance_schema/table_shares	NO
+memory/performance_schema/threads	NO
+memory/performance_schema/thread_class	NO
+memory/performance_schema/users	NO
 stage/innodb/alter table (end)	YES
 stage/innodb/alter table (flush)	YES
 stage/innodb/alter table (insert)	YES
@@ -1601,581 +329,38 @@ stage/innodb/alter table (log apply table)	YES
 stage/innodb/alter table (merge sort)	YES
 stage/innodb/alter table (read PK and internal sort)	YES
 stage/innodb/buffer pool load	YES
-statement/sql/select	YES
-statement/sql/create_table	YES
-statement/sql/create_index	YES
-statement/sql/alter_table	YES
-statement/sql/update	YES
-statement/sql/insert	YES
-statement/sql/insert_select	YES
-statement/sql/delete	YES
-statement/sql/truncate	YES
-statement/sql/drop_table	YES
-statement/sql/drop_index	YES
-statement/sql/show_databases	YES
-statement/sql/show_tables	YES
-statement/sql/show_fields	YES
-statement/sql/show_keys	YES
-statement/sql/show_variables	YES
-statement/sql/show_status	YES
-statement/sql/show_engine_logs	YES
-statement/sql/show_engine_status	YES
-statement/sql/show_engine_mutex	YES
-statement/sql/show_processlist	YES
-statement/sql/show_master_status	YES
-statement/sql/show_slave_status	YES
-statement/sql/show_grants	YES
-statement/sql/show_create_table	YES
-statement/sql/show_charsets	YES
-statement/sql/show_collations	YES
-statement/sql/show_create_db	YES
-statement/sql/show_table_status	YES
-statement/sql/show_triggers	YES
-statement/sql/load	YES
-statement/sql/set_option	YES
-statement/sql/lock_tables	YES
-statement/sql/unlock_tables	YES
-statement/sql/grant	YES
-statement/sql/change_db	YES
-statement/sql/create_db	YES
-statement/sql/drop_db	YES
-statement/sql/alter_db	YES
-statement/sql/repair	YES
-statement/sql/replace	YES
-statement/sql/replace_select	YES
-statement/sql/create_udf	YES
-statement/sql/drop_function	YES
-statement/sql/revoke	YES
-statement/sql/optimize	YES
-statement/sql/check	YES
-statement/sql/assign_to_keycache	YES
-statement/sql/preload_keys	YES
-statement/sql/flush	YES
-statement/sql/kill	YES
-statement/sql/analyze	YES
-statement/sql/rollback	YES
-statement/sql/rollback_to_savepoint	YES
-statement/sql/commit	YES
-statement/sql/savepoint	YES
-statement/sql/release_savepoint	YES
-statement/sql/slave_start	YES
-statement/sql/slave_stop	YES
-statement/sql/group_replication_start	YES
-statement/sql/group_replication_stop	YES
-statement/sql/begin	YES
-statement/sql/change_master	YES
-statement/sql/change_repl_filter	YES
-statement/sql/rename_table	YES
-statement/sql/reset	YES
-statement/sql/purge	YES
-statement/sql/purge_before_date	YES
-statement/sql/show_binlogs	YES
-statement/sql/show_open_tables	YES
-statement/sql/ha_open	YES
-statement/sql/ha_close	YES
-statement/sql/ha_read	YES
-statement/sql/show_slave_hosts	YES
-statement/sql/delete_multi	YES
-statement/sql/update_multi	YES
-statement/sql/show_binlog_events	YES
-statement/sql/do	YES
-statement/sql/show_warnings	YES
-statement/sql/empty_query	YES
-statement/sql/show_errors	YES
-statement/sql/show_storage_engines	YES
-statement/sql/show_privileges	YES
-statement/sql/help	YES
-statement/sql/create_user	YES
-statement/sql/drop_user	YES
-statement/sql/rename_user	YES
-statement/sql/revoke_all	YES
-statement/sql/checksum	YES
-statement/sql/create_procedure	YES
-statement/sql/create_function	YES
-statement/sql/call_procedure	YES
-statement/sql/drop_procedure	YES
-statement/sql/alter_procedure	YES
-statement/sql/alter_function	YES
-statement/sql/show_create_proc	YES
-statement/sql/show_create_func	YES
-statement/sql/show_procedure_status	YES
-statement/sql/show_function_status	YES
-statement/sql/prepare_sql	YES
-statement/sql/execute_sql	YES
-statement/sql/dealloc_sql	YES
-statement/sql/create_view	YES
-statement/sql/drop_view	YES
-statement/sql/create_trigger	YES
-statement/sql/drop_trigger	YES
-statement/sql/xa_start	YES
-statement/sql/xa_end	YES
-statement/sql/xa_prepare	YES
-statement/sql/xa_commit	YES
-statement/sql/xa_rollback	YES
-statement/sql/xa_recover	YES
-statement/sql/show_procedure_code	YES
-statement/sql/show_function_code	YES
-statement/sql/alter_tablespace	YES
-statement/sql/install_plugin	YES
-statement/sql/uninstall_plugin	YES
-statement/sql/binlog	YES
-statement/sql/show_plugins	YES
-statement/sql/create_server	YES
-statement/sql/drop_server	YES
-statement/sql/alter_server	YES
-statement/sql/create_event	YES
-statement/sql/alter_event	YES
-statement/sql/drop_event	YES
-statement/sql/show_create_event	YES
-statement/sql/show_events	YES
-statement/sql/show_create_trigger	YES
-statement/sql/alter_db_upgrade	YES
-statement/sql/show_profile	YES
-statement/sql/show_profiles	YES
-statement/sql/signal	YES
-statement/sql/resignal	YES
-statement/sql/show_relaylog_events	YES
-statement/sql/get_diagnostics	YES
-statement/sql/alter_user	YES
-statement/sql/explain_other	YES
-statement/sql/show_create_user	YES
-statement/sql/shutdown	YES
-statement/sql/alter_instance	YES
-statement/sql/error	YES
-statement/sp/stmt	YES
-statement/sp/set	YES
-statement/sp/set_trigger_field	YES
-statement/sp/jump	YES
-statement/sp/jump_if_not	YES
-statement/sp/freturn	YES
-statement/sp/hpush_jump	YES
-statement/sp/hpop	YES
-statement/sp/hreturn	YES
-statement/sp/cpush	YES
-statement/sp/cpop	YES
-statement/sp/copen	YES
-statement/sp/cclose	YES
-statement/sp/cfetch	YES
-statement/sp/error	YES
-statement/sp/set_case_expr	YES
-statement/scheduler/event	YES
-statement/com/Sleep	YES
-statement/com/Quit	YES
-statement/com/Init DB	YES
-statement/com/Field List	YES
-statement/com/Create DB	YES
-statement/com/Drop DB	YES
-statement/com/Refresh	YES
-statement/com/Shutdown	YES
-statement/com/Statistics	YES
-statement/com/Processlist	YES
-statement/com/Connect	YES
-statement/com/Kill	YES
-statement/com/Debug	YES
-statement/com/Ping	YES
-statement/com/Time	YES
-statement/com/Delayed insert	YES
-statement/com/Change user	YES
 statement/com/Binlog Dump	YES
-statement/com/Table Dump	YES
-statement/com/Connect Out	YES
-statement/com/Register Slave	YES
-statement/com/Prepare	YES
-statement/com/Execute	YES
-statement/com/Long Data	YES
+statement/com/Binlog Dump GTID	YES
+statement/com/Change user	YES
 statement/com/Close stmt	YES
+statement/com/Connect	YES
+statement/com/Connect Out	YES
+statement/com/Create DB	YES
+statement/com/Daemon	YES
+statement/com/Debug	YES
+statement/com/Delayed insert	YES
+statement/com/Drop DB	YES
+statement/com/Error	YES
+statement/com/Execute	YES
+statement/com/Fetch	YES
+statement/com/Field List	YES
+statement/com/Init DB	YES
+statement/com/Kill	YES
+statement/com/Long Data	YES
+statement/com/Ping	YES
+statement/com/Prepare	YES
+statement/com/Processlist	YES
+statement/com/Quit	YES
+statement/com/Refresh	YES
+statement/com/Register Slave	YES
+statement/com/Reset Connection	YES
 statement/com/Reset stmt	YES
 statement/com/Set option	YES
-statement/com/Fetch	YES
-statement/com/Daemon	YES
-statement/com/Binlog Dump GTID	YES
-statement/com/Reset Connection	YES
-statement/com/Error	YES
-statement/abstract/Query	YES
-statement/abstract/new_packet	YES
-statement/abstract/relay_log	YES
-transaction	YES
-wait/io/socket/sql/server_tcpip_socket	YES
-wait/io/socket/sql/server_unix_socket	YES
-wait/io/socket/sql/client_connection	YES
-idle	YES
-memory/performance_schema/mutex_instances	NO
-memory/performance_schema/rwlock_instances	NO
-memory/performance_schema/cond_instances	NO
-memory/performance_schema/file_instances	NO
-memory/performance_schema/socket_instances	NO
-memory/performance_schema/metadata_locks	NO
-memory/performance_schema/file_handle	NO
-memory/performance_schema/accounts	NO
-memory/performance_schema/events_waits_summary_by_account_by_event_name	NO
-memory/performance_schema/events_stages_summary_by_account_by_event_name	NO
-memory/performance_schema/events_statements_summary_by_account_by_event_name	NO
-memory/performance_schema/events_transactions_summary_by_account_by_event_name	NO
-memory/performance_schema/memory_summary_by_account_by_event_name	NO
-memory/performance_schema/events_stages_summary_global_by_event_name	NO
-memory/performance_schema/events_statements_summary_global_by_event_name	NO
-memory/performance_schema/memory_summary_global_by_event_name	NO
-memory/performance_schema/hosts	NO
-memory/performance_schema/events_waits_summary_by_host_by_event_name	NO
-memory/performance_schema/events_stages_summary_by_host_by_event_name	NO
-memory/performance_schema/events_statements_summary_by_host_by_event_name	NO
-memory/performance_schema/events_transactions_summary_by_host_by_event_name	NO
-memory/performance_schema/memory_summary_by_host_by_event_name	NO
-memory/performance_schema/threads	NO
-memory/performance_schema/events_waits_summary_by_thread_by_event_name	NO
-memory/performance_schema/events_stages_summary_by_thread_by_event_name	NO
-memory/performance_schema/events_statements_summary_by_thread_by_event_name	NO
-memory/performance_schema/events_transactions_summary_by_thread_by_event_name	NO
-memory/performance_schema/memory_summary_by_thread_by_event_name	NO
-memory/performance_schema/events_waits_history	NO
-memory/performance_schema/events_stages_history	NO
-memory/performance_schema/events_statements_history	NO
-memory/performance_schema/events_statements_history.tokens	NO
-memory/performance_schema/events_statements_history.sqltext	NO
-memory/performance_schema/events_statements_current	NO
-memory/performance_schema/events_statements_current.tokens	NO
-memory/performance_schema/events_statements_current.sqltext	NO
-memory/performance_schema/events_transactions_history	NO
-memory/performance_schema/session_connect_attrs	NO
-memory/performance_schema/users	NO
-memory/performance_schema/events_waits_summary_by_user_by_event_name	NO
-memory/performance_schema/events_stages_summary_by_user_by_event_name	NO
-memory/performance_schema/events_statements_summary_by_user_by_event_name	NO
-memory/performance_schema/events_transactions_summary_by_user_by_event_name	NO
-memory/performance_schema/memory_summary_by_user_by_event_name	NO
-memory/performance_schema/mutex_class	NO
-memory/performance_schema/rwlock_class	NO
-memory/performance_schema/cond_class	NO
-memory/performance_schema/thread_class	NO
-memory/performance_schema/file_class	NO
-memory/performance_schema/socket_class	NO
-memory/performance_schema/stage_class	NO
-memory/performance_schema/statement_class	NO
-memory/performance_schema/memory_class	NO
-memory/performance_schema/setup_actors	NO
-memory/performance_schema/setup_objects	NO
-memory/performance_schema/events_statements_summary_by_digest	NO
-memory/performance_schema/events_statements_summary_by_digest.tokens	NO
-memory/performance_schema/events_stages_history_long	NO
-memory/performance_schema/events_statements_history_long	NO
-memory/performance_schema/events_statements_history_long.tokens	NO
-memory/performance_schema/events_statements_history_long.sqltext	NO
-memory/performance_schema/events_transactions_history_long	NO
-memory/performance_schema/events_waits_history_long	NO
-memory/performance_schema/table_handles	NO
-memory/performance_schema/table_shares	NO
-memory/performance_schema/table_io_waits_summary_by_index_usage	NO
-memory/performance_schema/table_lock_waits_summary_by_table	NO
-memory/performance_schema/events_statements_summary_by_program	NO
-memory/performance_schema/prepared_statements_instances	NO
-memory/performance_schema/scalable_buffer	NO
-memory/sql/Locked_tables_list::m_locked_tables_root	NO
-memory/sql/display_table_locks	NO
-memory/sql/THD::transactions::mem_root	NO
-memory/sql/Delegate::memroot	NO
-memory/sql/sql_acl_mem	NO
-memory/sql/sql_acl_memex	NO
-memory/sql/acl_cache	NO
-memory/sql/thd::main_mem_root	NO
-memory/sql/help	NO
-memory/sql/new_frm_mem	NO
-memory/sql/TABLE_SHARE::mem_root	NO
-memory/sql/gdl	NO
-memory/sql/Table_triggers_list	NO
-memory/sql/servers	NO
-memory/sql/Prepared_statement_map	NO
-memory/sql/Prepared_statement::main_mem_root	NO
-memory/sql/Protocol_local::m_rset_root	NO
-memory/sql/Warning_info::m_warn_root	NO
-memory/sql/THD::sp_cache	NO
-memory/sql/sp_head::main_mem_root	NO
-memory/sql/sp_head::execute_mem_root	NO
-memory/sql/sp_head::call_mem_root	NO
-memory/sql/table_mapping::m_mem_root	NO
-memory/sql/QUICK_RANGE_SELECT::alloc	NO
-memory/sql/QUICK_INDEX_MERGE_SELECT::alloc	NO
-memory/sql/QUICK_ROR_INTERSECT_SELECT::alloc	NO
-memory/sql/QUICK_ROR_UNION_SELECT::alloc	NO
-memory/sql/QUICK_GROUP_MIN_MAX_SELECT::alloc	NO
-memory/sql/test_quick_select	NO
-memory/sql/prune_partitions::exec	NO
-memory/sql/MYSQL_BIN_LOG::recover	NO
-memory/sql/Blob_mem_storage::storage	NO
-memory/sql/NAMED_ILINK::name	NO
-memory/sql/String::value	NO
-memory/sql/Sys_var_charptr::value	NO
-memory/sql/Queue::queue_item	NO
-memory/sql/THD::db	NO
-memory/sql/user_var_entry	NO
-memory/sql/Slave_job_group::group_relay_log_name	NO
-memory/sql/Relay_log_info::group_relay_log_name	NO
-memory/sql/binlog_cache_mngr	NO
-memory/sql/Row_data_memory::memory	NO
-memory/sql/Gtid_set::to_string	NO
-memory/sql/Gtid_state::to_string	NO
-memory/sql/Owned_gtids::to_string	NO
-memory/sql/Log_event	NO
-memory/sql/Incident_log_event::message	NO
-memory/sql/Rows_query_log_event::rows_query	NO
-memory/sql/Sort_param::tmp_buffer	NO
-memory/sql/Filesort_info::merge	NO
-memory/sql/Filesort_info::record_pointers	NO
-memory/sql/Filesort_buffer::sort_keys	NO
-memory/sql/handler::errmsgs	NO
-memory/sql/handlerton	NO
-memory/sql/XID	NO
-memory/sql/host_cache::hostname	NO
-memory/sql/user_var_entry::value	NO
-memory/sql/User_level_lock	NO
-memory/sql/MYSQL_LOG::name	NO
-memory/sql/TC_LOG_MMAP::pages	NO
-memory/sql/my_bitmap_map	NO
-memory/sql/QUICK_RANGE_SELECT::mrr_buf_desc	NO
-memory/sql/Event_queue_element_for_exec::names	NO
-memory/sql/my_str_malloc	NO
-memory/sql/MYSQL_BIN_LOG::basename	NO
-memory/sql/MYSQL_BIN_LOG::index	NO
-memory/sql/MYSQL_RELAY_LOG::basename	NO
-memory/sql/MYSQL_RELAY_LOG::index	NO
-memory/sql/rpl_filter memory	NO
-memory/sql/errmsgs	NO
-memory/sql/Gis_read_stream::err_msg	NO
-memory/sql/Geometry::ptr_and_wkb_data	NO
-memory/sql/MYSQL_LOCK	NO
-memory/sql/NET::buff	NO
-memory/sql/NET::compress_packet	NO
-memory/sql/Event_scheduler::scheduler_param	NO
-memory/sql/Gtid_set::Interval_chunk	NO
-memory/sql/Owned_gtids::sidno_to_hash	NO
-memory/sql/Sid_map::Node	NO
-memory/sql/Mutex_cond_array::Mutex_cond	NO
-memory/sql/TABLE_RULE_ENT	NO
-memory/sql/Rpl_info_table	NO
-memory/sql/Rpl_info_file::buffer	NO
-memory/sql/db_worker_hash_entry	NO
-memory/sql/rpl_slave::check_temp_dir	NO
-memory/sql/rpl_slave::command_buffer	NO
-memory/sql/binlog_ver_1_event	NO
-memory/sql/SLAVE_INFO	NO
-memory/sql/binlog_pos	NO
-memory/sql/HASH_ROW_ENTRY	NO
-memory/sql/binlog_statement_buffer	NO
-memory/sql/partition_syntax_buffer	NO
-memory/sql/READ_INFO	NO
-memory/sql/JOIN_CACHE	NO
-memory/sql/TABLE::sort_io_cache	NO
-memory/sql/frm	NO
-memory/sql/Unique::sort_buffer	NO
-memory/sql/Unique::merge_buffer	NO
-memory/sql/TABLE	NO
-memory/sql/frm::extra_segment_buff	NO
-memory/sql/frm::form_pos	NO
-memory/sql/frm::string	NO
-memory/sql/LOG_name	NO
-memory/sql/DATE_TIME_FORMAT	NO
-memory/sql/DDL_LOG_MEMORY_ENTRY	NO
-memory/sql/ST_SCHEMA_TABLE	NO
-memory/sql/ignored_db	NO
-memory/sql/PROFILE	NO
-memory/sql/global_system_variables	NO
-memory/sql/THD::variables	NO
-memory/sql/Security_context	NO
-memory/sql/Shared_memory_name	NO
-memory/sql/bison_stack	NO
-memory/sql/THD::handler_tables_hash	NO
-memory/sql/hash_index_key_buffer	NO
-memory/sql/dboptions_hash	NO
-memory/sql/user_conn	NO
-memory/sql/LOG_POS_COORD	NO
-memory/sql/XID_STATE	NO
-memory/sql/MPVIO_EXT::auth_info	NO
-memory/sql/opt_bin_logname	NO
-memory/sql/Query_cache	NO
-memory/sql/READ_RECORD_cache	NO
-memory/sql/Quick_ranges	NO
-memory/sql/File_query_log::name	NO
-memory/sql/Table_trigger_dispatcher::m_mem_root	NO
-memory/sql/thd_timer	NO
-memory/sql/THD::Session_tracker	NO
-memory/sql/THD::Session_sysvar_resource_manager	NO
-memory/sql/show_slave_status_io_gtid_set	NO
-memory/sql/write_set_extraction	NO
-memory/sql/get_all_tables	NO
-memory/sql/fill_schema_schemata	NO
-memory/sql/native_functions	NO
-memory/sql/JSON	NO
-memory/client/mysql_options	NO
-memory/client/MYSQL_DATA	NO
-memory/client/MYSQL	NO
-memory/client/MYSQL_RES	NO
-memory/client/MYSQL_ROW	NO
-memory/client/MYSQL_STATE_CHANGE_INFO	NO
-memory/client/MYSQL_HANDSHAKE	NO
-memory/vio/ssl_fd	NO
-memory/vio/vio	NO
-memory/vio/read_buffer	NO
-memory/mysys/max_alloca	NO
-memory/mysys/charset_file	NO
-memory/mysys/charset_loader	NO
-memory/mysys/lf_node	NO
-memory/mysys/lf_dynarray	NO
-memory/mysys/lf_slist	NO
-memory/mysys/LIST	NO
-memory/mysys/IO_CACHE	NO
-memory/mysys/KEY_CACHE	NO
-memory/mysys/SAFE_HASH_ENTRY	NO
-memory/mysys/MY_TMPDIR::full_list	NO
-memory/mysys/MY_BITMAP::bitmap	NO
-memory/mysys/my_compress_alloc	NO
-memory/mysys/pack_frm	NO
-memory/mysys/my_err_head	NO
-memory/mysys/my_file_info	NO
-memory/mysys/MY_DIR	NO
-memory/mysys/MY_STAT	NO
-memory/mysys/QUEUE	NO
-memory/mysys/DYNAMIC_STRING	NO
-memory/mysys/TREE	NO
-memory/sql/Event_basic::mem_root	NO
-memory/sql/root	NO
-memory/sql/load_env_plugins	NO
-memory/sql/MDL_context::acquire_locks	NO
-memory/sql/Partition_share	NO
-memory/sql/partition_sort_buffer	NO
-memory/sql/Partition_admin	NO
-memory/sql/plugin_mem_root	NO
-memory/sql/plugin_init_tmp	NO
-memory/sql/plugin_int_mem_root	NO
-memory/sql/mysql_plugin_dl	NO
-memory/sql/mysql_plugin	NO
-memory/sql/plugin_bookmark	NO
-memory/csv/TINA_SHARE	NO
-memory/csv/blobroot	NO
-memory/csv/tina_set	NO
-memory/csv/row	NO
-memory/csv/Transparent_file	NO
-memory/innodb/adaptive hash index	NO
-memory/innodb/buf_buf_pool	NO
-memory/innodb/dict_stats_bg_recalc_pool_t	NO
-memory/innodb/dict_stats_index_map_t	NO
-memory/innodb/dict_stats_n_diff_on_level	NO
-memory/innodb/other	NO
-memory/innodb/row_log_buf	NO
-memory/innodb/row_merge_sort	NO
-memory/innodb/std	NO
-memory/innodb/trx_sys_t::rw_trx_ids	NO
-memory/innodb/partitioning	NO
-memory/innodb/api0api	NO
-memory/innodb/btr0btr	NO
-memory/innodb/btr0bulk	NO
-memory/innodb/btr0cur	NO
-memory/innodb/btr0pcur	NO
-memory/innodb/btr0sea	NO
-memory/innodb/buf0buf	NO
-memory/innodb/buf0dblwr	NO
-memory/innodb/buf0dump	NO
-memory/innodb/buf0flu	NO
-memory/innodb/buf0lru	NO
-memory/innodb/dict0dict	NO
-memory/innodb/dict0mem	NO
-memory/innodb/dict0stats	NO
-memory/innodb/dict0stats_bg	NO
-memory/innodb/eval0eval	NO
-memory/innodb/fil0fil	NO
-memory/innodb/fsp0file	NO
-memory/innodb/fsp0space	NO
-memory/innodb/fsp0sysspace	NO
-memory/innodb/fts0ast	NO
-memory/innodb/fts0config	NO
-memory/innodb/fts0fts	NO
-memory/innodb/fts0opt	NO
-memory/innodb/fts0pars	NO
-memory/innodb/fts0que	NO
-memory/innodb/fts0sql	NO
-memory/innodb/gis0sea	NO
-memory/innodb/ha0ha	NO
-memory/innodb/ha_innodb	NO
-memory/innodb/handler0alter	NO
-memory/innodb/hash0hash	NO
-memory/innodb/i_s	NO
-memory/innodb/ibuf0ibuf	NO
-memory/innodb/lexyy	NO
-memory/innodb/lock0lock	NO
-memory/innodb/log0log	NO
-memory/innodb/log0recv	NO
-memory/innodb/mem0mem	NO
-memory/innodb/os0event	NO
-memory/innodb/os0file	NO
-memory/innodb/page0cur	NO
-memory/innodb/page0zip	NO
-memory/innodb/pars0lex	NO
-memory/innodb/read0read	NO
-memory/innodb/rem0rec	NO
-memory/innodb/row0ftsort	NO
-memory/innodb/row0import	NO
-memory/innodb/row0log	NO
-memory/innodb/row0merge	NO
-memory/innodb/row0mysql	NO
-memory/innodb/row0sel	NO
-memory/innodb/row0trunc	NO
-memory/innodb/srv0conc	NO
-memory/innodb/srv0srv	NO
-memory/innodb/srv0start	NO
-memory/innodb/sync0arr	NO
-memory/innodb/sync0debug	NO
-memory/innodb/sync0rw	NO
-memory/innodb/sync0types	NO
-memory/innodb/trx0i_s	NO
-memory/innodb/trx0purge	NO
-memory/innodb/trx0roll	NO
-memory/innodb/trx0rseg	NO
-memory/innodb/trx0sys	NO
-memory/innodb/trx0trx	NO
-memory/innodb/trx0undo	NO
-memory/innodb/usr0sess	NO
-memory/innodb/ut0list	NO
-memory/innodb/ut0mem	NO
-memory/innodb/ut0mutex	NO
-memory/innodb/ut0pool	NO
-memory/innodb/ut0rbt	NO
-memory/innodb/ut0wqueue	NO
-memory/myisam/MYISAM_SHARE	NO
-memory/myisam/MI_INFO	NO
-memory/myisam/MI_INFO::ft1_to_ft2	NO
-memory/myisam/MI_INFO::bulk_insert	NO
-memory/myisam/record_buffer	NO
-memory/myisam/FTB	NO
-memory/myisam/FT_INFO	NO
-memory/myisam/FTPARSER_PARAM	NO
-memory/myisam/ft_memroot	NO
-memory/myisam/ft_stopwords	NO
-memory/myisam/MI_SORT_PARAM	NO
-memory/myisam/MI_SORT_PARAM::wordroot	NO
-memory/myisam/SORT_FT_BUF	NO
-memory/myisam/SORT_KEY_BLOCKS	NO
-memory/myisam/filecopy	NO
-memory/myisam/SORT_INFO::buffer	NO
-memory/myisam/MI_DECODE_TREE	NO
-memory/myisam/MYISAM_SHARE::decode_tables	NO
-memory/myisam/preload_buffer	NO
-memory/myisam/stPageList::pages	NO
-memory/myisam/keycache_thread_var	NO
-memory/memory/HP_SHARE	NO
-memory/memory/HP_INFO	NO
-memory/memory/HP_PTRS	NO
-memory/memory/HP_KEYDEF	NO
-memory/myisammrg/MYRG_INFO	NO
-memory/myisammrg/children	NO
-memory/archive/FRM	NO
-memory/archive/record_buffer	NO
-memory/blackhole/blackhole_share	NO
-memory/partition/ha_partition::file	NO
-memory/partition/ha_partition::engine_array	NO
-memory/partition/ha_partition::part_ids	NO
-memory/sql/tz_storage	NO
-memory/sql/servers_cache	NO
-memory/sql/udf_mem	NO
-memory/sql/Relay_log_info::mts_coor	NO
-wait/lock/metadata/sql/mdl	YES
+statement/com/Shutdown	YES
+statement/com/Sleep	YES
+statement/com/Statistics	YES
+statement/com/Table Dump	YES
+statement/com/Time	YES
 UPDATE performance_schema.setup_instruments SET enabled = 'YES', timed = 'YES';
 TRUNCATE TABLE performance_schema.setup_actors;
 INSERT INTO performance_schema.setup_actors VALUES ('%', '%', '%', 'YES', 'YES');

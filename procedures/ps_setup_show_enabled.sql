@@ -123,19 +123,26 @@ CREATE DEFINER='root'@'localhost' PROCEDURE ps_setup_show_enabled (
 BEGIN
     SELECT @@performance_schema AS performance_schema_enabled;
 
-    SELECT CONCAT('\'', host, '\'@\'', user, '\'') AS enabled_users
-      FROM performance_schema.setup_actors;
+    -- In 5.7.6 and later the setup_actors table has an ENABLED column to
+    -- specify whether the actor is enabled. Before that all actors matched
+    -- in the setup_actors table were enabled.
+    SELECT CONCAT('\'', user, '\'@\'', host, '\'') AS enabled_users
+      FROM performance_schema.setup_actors
+     /*!50706 WHERE enabled = 'YES' */
+     ORDER BY enabled_users;
 
     SELECT object_type,
            CONCAT(object_schema, '.', object_name) AS objects,
            enabled,
            timed
       FROM performance_schema.setup_objects
-     WHERE enabled = 'YES';
+     WHERE enabled = 'YES'
+     ORDER BY object_type, objects;
 
     SELECT name AS enabled_consumers
       FROM performance_schema.setup_consumers
-     WHERE enabled = 'YES';
+     WHERE enabled = 'YES'
+     ORDER BY enabled_consumers;
 
     IF (in_show_threads) THEN
         SELECT IF(name = 'thread/sql/one_connection', 
@@ -151,7 +158,8 @@ BEGIN
         SELECT name AS enabled_instruments,
                timed
           FROM performance_schema.setup_instruments
-         WHERE enabled = 'YES';
+         WHERE enabled = 'YES'
+         ORDER BY enabled_instruments;
     END IF;
 END$$
 

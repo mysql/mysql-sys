@@ -50,7 +50,8 @@ CREATE DEFINER='root'@'localhost' PROCEDURE ps_setup_show_disabled_consumers ()
 BEGIN
     SELECT name AS disabled_consumers
       FROM performance_schema.setup_consumers
-     WHERE enabled = 'NO';
+     WHERE enabled = 'NO'
+     ORDER BY disabled_consumers;
 END$$
 
 DELIMITER ;

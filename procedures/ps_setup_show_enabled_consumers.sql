@@ -50,7 +50,8 @@ CREATE DEFINER='root'@'localhost' PROCEDURE ps_setup_show_enabled_consumers ()
 BEGIN
     SELECT name AS enabled_consumers
       FROM performance_schema.setup_consumers
-     WHERE enabled = 'YES';
+     WHERE enabled = 'YES'
+     ORDER BY enabled_consumers;
 END$$
 
 DELIMITER ;

@@ -40,7 +40,8 @@ CREATE DEFINER='root'@'localhost' PROCEDURE ps_setup_show_disabled_instruments (
 BEGIN
     SELECT name AS disabled_instruments, timed
       FROM performance_schema.setup_instruments
-     WHERE enabled = 'NO';
+     WHERE enabled = 'NO'
+     ORDER BY disabled_instruments;
 END$$
 
 DELIMITER ;

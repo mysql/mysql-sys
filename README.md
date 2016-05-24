@@ -4716,6 +4716,9 @@ Query OK, 0 rows affected (0.32 sec)
 
 Shows all currently disable Performance Schema configuration.
 
+Disabled users is only available for MySQL 5.7.6 and later.
+In earlier versions it was only possible to enable users.
+
 ##### Parameters
 
 * in_show_instruments (BOOLEAN): Whether to print disabled instruments (can print many items)
@@ -4732,7 +4735,7 @@ mysql> CALL sys.ps_setup_show_disabled(TRUE, TRUE);
 1 row in set (0.00 sec)
 
 +--------------------+
-| enabled_users      |
+| disabled_users     |
 +--------------------+
 | 'mark'@'localhost' |
 +--------------------+
