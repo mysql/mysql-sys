@@ -15,6 +15,8 @@
 
 DROP FUNCTION IF EXISTS quote_identifier;
 
+DELIMITER $$
+
 -- https://dev.mysql.com/doc/refman/5.7/en/identifiers.html
 -- Maximum supported length for any of the current identifiers in 5.7.5+ is 256 characters.
 -- Before that, user variables could have any length.
@@ -62,4 +64,8 @@ CREATE DEFINER='root'@'localhost' FUNCTION quote_identifier(in_identifier TEXT)
     SQL SECURITY INVOKER
     DETERMINISTIC
     NO SQL
- RETURN CONCAT('`', REPLACE(in_identifier, '`', '``'), '`');
+BEGIN
+    RETURN CONCAT('`', REPLACE(in_identifier, '`', '``'), '`');
+END$$
+
+DELIMITER ;
