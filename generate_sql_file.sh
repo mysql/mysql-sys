@@ -165,7 +165,7 @@ then
   echo "" >> $OUTPUTFILE
   echo "--" >> $OUTPUTFILE
   echo "-- WARNING: THIS IS A GENERATED FILE, CHANGES NEED TO BE MADE ON THE UPSTREAM MYSQL-SYS REPOSITORY AS WELL" >> $OUTPUTFILE
-  echo "-- PLEASE SUBMIT A PULL REQUEST TO https://github.com/MarkLeith/mysql-sys" >> $OUTPUTFILE
+  echo "-- PLEASE SUBMIT A PULL REQUEST TO https://github.com/mysql/mysql-sys" >> $OUTPUTFILE
   echo "--" >> $OUTPUTFILE
   echo "" >> $OUTPUTFILE
 
