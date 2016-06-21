@@ -5024,7 +5024,13 @@ When finding a statement of interest within the performance_schema.events_statem
 
 It will also attempt to generate an EXPLAIN for the longest running example of the digest during the interval.
 
-Note this may fail, as Performance Schema truncates long SQL_TEXT values (and hence the EXPLAIN will fail due to parse errors).
+Note this may fail, as:
+
+* Performance Schema truncates long SQL_TEXT values (and hence the EXPLAIN will fail due to parse errors)
+* the default schema is sys (so tables that are not fully qualified in the query may not be found)
+* some queries such as SHOW are not supported in EXPLAIN.
+
+When the EXPLAIN fails, the error will be ignored and no EXPLAIN output generated.
 
 Requires the SUPER privilege for "SET sql_log_bin = 0;".
 
