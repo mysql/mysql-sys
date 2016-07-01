@@ -10,7 +10,11 @@ SET ENABLED = 'NO'
 UPDATE performance_schema.setup_consumers
 SET ENABLED = 'NO'
  WHERE NAME LIKE '%\_history\_long';
-UPDATE performance_schema.threads SET INSTRUMENTED = 'NO' WHERE NAME LIKE 'thread/innodb/srv\_%';
+UPDATE performance_schema.threads
+SET INSTRUMENTED = 'NO'
+ WHERE NAME LIKE 'thread/innodb/srv\_%'
+    OR NAME LIKE '%con\_%'
+    OR NAME LIKE '%signal_handler%';
 CALL sys.ps_setup_show_enabled(FALSE, FALSE);
 performance_schema_enabled
 1
@@ -208,7 +212,6 @@ innodb/page_cleaner_thread	BACKGROUND
 root@localhost	FOREGROUND
 sql/compress_gtid_table	FOREGROUND
 sql/main	BACKGROUND
-sql/signal_handler	BACKGROUND
 sql/thread_timer_notifier	BACKGROUND
 CALL sys.ps_setup_show_enabled(TRUE, TRUE);
 performance_schema_enabled
@@ -247,7 +250,6 @@ innodb/page_cleaner_thread	BACKGROUND
 root@localhost	FOREGROUND
 sql/compress_gtid_table	FOREGROUND
 sql/main	BACKGROUND
-sql/signal_handler	BACKGROUND
 sql/thread_timer_notifier	BACKGROUND
 enabled_instruments	timed
 idle	YES

@@ -20,8 +20,12 @@ UPDATE performance_schema.setup_consumers
    SET ENABLED = 'NO'
  WHERE NAME LIKE '%\_history\_long';
 
-# Disable some of the background threads:
-UPDATE performance_schema.threads SET INSTRUMENTED = 'NO' WHERE NAME LIKE 'thread/innodb/srv\_%';
+# Disable some of the background threads (including those that differ between unix like and Windows systems):
+UPDATE performance_schema.threads
+   SET INSTRUMENTED = 'NO'
+ WHERE NAME LIKE 'thread/innodb/srv\_%'
+    OR NAME LIKE '%con\_%'
+    OR NAME LIKE '%signal_handler%';
 
 # Show limited info (no thread or instrument info)
 CALL sys.ps_setup_show_enabled(FALSE, FALSE);
