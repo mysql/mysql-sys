@@ -66,10 +66,9 @@ CREATE DEFINER='root'@'localhost' PROCEDURE diagnostics (
                NOTE: The more that are enabled, the more impact on the performance.
                Supported values are:
                   * current - use the current settings.
-                  * medium - enable some settings. This requires the SUPER privilege.
+                  * medium - enable some settings.
                   * full - enables all settings. This will have a big impact on the
-                           performance - be careful using this option. This requires
-                           the SUPER privilege.
+                           performance - be careful using this option.
                If another setting the ''current'' is chosen, the current settings
                are restored at the end of the procedure.
 
@@ -183,7 +182,7 @@ BEGIN
         SET @sys.statement_truncate_len       = sys.sys_get_config('statement_truncate_len'      , '64' );
     END IF;
 
-    -- Temorary table are used - disable sql_log_bin if necessary to prevent them replicating
+    -- Temporary table are used - disable sql_log_bin if necessary to prevent them replicating
     SET @log_bin := @@sql_log_bin;
     IF (@log_bin = 1) THEN
         SET sql_log_bin = 0;
@@ -585,7 +584,7 @@ BEGIN
             SELECT /*!50706 Channel_name, */Host, User_name, Port, Connect_retry,
                    Enabled_ssl, Ssl_ca, Ssl_capath, Ssl_cert, Ssl_cipher, Ssl_key, Ssl_verify_server_cert,
                    Heartbeat, Bind, Ignored_server_ids, Uuid, Retry_count, Ssl_crl, Ssl_crlpath,
-                   Enabled_auto_position
+                   Tls_version, Enabled_auto_position
               FROM mysql.slave_master_info/*!50706 ORDER BY Channel_name*/;
         END IF;
 

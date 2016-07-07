@@ -1,4 +1,4 @@
--- Copyright (c) 2014, 2015, Oracle and/or its affiliates. All rights reserved.
+-- Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
 --
 -- This program is free software; you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -54,15 +54,16 @@ CREATE DEFINER='root'@'localhost' PROCEDURE ps_setup_show_enabled (
              +---------------+
              1 row in set (0.01 sec)
 
-             +----------------------+---------+-------+
-             | objects              | enabled | timed |
-             +----------------------+---------+-------+
-             | mysql.%              | NO      | NO    |
-             | performance_schema.% | NO      | NO    |
-             | information_schema.% | NO      | NO    |
-             | %.%                  | YES     | YES   |
-             +----------------------+---------+-------+
-             4 rows in set (0.01 sec)
+             +-------------+---------+---------+-------+
+             | object_type | objects | enabled | timed |
+             +-------------+---------+---------+-------+
+             | EVENT       | %.%     | YES     | YES   |
+             | FUNCTION    | %.%     | YES     | YES   |
+             | PROCEDURE   | %.%     | YES     | YES   |
+             | TABLE       | %.%     | YES     | YES   |
+             | TRIGGER     | %.%     | YES     | YES   |
+             +-------------+---------+---------+-------+
+             5 rows in set (0.01 sec)
 
              +---------------------------+
              | enabled_consumers         |
@@ -74,16 +75,33 @@ CREATE DEFINER='root'@'localhost' PROCEDURE ps_setup_show_enabled (
              +---------------------------+
              4 rows in set (0.05 sec)
 
-             +--------------------------+-------------+
-             | enabled_threads          | thread_type |
-             +--------------------------+-------------+
-             | innodb/srv_master_thread | BACKGROUND  |
-             | root@localhost           | FOREGROUND  |
-             | root@localhost           | FOREGROUND  |
-             | root@localhost           | FOREGROUND  |
-             | root@localhost           | FOREGROUND  |
-             +--------------------------+-------------+
-             5 rows in set (0.03 sec)
+             +---------------------------------+-------------+
+             | enabled_threads                 | thread_type |
+             +---------------------------------+-------------+
+             | sql/main                        | BACKGROUND  |
+             | sql/thread_timer_notifier       | BACKGROUND  |
+             | innodb/io_ibuf_thread           | BACKGROUND  |
+             | innodb/io_log_thread            | BACKGROUND  |
+             | innodb/io_read_thread           | BACKGROUND  |
+             | innodb/io_read_thread           | BACKGROUND  |
+             | innodb/io_write_thread          | BACKGROUND  |
+             | innodb/io_write_thread          | BACKGROUND  |
+             | innodb/page_cleaner_thread      | BACKGROUND  |
+             | innodb/srv_lock_timeout_thread  | BACKGROUND  |
+             | innodb/srv_error_monitor_thread | BACKGROUND  |
+             | innodb/srv_monitor_thread       | BACKGROUND  |
+             | innodb/srv_master_thread        | BACKGROUND  |
+             | innodb/srv_purge_thread         | BACKGROUND  |
+             | innodb/srv_worker_thread        | BACKGROUND  |
+             | innodb/srv_worker_thread        | BACKGROUND  |
+             | innodb/srv_worker_thread        | BACKGROUND  |
+             | innodb/buf_dump_thread          | BACKGROUND  |
+             | innodb/dict_stats_thread        | BACKGROUND  |
+             | sql/signal_handler              | BACKGROUND  |
+             | sql/compress_gtid_table         | FOREGROUND  |
+             | root@localhost                  | FOREGROUND  |
+             +---------------------------------+-------------+
+             22 rows in set (0.01 sec)
 
              +-------------------------------------+-------+
              | enabled_instruments                 | timed |
@@ -105,18 +123,26 @@ CREATE DEFINER='root'@'localhost' PROCEDURE ps_setup_show_enabled (
 BEGIN
     SELECT @@performance_schema AS performance_schema_enabled;
 
-    SELECT CONCAT('\'', host, '\'@\'', user, '\'') AS enabled_users
-      FROM performance_schema.setup_actors;
+    -- In 5.7.6 and later the setup_actors table has an ENABLED column to
+    -- specify whether the actor is enabled. Before that all actors matched
+    -- in the setup_actors table were enabled.
+    SELECT CONCAT('\'', user, '\'@\'', host, '\'') AS enabled_users
+      FROM performance_schema.setup_actors
+     /*!50706 WHERE enabled = 'YES' */
+     ORDER BY enabled_users;
 
     SELECT object_type,
            CONCAT(object_schema, '.', object_name) AS objects,
            enabled,
            timed
-      FROM performance_schema.setup_objects;
+      FROM performance_schema.setup_objects
+     WHERE enabled = 'YES'
+     ORDER BY object_type, objects;
 
     SELECT name AS enabled_consumers
       FROM performance_schema.setup_consumers
-     WHERE enabled = 'YES';
+     WHERE enabled = 'YES'
+     ORDER BY enabled_consumers;
 
     IF (in_show_threads) THEN
         SELECT IF(name = 'thread/sql/one_connection', 
@@ -124,14 +150,16 @@ BEGIN
                   REPLACE(name, 'thread/', '')) AS enabled_threads,
         TYPE AS thread_type
           FROM performance_schema.threads
-         WHERE INSTRUMENTED = 'YES';
+         WHERE INSTRUMENTED = 'YES'
+         ORDER BY enabled_threads;
     END IF;
 
     IF (in_show_instruments) THEN
         SELECT name AS enabled_instruments,
                timed
           FROM performance_schema.setup_instruments
-         WHERE enabled = 'YES';
+         WHERE enabled = 'YES'
+         ORDER BY enabled_instruments;
     END IF;
 END$$
 

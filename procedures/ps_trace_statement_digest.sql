@@ -1,4 +1,4 @@
--- Copyright (c) 2014, 2015, Oracle and/or its affiliates. All rights reserved.
+-- Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
 --
 -- This program is free software; you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -39,9 +39,16 @@ CREATE DEFINER='root'@'localhost' PROCEDURE ps_trace_statement_digest (
              interval.
 
              It will also attempt to generate an EXPLAIN for the longest running 
-             example of the digest during the interval. Note this may fail, as
-             Performance Schema truncates long SQL_TEXT values (and hence the 
-             EXPLAIN will fail due to parse errors).
+             example of the digest during the interval. Note this may fail, as:
+
+                * Performance Schema truncates long SQL_TEXT values (and hence the 
+                  EXPLAIN will fail due to parse errors)
+                * the default schema is sys (so tables that are not fully qualified
+                  in the query may not be found)
+                * some queries such as SHOW are not supported in EXPLAIN.
+
+             When the EXPLAIN fails, the error will be ignored and no EXPLAIN
+             output generated.
 
              Requires the SUPER privilege for "SET sql_log_bin = 0;".
 
@@ -51,15 +58,15 @@ CREATE DEFINER='root'@'localhost' PROCEDURE ps_trace_statement_digest (
              in_digest (VARCHAR(32)):
                The statement digest identifier you would like to analyze
              in_runtime (INT):
-               The number of seconds to run analysis for (defaults to a minute)
+               The number of seconds to run analysis for
              in_interval (DECIMAL(2,2)):
                The interval (in seconds, may be fractional) at which to try
-               and take snapshots (defaults to a second)
+               and take snapshots
              in_start_fresh (BOOLEAN):
                Whether to TRUNCATE the events_statements_history_long and
-               events_stages_history_long tables before starting (default false)
+               events_stages_history_long tables before starting
              in_auto_enable (BOOLEAN):
-               Whether to automatically turn on required consumers (default false)
+               Whether to automatically turn on required consumers
 
              Example
              -----------
@@ -143,6 +150,7 @@ BEGIN
 
     DECLARE v_start_fresh BOOLEAN DEFAULT false;
     DECLARE v_auto_enable BOOLEAN DEFAULT false;
+    DECLARE v_explain     BOOLEAN DEFAULT true;
     DECLARE v_this_thread_enabed ENUM('YES', 'NO');
     DECLARE v_runtime INT DEFAULT 0;
     DECLARE v_start INT DEFAULT 0;
@@ -269,19 +277,38 @@ BEGIN
       FROM stmt_trace
     ORDER BY timer_wait DESC LIMIT 1;
 
-    SELECT event_name,
-           sys.format_time(timer_wait) as latency
-      FROM stmt_stages
-     WHERE stmt_id = @sql_id
-     ORDER BY event_id;
+    IF (@sql_id IS NOT NULL) THEN
+        SELECT event_name,
+               sys.format_time(timer_wait) as latency
+          FROM stmt_stages
+         WHERE stmt_id = @sql_id
+         ORDER BY event_id;
+    END IF;
 
     DROP TEMPORARY TABLE stmt_trace;
     DROP TEMPORARY TABLE stmt_stages;
 
-    SET @stmt := CONCAT("EXPLAIN FORMAT=JSON ", @sql);
-    PREPARE explain_stmt FROM @stmt;
-    EXECUTE explain_stmt;
-    DEALLOCATE PREPARE explain_stmt;
+    IF (@sql IS NOT NULL) THEN
+        SET @stmt := CONCAT("EXPLAIN FORMAT=JSON ", @sql);
+        BEGIN
+            -- Not all queries support EXPLAIN, so catch the cases that are
+            -- not supported. Currently that includes cases where the table
+            -- is not fully qualified and is not in the default schema for this
+            -- procedure as it's not possible to change the default schema inside
+            -- a procedure.
+            --
+            -- Errno = 1064: You have an error in your SQL syntax
+            -- Errno = 1146: Table '...' doesn't exist
+            DECLARE CONTINUE HANDLER FOR 1064, 1146 SET v_explain = false;
+
+            PREPARE explain_stmt FROM @stmt;
+        END;
+
+        IF (v_explain) THEN
+            EXECUTE explain_stmt;
+            DEALLOCATE PREPARE explain_stmt;
+        END IF;
+    END IF;
 
     IF v_auto_enable THEN
         CALL sys.ps_setup_reload_saved();

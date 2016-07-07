@@ -31,17 +31,26 @@ CREATE DEFINER='root'@'localhost' PROCEDURE ps_setup_save (
              Use the companion procedure - ps_setup_reload_saved(), to 
              restore the saved config.
 
+             The named lock "sys.ps_setup_save" is taken before the
+             current configuration is saved. If the attempt to get the named
+             lock times out, an error occurs.
+
+             The lock is released after the settings have been restored by
+             calling ps_setup_reload_saved().
+
              Requires the SUPER privilege for "SET sql_log_bin = 0;".
 
              Parameters
              -----------
 
-             None.
+             in_timeout INT
+               The timeout in seconds used when trying to obtain the lock.
+               A negative timeout means infinite timeout.
 
              Example
              -----------
 
-             mysql> CALL sys.ps_setup_save();
+             mysql> CALL sys.ps_setup_save(-1);
              Query OK, 0 rows affected (0.08 sec)
 
              mysql> UPDATE performance_schema.setup_instruments 

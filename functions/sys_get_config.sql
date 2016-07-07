@@ -50,8 +50,7 @@ CREATE DEFINER='root'@'localhost' FUNCTION sys_get_config (
                The name of the config option to return the value for.
 
              in_default_value (VARCHAR(128)):
-               The default value to return if neither a use variable exists nor the variable exists
-               in sys.sys_config.
+               The default value to return if the variable does not exist in sys.sys_config.
 
              Returns
              -----------

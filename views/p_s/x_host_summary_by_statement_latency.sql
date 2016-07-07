@@ -46,7 +46,7 @@ VIEW x$host_summary_by_statement_latency (
 SELECT IF(host IS NULL, 'background', host) AS host,
        SUM(count_star) AS total,
        SUM(sum_timer_wait) AS total_latency,
-       SUM(max_timer_wait) AS max_latency,
+       MAX(max_timer_wait) AS max_latency,
        SUM(sum_lock_time) AS lock_latency,
        SUM(sum_rows_sent) AS rows_sent,
        SUM(sum_rows_examined) AS rows_examined,

@@ -48,7 +48,7 @@ CREATE DEFINER='root'@'localhost' PROCEDURE ps_setup_enable_instrument (
 
              Query OK, 0 rows affected (0.02 sec)
 
-             To enable just a the scpecific TCP/IP based network IO instrument:
+             To enable just a specific TCP/IP based network IO instrument:
 
              mysql> CALL sys.ps_setup_enable_instrument(\'wait/io/socket/sql/server_tcpip_socket\');
              +-----------------------+

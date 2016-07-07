@@ -1,4 +1,4 @@
--- Copyright (c) 2014, 2015, Oracle and/or its affiliates. All rights reserved.
+-- Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
 --
 -- This program is free software; you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -46,8 +46,8 @@ SELECT IF(LOCATE('.', ibp.table_name) = 0, 'InnoDB System', REPLACE(SUBSTRING_IN
        SUM(IF(ibp.compressed_size = 0, 16384, compressed_size)) AS allocated,
        SUM(ibp.data_size) AS data,
        COUNT(ibp.page_number) AS pages,
-       COUNT(IF(ibp.is_hashed = 'YES', 1, 0)) AS pages_hashed,
-       COUNT(IF(ibp.is_old = 'YES', 1, 0)) AS pages_old,
+       COUNT(IF(ibp.is_hashed = 'YES', 1, NULL)) AS pages_hashed,
+       COUNT(IF(ibp.is_old = 'YES', 1, NULL)) AS pages_old,
        ROUND(IFNULL(SUM(ibp.number_records)/NULLIF(COUNT(DISTINCT ibp.index_name), 0), 0)) AS rows_cached 
   FROM information_schema.innodb_buffer_page ibp 
  WHERE table_name IS NOT NULL

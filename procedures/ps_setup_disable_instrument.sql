@@ -46,7 +46,7 @@ CREATE DEFINER='root'@'localhost' PROCEDURE ps_setup_disable_instrument (
              +--------------------------+
              1 row in set (0.02 sec)
 
-             To disable just a the scpecific TCP/IP based network IO instrument:
+             To disable just a specific TCP/IP based network IO instrument:
 
              mysql> CALL sys.ps_setup_disable_instrument(\'wait/io/socket/sql/server_tcpip_socket\');
              +------------------------+
@@ -56,7 +56,7 @@ CREATE DEFINER='root'@'localhost' PROCEDURE ps_setup_disable_instrument (
              +------------------------+
              1 row in set (0.00 sec)
 
-             To enable all instruments:
+             To disable all instruments:
 
              mysql> CALL sys.ps_setup_disable_instrument(\'\');
              +--------------------------+

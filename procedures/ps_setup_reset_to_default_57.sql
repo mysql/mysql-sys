@@ -50,7 +50,7 @@ CREATE DEFINER='root'@'localhost' PROCEDURE ps_setup_reset_to_default (
              1 row in set (0.00 sec)
              ...
 
-             mysql> CALL sys.ps_setup_reset_to_default(false)\G
+             mysql> CALL sys.ps_setup_reset_to_default(false)\\G
              Query OK, 0 rows affected (0.00 sec)
             '
     SQL SECURITY INVOKER

@@ -352,20 +352,20 @@ mysql> desc host_summary_by_statement_latency;
 9 rows in set (0.29 sec)
 
 mysql> desc x$host_summary_by_statement_latency;
-+---------------+---------------+------+-----+---------+-------+
-| Field         | Type          | Null | Key | Default | Extra |
-+---------------+---------------+------+-----+---------+-------+
-| host          | varchar(60)   | YES  |     | NULL    |       |
-| total         | decimal(42,0) | YES  |     | NULL    |       |
-| total_latency | decimal(42,0) | YES  |     | NULL    |       |
-| max_latency   | decimal(42,0) | YES  |     | NULL    |       |
-| lock_latency  | decimal(42,0) | YES  |     | NULL    |       |
-| rows_sent     | decimal(42,0) | YES  |     | NULL    |       |
-| rows_examined | decimal(42,0) | YES  |     | NULL    |       |
-| rows_affected | decimal(42,0) | YES  |     | NULL    |       |
-| full_scans    | decimal(43,0) | YES  |     | NULL    |       |
-+---------------+---------------+------+-----+---------+-------+
-9 rows in set (0.54 sec)
++---------------+---------------------+------+-----+---------+-------+
+| Field         | Type                | Null | Key | Default | Extra |
++---------------+---------------------+------+-----+---------+-------+
+| host          | varchar(60)         | YES  |     | NULL    |       |
+| total         | decimal(42,0)       | YES  |     | NULL    |       |
+| total_latency | decimal(42,0)       | YES  |     | NULL    |       |
+| max_latency   | bigint(20) unsigned | YES  |     | NULL    |       |
+| lock_latency  | decimal(42,0)       | YES  |     | NULL    |       |
+| rows_sent     | decimal(42,0)       | YES  |     | NULL    |       |
+| rows_examined | decimal(42,0)       | YES  |     | NULL    |       |
+| rows_affected | decimal(42,0)       | YES  |     | NULL    |       |
+| full_scans    | decimal(43,0)       | YES  |     | NULL    |       |
++---------------+---------------------+------+-----+---------+-------+
+9 rows in set (0.00 sec)
 ```
 
 ##### Example
@@ -3608,7 +3608,7 @@ Useful for printing statement related data from Performance Schema from the comm
 
 ##### Returns
 
-VARCHAR(65)
+LONGTEXT
 
 ##### Example
 ```SQL
@@ -4031,6 +4031,40 @@ sys.ps_thread_trx_info(48): [
 1 row in set (0.03 sec)
 ```
 
+#### quote_identifier
+
+##### Description
+
+Takes an unquoted identifier (schema name, table name, etc.) and
+returns the identifier quoted with backticks.
+
+##### Parameters
+
+* in_identifier (TEXT): The identifier to quote.
+
+##### Returns
+
+TEXT
+
+##### Example
+```SQL
+mysql> SELECT sys.quote_identifier('my_identifier') AS Identifier;
++-----------------+
+| Identifier      |
++-----------------+
+| `my_identifier` |
++-----------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT sys.quote_identifier('my`idenfier') AS Identifier;
++----------------+
+| Identifier     |
++----------------+
+| `my``idenfier` |
++----------------+
+1 row in set (0.00 sec)
+```
+
 #### sys_get_config
 
 ##### Description
@@ -4055,7 +4089,7 @@ Notes for using sys_get_config():
 ##### Parameters
 
 * in_variable_name (VARCHAR(128)): The name of the config option to return the value for.
-* in_default_value (VARCHAR(128)): The default value to return if neither a use variable exists nor the variable exists in sys.sys_config.
+* in_default_value (VARCHAR(128)): The default value to return if the variable does not exist in sys.sys_config.
 
 ##### Returns
 
@@ -4178,11 +4212,11 @@ mysql> SHOW DATABASES;
 5 rows in set (0.00 sec)
 
 mysql> CALL sys.create_synonym_db('performance_schema', 'ps');
-+-------------------------------------+
-| summary                             |
-+-------------------------------------+
-| Created 74 views in the ps database |
-+-------------------------------------+
++---------------------------------------+
+| summary                               |
++---------------------------------------+
+| Created 74 views in the `ps` database |
++---------------------------------------+
 1 row in set (8.57 sec)
 
 Query OK, 0 rows affected (8.57 sec)
@@ -4209,39 +4243,6 @@ mysql> SHOW FULL TABLES FROM ps;
 | events_stages_current                   | VIEW       |
 | events_stages_history                   | VIEW       |
 ...
-```
-
-#### execute_prepared_stmt
-
-##### Description
-
-Takes the query in the argument and executes it using a prepared statement. The prepared statement is deallocated,
-so the procedure is mainly useful for executing one off dynamically created queries.
-
-The sys_execute_prepared_stmt prepared statement name is used for the query and is required not to exist.
-
-##### Parameters
-
-* in_query (longtext CHARACTER SET UTF8):
-** The query to execute.
-
-The following configuration option is supported:
-
-   * sys.debug
-     Whether to provide debugging output.
-     Default is 'OFF'. Set to 'ON' to include.
-
-##### Example
-```SQL
-mysql> CALL sys.execute_prepared_stmt(''SELECT * FROM sys.sys_config'');
-+------------------------+-------+---------------------+--------+
-| variable               | value | set_time            | set_by |
-+------------------------+-------+---------------------+--------+
-| statement_truncate_len | 64    | 2015-06-30 13:06:00 | NULL   |
-+------------------------+-------+---------------------+--------+
-1 row in set (0.00 sec)
-
-Query OK, 0 rows affected (0.00 sec)
 ```
 
 #### diagnostics
@@ -4310,9 +4311,9 @@ If another setting the 'current' is chosen, the current settings
 are restored at the end of the procedure.
 Supported values are:
 ** current - use the current settings.
-** medium - enable some settings. This requires the SUPER privilege.
+** medium - enable some settings.
 ** full - enables all settings. This will have a big impact on the
-   performance - be careful using this option. This requires the SUPER privilege.
+   performance - be careful using this option.
 
 ##### Example
 ```SQL
@@ -4343,47 +4344,37 @@ mysql> CALL sys.ps_setup_disable_background_threads();
 1 row in set (0.00 sec)
 ```
 
-#### ps_setup_disable_instrument
+#### execute_prepared_stmt
 
 ##### Description
 
-Disables instruments within Performance Schema  matching the input pattern.
+Takes the query in the argument and executes it using a prepared statement. The prepared statement is deallocated,
+so the procedure is mainly useful for executing one off dynamically created queries.
+
+The sys_execute_prepared_stmt prepared statement name is used for the query and is required not to exist.
 
 ##### Parameters
 
-* in_pattern (VARCHAR(128)): A LIKE pattern match (using "%in_pattern%") of events to disable
+* in_query (longtext CHARACTER SET UTF8):
+** The query to execute.
+
+The following configuration option is supported:
+
+   * sys.debug
+     Whether to provide debugging output.
+     Default is 'OFF'. Set to 'ON' to include.
 
 ##### Example
-
-To disable all mutex instruments:
 ```SQL
-mysql> CALL sys.ps_setup_disable_instrument('wait/synch/mutex');
-+--------------------------+
-| summary                  |
-+--------------------------+
-| Disabled 155 instruments |
-+--------------------------+
-1 row in set (0.02 sec)
-```
-To disable just a the scpecific TCP/IP based network IO instrument:
-```SQL
-mysql> CALL sys.ps_setup_disable_instrument('wait/io/socket/sql/server_tcpip_socket');
-+------------------------+
-| summary                |
-+------------------------+
-| Disabled 1 instruments |
-+------------------------+
+mysql> CALL sys.execute_prepared_stmt('SELECT * FROM sys.sys_config');
++------------------------+-------+---------------------+--------+
+| variable               | value | set_time            | set_by |
++------------------------+-------+---------------------+--------+
+| statement_truncate_len | 64    | 2015-06-30 13:06:00 | NULL   |
++------------------------+-------+---------------------+--------+
 1 row in set (0.00 sec)
-```
-To enable all instruments:
-```SQL
-mysql> CALL sys.ps_setup_disable_instrument('');
-+--------------------------+
-| summary                  |
-+--------------------------+
-| Disabled 547 instruments |
-+--------------------------+
-1 row in set (0.01 sec)
+
+Query OK, 0 rows affected (0.00 sec)
 ```
 
 #### ps_setup_disable_consumer
@@ -4418,6 +4409,49 @@ mysql> CALL sys.ps_setup_disable_consumer('stage');
 | Disabled 3 consumers   |
 +------------------------+
 1 row in set (0.00 sec)
+```
+
+#### ps_setup_disable_instrument
+
+##### Description
+
+Disables instruments within Performance Schema  matching the input pattern.
+
+##### Parameters
+
+* in_pattern (VARCHAR(128)): A LIKE pattern match (using "%in_pattern%") of events to disable
+
+##### Example
+
+To disable all mutex instruments:
+```SQL
+mysql> CALL sys.ps_setup_disable_instrument('wait/synch/mutex');
++--------------------------+
+| summary                  |
++--------------------------+
+| Disabled 155 instruments |
++--------------------------+
+1 row in set (0.02 sec)
+```
+To disable just a specific TCP/IP based network IO instrument:
+```SQL
+mysql> CALL sys.ps_setup_disable_instrument('wait/io/socket/sql/server_tcpip_socket');
++------------------------+
+| summary                |
++------------------------+
+| Disabled 1 instruments |
++------------------------+
+1 row in set (0.00 sec)
+```
+To disable all instruments:
+```SQL
+mysql> CALL sys.ps_setup_disable_instrument('');
++--------------------------+
+| summary                  |
++--------------------------+
+| Disabled 547 instruments |
++--------------------------+
+1 row in set (0.01 sec)
 ```
 
 #### ps_setup_disable_thread
@@ -4529,7 +4563,7 @@ mysql> CALL sys.ps_setup_enable_instrument('wait/synch/mutex');
 +-------------------------+
 1 row in set (0.02 sec)
 ```
-To enable just a the scpecific TCP/IP based network IO instrument:
+To enable just a specific TCP/IP based network IO instrument:
 ```SQL
 mysql> CALL sys.ps_setup_enable_instrument('wait/io/socket/sql/server_tcpip_socket');
 +-----------------------+
@@ -4638,7 +4672,7 @@ VALUES ('%', '%', '%')
 1 row in set (0.00 sec)
 ...
 
-mysql> CALL sys.ps_setup_reset_to_default(false)G
+mysql> CALL sys.ps_setup_reset_to_default(false)\G
 Query OK, 0 rows affected (0.00 sec)
 ```
 
@@ -4650,15 +4684,19 @@ Saves the current configuration of Performance Schema, so that you can alter the
 
 Use the companion procedure - ps_setup_reload_saved(), to restore the saved config.
 
+The named lock "sys.ps_setup_save" is taken before the current configuration is saved. If the attempt to get the named lock times out, an error occurs.
+
+The lock is released after the settings have been restored by calling ps_setup_reload_saved().
+
 Requires the SUPER privilege for "SET sql_log_bin = 0;".
 
 ##### Parameters
 
-None.
+* in_timeout (INT): The timeout in seconds used when trying to obtain the lock. A negative timeout means infinite timeout.
 
 ##### Example
 ```SQL
-mysql> CALL sys.ps_setup_save();
+mysql> CALL sys.ps_setup_save(-1);
 Query OK, 0 rows affected (0.08 sec)
 
 mysql> UPDATE performance_schema.setup_instruments 
@@ -4678,10 +4716,13 @@ Query OK, 0 rows affected (0.32 sec)
 
 Shows all currently disable Performance Schema configuration.
 
+Disabled users is only available for MySQL 5.7.6 and later.
+In earlier versions it was only possible to enable users.
+
 ##### Parameters
 
-* in_in_show_instruments (BOOLEAN): Whether to print disabled instruments (can print many items)
-* in_in_show_threads (BOOLEAN): Whether to print disabled threads
+* in_show_instruments (BOOLEAN): Whether to print disabled instruments (can print many items)
+* in_show_threads (BOOLEAN): Whether to print disabled threads
 
 ##### Example
 ```SQL
@@ -4694,7 +4735,7 @@ mysql> CALL sys.ps_setup_show_disabled(TRUE, TRUE);
 1 row in set (0.00 sec)
 
 +--------------------+
-| enabled_users      |
+| disabled_users     |
 +--------------------+
 | 'mark'@'localhost' |
 +--------------------+
@@ -4825,15 +4866,16 @@ mysql> CALL sys.ps_setup_show_enabled(TRUE, TRUE);
 +---------------+
 1 row in set (0.01 sec)
 
-+----------------------+---------+-------+
-| objects              | enabled | timed |
-+----------------------+---------+-------+
-| mysql.%              | NO      | NO    |
-| performance_schema.% | NO      | NO    |
-| information_schema.% | NO      | NO    |
-| %.%                  | YES     | YES   |
-+----------------------+---------+-------+
-4 rows in set (0.01 sec)
++-------------+---------+---------+-------+
+| object_type | objects | enabled | timed |
++-------------+---------+---------+-------+
+| EVENT       | %.%     | YES     | YES   |
+| FUNCTION    | %.%     | YES     | YES   |
+| PROCEDURE   | %.%     | YES     | YES   |
+| TABLE       | %.%     | YES     | YES   |
+| TRIGGER     | %.%     | YES     | YES   |
++-------------+---------+---------+-------+
+5 rows in set (0.01 sec)
 
 +---------------------------+
 | enabled_consumers         |
@@ -4845,16 +4887,33 @@ mysql> CALL sys.ps_setup_show_enabled(TRUE, TRUE);
 +---------------------------+
 4 rows in set (0.05 sec)
 
-+--------------------------+-------------+
-| enabled_threads          | thread_type |
-+--------------------------+-------------+
-| innodb/srv_master_thread | BACKGROUND  |
-| root@localhost           | FOREGROUND  |
-| root@localhost           | FOREGROUND  |
-| root@localhost           | FOREGROUND  |
-| root@localhost           | FOREGROUND  |
-+--------------------------+-------------+
-5 rows in set (0.03 sec)
++---------------------------------+-------------+
+| enabled_threads                 | thread_type |
++---------------------------------+-------------+
+| sql/main                        | BACKGROUND  |
+| sql/thread_timer_notifier       | BACKGROUND  |
+| innodb/io_ibuf_thread           | BACKGROUND  |
+| innodb/io_log_thread            | BACKGROUND  |
+| innodb/io_read_thread           | BACKGROUND  |
+| innodb/io_read_thread           | BACKGROUND  |
+| innodb/io_write_thread          | BACKGROUND  |
+| innodb/io_write_thread          | BACKGROUND  |
+| innodb/page_cleaner_thread      | BACKGROUND  |
+| innodb/srv_lock_timeout_thread  | BACKGROUND  |
+| innodb/srv_error_monitor_thread | BACKGROUND  |
+| innodb/srv_monitor_thread       | BACKGROUND  |
+| innodb/srv_master_thread        | BACKGROUND  |
+| innodb/srv_purge_thread         | BACKGROUND  |
+| innodb/srv_worker_thread        | BACKGROUND  |
+| innodb/srv_worker_thread        | BACKGROUND  |
+| innodb/srv_worker_thread        | BACKGROUND  |
+| innodb/buf_dump_thread          | BACKGROUND  |
+| innodb/dict_stats_thread        | BACKGROUND  |
+| sql/signal_handler              | BACKGROUND  |
+| sql/compress_gtid_table         | FOREGROUND  |
+| root@localhost                  | FOREGROUND  |
++---------------------------------+-------------+
+22 rows in set (0.01 sec)
 
 +-------------------------------------+-------+
 | enabled_instruments                 | timed |
@@ -4927,7 +4986,7 @@ None.
 
 ##### Example
 ```SQL
-mysql> CALL sys.ps_statement_avg_latency_histogram()G
+mysql> CALL sys.ps_statement_avg_latency_histogram()\G
 *************************** 1. row ***************************
 Performance Schema Statement Digest Average Latency Histogram:
 
@@ -4965,17 +5024,23 @@ When finding a statement of interest within the performance_schema.events_statem
 
 It will also attempt to generate an EXPLAIN for the longest running example of the digest during the interval.
 
-Note this may fail, as Performance Schema truncates long SQL_TEXT values (and hence the EXPLAIN will fail due to parse errors).
+Note this may fail, as:
+
+* Performance Schema truncates long SQL_TEXT values (and hence the EXPLAIN will fail due to parse errors)
+* the default schema is sys (so tables that are not fully qualified in the query may not be found)
+* some queries such as SHOW are not supported in EXPLAIN.
+
+When the EXPLAIN fails, the error will be ignored and no EXPLAIN output generated.
 
 Requires the SUPER privilege for "SET sql_log_bin = 0;".
 
 ##### Parameters
 
 * in_digest VARCHAR(32): The statement digest identifier you would like to analyze
-* in_runtime (INT): The number of seconds to run analysis for (defaults to a minute)
-* in_interval (DECIMAL(2,2)): The interval (in seconds, may be fractional) at which to try and take snapshots (defaults to a second)
-* in_start_fresh (BOOLEAN): Whether to TRUNCATE the events_statements_history_long and events_stages_history_long tables before starting (default false)
-* in_auto_enable (BOOLEAN): Whether to automatically turn on required consumers (default false)
+* in_runtime (INT): The number of seconds to run analysis for
+* in_interval (DECIMAL(2,2)): The interval (in seconds, may be fractional) at which to try and take snapshots
+* in_start_fresh (BOOLEAN): Whether to TRUNCATE the events_statements_history_long and events_stages_history_long tables before starting
+* in_auto_enable (BOOLEAN): Whether to automatically turn on required consumers
 
 ##### Example
 ```SQL
