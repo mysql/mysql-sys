@@ -1,5 +1,29 @@
 # Change history for the MySQL sys schema
 
+## 1.5.1 (07/07/16)
+
+### Improvements
+
+* A `quote_identifier` function was added, which can be used to properly backtick identifier names
+* The `Tls_version` column was added to the output from the `mysql.slave_master_info` table, from the `diagnostics` procedure (backported from 5.7 upstream change)
+
+### Bug Fixes
+
+* MySQL Bug #77853 / Oracle Bug #21512106 - The `format_path` function did not consider directory boundaries when comparing variables to paths - it now does. Also fixed to no longer translate backslashes within Windows paths to forward slash
+* Oracle Bug #21663578 - Fixed an instability within the sysschema.v_schema_tables_with_full_table_scans test
+* Oracle Bug #21970078 - The host_summary view could fail with a division by zero error
+* MySQL Bug #78874 / Oracle Bug #22066096 - The `ps_setup_show_enabled` procedure showed all rows for the `performance_schema.setup_objects` table, rather than only those that are enabled
+* MySQL Bug #80569 / Oracle Bug #22848110 - The `max_latency` column for the `host_summary_by_statement_latency` view incorrectly showed the SUM of latency
+* MySQL Bug #80833 / Oracle Bug #22988461 - The `pages_hashed` and `pages_old` columns within the `innodb_buffer_stats_by_schema` and `innodb_buffer_stats_by_table` views were calculated incorrectly (**Contributed by Tsubasa Tanaka**)
+* MySQL Bug #78823 / Oracle Bug #22011361 - The `create_synonym_db` procedure failed when using reserved words as the synonym name (this change also introduced the `quote_identifier` function mentioned above **Contriubuted by Paul Dubois**)
+* MySQL Bug #81564 / Oracle Bug #23335880 - The `ps_setup_show_enabled` and `ps_setup_show_disabled` procedures were fixed to:
+** Show `user@host` instead of `host@user` for accounts
+** Fixed the column header for `disabled_users` within `ps_setup_show_disabled`
+** Explicitly ordered all output for test stability
+** Show disabled users for 5.7.6+
+* Oracle Bug #21970806 - The `sysschema.fn_ps_thread_trx_info` test was unstable
+* Oracle Bug #23621189 - The `ps_trace_statement_digest` procedure ran EXPLAIN incorrectly in certain cases (such as on a SHOW statement, no query being specified, or not having a full qualified table), the procedure now catches these issues and ignores them
+
 ## 1.5.0 (11/09/15)
 
 ### Improvements
