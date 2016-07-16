@@ -22,7 +22,7 @@
 -- +-------------+---------------+
 -- | sys_version | mysql_version |
 -- +-------------+---------------+
--- | 1.5.0       | 5.7.8-rc      |
+-- | 1.6.0       | 5.7.8-rc      |
 -- +-------------+---------------+
 -- 
 
@@ -33,5 +33,5 @@ VIEW version (
   sys_version,
   mysql_version
 ) AS 
-SELECT '1.5.1' AS sys_version, 
+SELECT '1.6.0' AS sys_version, 
         version() AS mysql_version;
