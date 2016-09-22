@@ -1061,7 +1061,7 @@ mysql> select * from latest_file_io limit 5;
 
 ##### Description
 
-Summarizes memory use by host using the 5.7 Performance Schema instrumentation.
+Summarizes memory allocated by host using the 5.7 Performance Schema instrumentation.
 
 When the host found is NULL, it is assumed to be a local "background" thread.
 
@@ -1111,7 +1111,7 @@ mysql> select * from memory_by_host_by_current_bytes WHERE host IS NOT NULL;
 
 ##### Description
 
-Summarizes memory use by user using the 5.7 Performance Schema instrumentation.
+Summarizes memory allocated by user using the 5.7 Performance Schema instrumentation.
 
 The user columns shows either the background or foreground user name appropriately.
 
@@ -1166,7 +1166,7 @@ mysql> select * from sys.memory_by_thread_by_current_bytes limit 5;
 
 ##### Description
 
-Summarizes memory use by user using the 5.7 Performance Schema instrumentation.
+Summarizes memory allocated by user using the 5.7 Performance Schema instrumentation.
 
 When the user found is NULL, it is assumed to be a "background" thread.
 
@@ -1216,7 +1216,7 @@ mysql> select * from memory_by_user_by_current_bytes;
 
 ##### Description
 
-Shows the current memory usage within the server globally broken down by allocation type.
+Shows the current memory allocated within the server globally broken down by allocation type.
 
 ##### Structures
 
@@ -1270,7 +1270,7 @@ mysql> select * from memory_global_by_current_bytes;
 
 ##### Description
 
-Shows the total memory usage within the server globally.
+Shows the total memory allocated within the server globally.
 
 ##### Structures
 
