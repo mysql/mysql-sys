@@ -16,7 +16,7 @@
 --
 -- View: memory_by_host_by_current_bytes
 --
--- Summarizes memory use by host using the 5.7 Performance Schema instrumentation.
+-- Summarizes memory allocated by host using the 5.7 Performance Schema instrumentation.
 -- 
 -- When the host found is NULL, it is assumed to be a local "background" thread.  
 --
