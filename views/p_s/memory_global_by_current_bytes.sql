@@ -16,7 +16,7 @@
 --
 -- View: memory_global_by_current_bytes
 -- 
--- Shows the current memory usage within the server globally broken down by allocation type.
+-- Shows the current memory allocated within the server globally broken down by allocation type.
 --
 -- mysql> select * from memory_global_by_current_bytes;
 -- +-------------------------------------------------+---------------+---------------+-------------------+------------+-------------+----------------+

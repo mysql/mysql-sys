@@ -16,7 +16,7 @@
 --
 -- View: memory_global_total
 -- 
--- Shows the total memory usage within the server globally.
+-- Shows the total memory allocated within the server globally.
 --
 -- mysql> select * from memory_global_total;
 -- +-----------------+

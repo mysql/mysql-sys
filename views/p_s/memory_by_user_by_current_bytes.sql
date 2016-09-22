@@ -16,7 +16,7 @@
 --
 -- View: memory_by_user_by_current_bytes
 --
--- Summarizes memory use by user using the 5.7 Performance Schema instrumentation.
+-- Summarizes memory allocated by user using the 5.7 Performance Schema instrumentation.
 -- 
 -- When the user found is NULL, it is assumed to be a "background" thread.  
 --
