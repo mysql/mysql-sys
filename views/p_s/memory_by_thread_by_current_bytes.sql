@@ -16,7 +16,7 @@
 --
 -- View: memory_by_thread_by_current_bytes
 --
--- Summarizes memory use by user using the 5.7 Performance Schema instrumentation.
+-- Summarizes memory allocated by user using the 5.7 Performance Schema instrumentation.
 -- 
 -- User shows either the background or foreground user name appropriately.
 --
