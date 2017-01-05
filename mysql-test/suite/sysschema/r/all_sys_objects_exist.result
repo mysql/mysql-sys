@@ -108,6 +108,7 @@ extract_schema_from_file_name	FUNCTION
 extract_table_from_file_name	FUNCTION
 format_bytes	FUNCTION
 format_path	FUNCTION
+format_percentage	FUNCTION
 format_statement	FUNCTION
 format_time	FUNCTION
 list_add	FUNCTION

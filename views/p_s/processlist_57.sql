@@ -32,7 +32,7 @@
 --                   time: 18
 --      current_statement: alter table t1 add column g int
 --      statement_latency: 18.45 s
---               progress: 98.84
+--               progress: 98.84 %
 --           lock_latency: 265.43 ms
 --          rows_examined: 0
 --              rows_sent: 0
@@ -101,7 +101,7 @@ SELECT pps.thread_id AS thd_id,
           sys.format_time(esc.timer_wait),
           NULL) AS statement_latency,
        IF(esc.end_event_id IS NULL,
-          ROUND(100 * (estc.work_completed / estc.work_estimated), 2),
+          format_percentage(estc.work_completed / estc.work_estimated),
           NULL) AS progress,
        sys.format_time(esc.lock_time) AS lock_latency,
        esc.rows_examined AS rows_examined,

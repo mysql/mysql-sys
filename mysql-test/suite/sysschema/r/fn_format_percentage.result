@@ -1,0 +1,21 @@
+SELECT sys.format_percentage(NULL);
+sys.format_percentage(NULL)
+NULL
+select sys.format_percentage(0.99921);
+sys.format_percentage(0.99921)
+99.92 %
+select sys.format_percentage(0.012);
+sys.format_percentage(0.012)
+1.20 %
+select sys.format_percentage(0);
+sys.format_percentage(0)
+0.00 %
+select sys.format_percentage(1);
+sys.format_percentage(1)
+100.00 %
+select sys.format_percentage(1.12);
+sys.format_percentage(1.12)
+112.00 %
+select sys.format_percentage(-0.2);
+sys.format_percentage(-0.2)
+-20.00 %
