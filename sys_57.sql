@@ -191,5 +191,6 @@ SOURCE ./procedures/ps_truncate_all_tables.sql
 
 SOURCE ./procedures/statement_performance_analyzer.sql
 SOURCE ./procedures/table_exists.sql
+SOURCE ./procedures/db_collation_convertor.sql
 
 SOURCE ./after_setup.sql
