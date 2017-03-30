@@ -96,6 +96,8 @@ SOURCE ./views/p_s/schema_unused_indexes.sql
 SOURCE ./views/p_s/schema_table_lock_waits.sql
 SOURCE ./views/p_s/x_schema_table_lock_waits.sql
 
+SOURCE ./views/p_s/ssl_per_thread.sql
+
 SOURCE ./views/p_s/statement_analysis.sql
 SOURCE ./views/p_s/x_statement_analysis.sql
 SOURCE ./views/p_s/statements_with_errors_or_warnings.sql
