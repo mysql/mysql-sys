@@ -77,7 +77,7 @@ BEGIN
   ELSEIF bytes >= 1073741824 THEN RETURN CONCAT(ROUND(bytes / 1073741824, 2), ' GiB');
   ELSEIF bytes >= 1048576 THEN RETURN CONCAT(ROUND(bytes / 1048576, 2), ' MiB');
   ELSEIF bytes >= 1024 THEN RETURN CONCAT(ROUND(bytes / 1024, 2), ' KiB');
-  ELSE RETURN CONCAT(ROUND(bytes, 0), ' bytes');
+  ELSE RETURN CONCAT(ROUND(bytes, 2), ' bytes');
   END IF;
 END$$
 
