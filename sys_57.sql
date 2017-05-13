@@ -29,6 +29,7 @@ SOURCE ./functions/format_bytes.sql
 SOURCE ./functions/format_path_57.sql
 SOURCE ./functions/format_statement.sql
 SOURCE ./functions/format_time.sql
+SOURCE ./functions/is_system_schema.sql
 SOURCE ./functions/list_add.sql
 SOURCE ./functions/list_drop.sql
 SOURCE ./functions/ps_is_account_enabled_57.sql
