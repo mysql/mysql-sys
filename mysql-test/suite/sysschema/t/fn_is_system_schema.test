@@ -1,0 +1,23 @@
+-- source include/not_embedded.inc
+# Tests for sys schema
+# Verify the sys.is_system_schema() function perfoms as expected
+
+# Should return FALSE
+SELECT sys.is_system_schma('test');
+
+# Thse should return TRUE
+SELECT sys.is_system_schma('mysql');
+
+SELECT sys.is_system_schma('information_schema');
+
+SELECT sys.is_system_schma('performance_schema');
+
+SELECT sys.is_system_schma('mysql_innodb_cluster_metadata');
+
+SELECT sys.is_system_schma('innodb_memcache');
+
+SELECT sys.is_system_schma('query_rewrite');
+
+SELECT sys.is_system_schma('ndbinfo');
+
+SELECT sys.is_system_schma('sys');
