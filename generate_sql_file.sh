@@ -28,8 +28,10 @@ MYSQLUSER="'root'@'localhost'"
 if [ $OS == "Darwin" ] ;
 then
   SED_R="sed -E"
+  SED_I="sed -i '' -e"
 else
   SED_R="sed -r"
+  SED_I="sed -i -e"
 fi
 
 USAGE="
@@ -149,15 +151,15 @@ then
     # The 5.6 MEM/WB integration should still use the root@localhost user
     if [ ! $MYSQLVERSION == "56" ] ;
     then
-      sed -i -e "s/'root'@'localhost'/$MYSQLUSER/g" $file
+      $SED_I "s/'root'@'localhost'/$MYSQLUSER/g" $file
     fi
-    sed -i -e "/Copyright/,/51 Franklin St/d" $file
-    sed -i -e "/^ *COMMENT/,/^ *'/{G;s/\n/\\\n/g;}" $file
-    sed -i -e "s/            '\\\n/            '/g" $file
-    sed -i -e "/^DELIMITER/d" $file
-    sed -i -e "s/\\$\\$/;/g" $file
-    sed -i -e "s/^ *//g" $file
-    sed -i -e "/^--/d" $file
+    $SED_I "/Copyright/,/51 Franklin St/d" $file
+    $SED_I "/^ *COMMENT/,/^ *'/{G;s/\n/\\\n/g;}" $file
+    $SED_I "s/            '\\\n/            '/g" $file
+    $SED_I "/^DELIMITER/d" $file
+    $SED_I "s/\\$\\$/;/g" $file
+    $SED_I "s/^ *//g" $file
+    $SED_I "/^--/d" $file
   done
 
   # Start the output file from a non-removed copyright file
@@ -192,7 +194,7 @@ then
       # First try and get a DROP command
       grep -E '(^DROP PROCEDURE|^DROP FUNCTION|^DROP TRIGGER)' $file >> $OUTPUTFILE
       # And remove any that may exist (but keep DROP TEMPORARY TABLE)
-      sed -i -e "/^DROP PROCEDURE/d;/^DROP FUNCTION/d;/^DROP TRIGGER/d" $file
+      $SED_I "/^DROP PROCEDURE/d;/^DROP FUNCTION/d;/^DROP TRIGGER/d" $file
       echo "" >> $OUTPUTFILE
       # Then collapse the rest of the file
       cat $file | tr '\n' ' ' >> $OUTPUTFILE
@@ -204,10 +206,10 @@ then
   sed -e "/Copyright/,/51 Franklin St/d;/sql_log_bin/d" $SYSDIR/after_setup.sql >> $OUTPUTFILE
 
   # Remove final leading and trailing spaces
-  sed -i '' -e "s/^ *//g" $OUTPUTFILE
-  sed -i '' -e "s/[ \t]*$//g" $OUTPUTFILE
+  $SED_I "s/^ *//g" $OUTPUTFILE
+  $SED_I "s/[ \t]*$//g" $OUTPUTFILE
   # Remove more than one empty line
-  sed -i '' -e "/^$/N;/^\n$/D" $OUTPUTFILE
+  $SED_I "/^$/N;/^\n$/D" $OUTPUTFILE
 
   mv $OUTPUTFILE $GENDIR/
   cd $GENDIR/
@@ -222,8 +224,8 @@ fi
 if [[ ! -z "$SKIPBINLOG" ]] ;
 then
   LOGWARNING="WARNING: Using a routine that could cause binary log events, but disabling of binary logging has been removed"
-  sed -i '' -e "s/^[ \s]*SET sql_log_bin = 0/SELECT \"$LOGWARNING\"/g" $GENDIR/$OUTPUTFILE
-  sed -i '' -e "s/\sSET sql_log_bin = @log_bin;/SET @log_bin = NULL;/g" $GENDIR/$OUTPUTFILE
+  $SED_I "s/^[ \s]*SET sql_log_bin = 0/SELECT \"$LOGWARNING\"/g" $GENDIR/$OUTPUTFILE
+  $SED_I "s/\sSET sql_log_bin = @log_bin;/SET @log_bin = NULL;/g" $GENDIR/$OUTPUTFILE
   SKIPBINLOG="disabled"
 else
   SKIPBINLOG="enabled"
