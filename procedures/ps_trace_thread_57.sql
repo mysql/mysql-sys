@@ -108,6 +108,7 @@ CREATE DEFINER='root'@'localhost' PROCEDURE ps_trace_thread (
     MODIFIES SQL DATA
 BEGIN
     DECLARE v_done bool DEFAULT FALSE;
+    DECLARE v_file_err bool DEFAULT FALSE;
     DECLARE v_start, v_runtime DECIMAL(20,2) DEFAULT 0.0;
     DECLARE v_min_event_id bigint unsigned DEFAULT 0;
     DECLARE v_this_thread_enabed ENUM('YES', 'NO');
@@ -236,6 +237,12 @@ BEGIN
            ) events 
        ORDER BY event_id;
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET v_done = TRUE;
+    -- Exit if file already exists
+    DECLARE CONTINUE HANDLER FOR 1086 
+        BEGIN 
+            SET v_file_err = TRUE;
+            SELECT CONCAT('File \'',in_outfile,'\' already exists') AS 'Error';
+        END;
 
     SET @log_bin := @@sql_log_bin;
     SET sql_log_bin = 0;
@@ -320,9 +327,11 @@ BEGIN
     EXECUTE stmt_output;
     DEALLOCATE PREPARE stmt_output;
    
-    SELECT CONCAT('Stack trace written to ', in_outfile) AS 'Info';
-    SELECT CONCAT('dot -Tpdf -o /tmp/stack_', in_thread_id, '.pdf ', in_outfile) AS 'Convert to PDF';
-    SELECT CONCAT('dot -Tpng -o /tmp/stack_', in_thread_id, '.png ', in_outfile) AS 'Convert to PNG';
+    IF (NOT v_file_err) THEN
+        SELECT CONCAT('Stack trace written to ', in_outfile) AS 'Info';
+        SELECT CONCAT('dot -Tpdf -o /tmp/stack_', in_thread_id, '.pdf ', in_outfile) AS 'Convert to PDF';
+        SELECT CONCAT('dot -Tpng -o /tmp/stack_', in_thread_id, '.png ', in_outfile) AS 'Convert to PNG';
+    END IF;
     DROP TEMPORARY TABLE tmp_events;
 
     -- Reset the settings for the performance schema
