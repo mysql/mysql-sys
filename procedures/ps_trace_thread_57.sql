@@ -224,7 +224,7 @@ BEGIN
                             IF(object_name IS NOT NULL, 
                                IF (event_name LIKE 'wait/io/socket%',
                                    -- Print the socket if used, else the IP:port as reported
-                                   CONCAT('\\n', IF (object_name LIKE ':0%', @@socket, object_name)),
+                                   CONCAT('\\n', IF (object_name LIKE ':0%', @@socket, REPLACE(object_name,'\0',''))),
                                    object_name),
                                ''
                             ),
